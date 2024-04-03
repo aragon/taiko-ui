@@ -22,6 +22,7 @@
     "dayjs": "^1.11.10",
     "dompurify": "^3.0.8",
     "ipfs-http-client": "^60.0.1",
+    "libsodium-wrappers": "^0.7.13",
     "next": "14.1.0",
     "react": "^18",
     "react-blockies": "^1.4.1",
@@ -33,6 +34,7 @@
   "devDependencies": {
     "@aragon/osx-commons-configs": "^0.2.0",
     "@types/dompurify": "^3.0.5",
+    "@types/libsodium-wrappers": "^0.7.13",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-blockies": "^1.4.4",
