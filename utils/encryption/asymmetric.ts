@@ -38,8 +38,8 @@ export function generateKeyPair() {
 export function getSeededKeyPair(hexSeed: string) {
   if (!hexSeed.match(/^[0-9a-fA-F]+$/)) {
     throw new Error("Invalid hexadecimal seed");
-  } else if (hexSeed.length % 2 !== 0) {
-    throw new Error("The hexadecimal seed cannot have an odd length");
+  } else if (hexSeed.length != 64) {
+    throw new Error("The hexadecimal seed should be 32 bytes long");
   }
   const bytesSeed = sodium.from_hex(hexSeed);
   return sodium.crypto_box_seed_keypair(bytesSeed);

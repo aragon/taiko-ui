@@ -11,6 +11,7 @@ describe("Symmetric encryption", () => {
   beforeAll(async () => {
     await libsodium.ready;
   });
+
   test("Generates a random symmetric key", () => {
     const key1 = generateSymmetricKey();
     const key2 = generateSymmetricKey();
