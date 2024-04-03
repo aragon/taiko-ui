@@ -9,7 +9,8 @@
     "lint": "next lint",
     "prettier": "prettier -c ./components ./context ./hooks ./pages ./plugins ./scripts ./utils ./constants.ts ; echo 'To write the changes: npm run prettier:write'",
     "prettier:write": "prettier -w ./components ./context ./hooks ./pages ./plugins ./scripts ./utils ./constants.ts",
-    "deploy-dao": "bun ./scripts/deploy.ts"
+    "deploy-dao": "bun ./scripts/deploy.ts",
+    "test": "bun test"
   },
   "dependencies": {
     "@aragon/ods": "1.0.15",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@aragon/osx-commons-configs": "^0.2.0",
+    "@types/bun": "latest",
     "@types/dompurify": "^3.0.5",
     "@types/libsodium-wrappers": "^0.7.13",
     "@types/node": "^20",
