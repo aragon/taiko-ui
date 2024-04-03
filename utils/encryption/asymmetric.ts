@@ -15,7 +15,7 @@ export function decryptString(ciphertext: Uint8Array, keyPair: KeyPair) {
 
 export function decryptBytes(
   ciphertext: Uint8Array,
-  keyPair: KeyPair
+  keyPair: KeyPair | Omit<KeyPair, "keyType">
 ): Uint8Array {
   return sodium.crypto_box_seal_open(
     ciphertext,
