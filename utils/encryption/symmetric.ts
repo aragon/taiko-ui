@@ -1,11 +1,7 @@
 import sodium from "libsodium-wrappers";
 import { concatenate } from "./util";
 
-export function getSymKey() {
-  return sodium.from_hex(
-    "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
-  );
-}
+const SYM_KEY_LENGTH = 32;
 
 export function encrypt(
   message: string | Uint8Array,
@@ -36,7 +32,12 @@ export function decryptString(
     sodium.crypto_secretbox_NONCEBYTES
   );
 
-  return sodium.crypto_secretbox_open_easy(ciphertext, nonce, symmetricKey);
+  return sodium.crypto_secretbox_open_easy(
+    ciphertext,
+    nonce,
+    symmetricKey,
+    "text"
+  );
 }
 
 export function decryptBytes(
@@ -61,6 +62,12 @@ export function decryptBytes(
     ciphertext,
     nonce,
     symmetricKey,
-    "text"
+    "uint8array"
   );
+}
+
+// Key helpers
+
+export function generateSymmetricKey(size: number = SYM_KEY_LENGTH) {
+  return sodium.randombytes_buf(size, "uint8array");
 }

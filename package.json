@@ -10,7 +10,8 @@
     "format": "prettier --check .; echo 'To write the changes: bun run format:fix'",
     "format:fix": "prettier -w . --list-different",
     "deploy-dao": "bun ./scripts/deploy.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "bun test"
   },
   "lint-staged": {
     "*.{js, jsx,ts,tsx}": [
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@aragon/osx-commons-configs": "^0.2.0",
+    "@types/bun": "latest",
     "@types/dompurify": "^3.0.5",
     "@types/node": "^20.11.30",
     "@types/react": "^18.2.71",
