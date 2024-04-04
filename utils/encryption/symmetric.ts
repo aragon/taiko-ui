@@ -15,46 +15,25 @@ export function encrypt(
 }
 
 export function decryptString(
-  nonce_and_ciphertext: Uint8Array,
+  nonceAndCiphertext: Uint8Array,
   symmetricKey: Uint8Array
 ) {
-  const minLength =
-    sodium.crypto_secretbox_NONCEBYTES + sodium.crypto_secretbox_MACBYTES;
-  if (nonce_and_ciphertext.length < minLength) {
-    throw "Invalid encrypted payload";
-  }
-
-  const nonce = nonce_and_ciphertext.slice(
-    0,
-    sodium.crypto_secretbox_NONCEBYTES
-  );
-  const ciphertext = nonce_and_ciphertext.slice(
-    sodium.crypto_secretbox_NONCEBYTES
-  );
-
-  return sodium.crypto_secretbox_open_easy(
-    ciphertext,
-    nonce,
-    symmetricKey,
-    "text"
-  );
+  const bytes = decryptBytes(nonceAndCiphertext, symmetricKey);
+  return sodium.to_string(bytes);
 }
 
 export function decryptBytes(
-  nonce_and_ciphertext: Uint8Array,
+  nonceAndCiphertext: Uint8Array,
   symmetricKey: Uint8Array
 ) {
   const minLength =
     sodium.crypto_secretbox_NONCEBYTES + sodium.crypto_secretbox_MACBYTES;
-  if (nonce_and_ciphertext.length < minLength) {
+  if (nonceAndCiphertext.length < minLength) {
     throw "Invalid encrypted payload";
   }
 
-  const nonce = nonce_and_ciphertext.slice(
-    0,
-    sodium.crypto_secretbox_NONCEBYTES
-  );
-  const ciphertext = nonce_and_ciphertext.slice(
+  const nonce = nonceAndCiphertext.slice(0, sodium.crypto_secretbox_NONCEBYTES);
+  const ciphertext = nonceAndCiphertext.slice(
     sodium.crypto_secretbox_NONCEBYTES
   );
 

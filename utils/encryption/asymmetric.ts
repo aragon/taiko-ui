@@ -9,12 +9,8 @@ export function encrypt(
 }
 
 export function decryptString(ciphertext: Uint8Array, keyPair: KeyPair) {
-  return sodium.crypto_box_seal_open(
-    ciphertext,
-    keyPair.publicKey,
-    keyPair.privateKey,
-    "text"
-  );
+  const bytes = decryptBytes(ciphertext, keyPair);
+  return sodium.to_string(bytes);
 }
 
 export function decryptBytes(
