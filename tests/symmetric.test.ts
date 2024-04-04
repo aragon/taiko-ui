@@ -44,4 +44,19 @@ describe("Symmetric encryption", () => {
     const decryptedHex = decryptBytes(encryptedPayload, symKey);
     expect(libsodium.to_hex(decryptedHex)).toBe("0a0f32375055");
   });
+
+  test("Incorrect keys can't decrypt", () => {
+    const symKey = generateSymmetricKey();
+    const wrongKey = generateSymmetricKey();
+
+    const bytes = new Uint8Array([10, 15, 50, 55, 80, 85]);
+    const encryptedPayload1 = encrypt(bytes, symKey);
+    const encryptedPayload2 = encrypt("Hello world", symKey);
+
+    expect(() => decryptBytes(encryptedPayload1, symKey)).not.toThrow();
+    expect(() => decryptString(encryptedPayload2, symKey)).not.toThrow();
+
+    expect(() => decryptBytes(encryptedPayload1, wrongKey)).toThrow();
+    expect(() => decryptString(encryptedPayload2, wrongKey)).toThrow();
+  });
 });
