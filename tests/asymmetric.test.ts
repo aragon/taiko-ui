@@ -37,8 +37,12 @@ describe("Symmetric encryption", () => {
   });
 
   test("Generates a seeded key pair", () => {
-    const alice = getSeededKeyPair("00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff");
-    const bob = getSeededKeyPair("00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff");
+    const alice = getSeededKeyPair(
+      "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff"
+    );
+    const bob = getSeededKeyPair(
+      "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff"
+    );
 
     expect(libsodium.to_hex(alice.keyType)).toBe(libsodium.to_hex(bob.keyType));
     expect(libsodium.to_hex(alice.privateKey)).toBe(
@@ -66,5 +70,21 @@ describe("Symmetric encryption", () => {
     expect(ciphertext.length).toBe(54);
     const decryptedHex = decryptBytes(ciphertext, bob);
     expect(libsodium.to_hex(decryptedHex)).toBe("0a0f32375055");
+  });
+
+  test("Unintended keys can't decrypt", () => {
+    const bob = generateKeyPair();
+    const cindy = generateKeyPair();
+
+    const bytes = new Uint8Array([10, 15, 50, 55, 80, 85]);
+
+    const ciphertext1 = encrypt(bytes, bob.publicKey);
+    const ciphertext2 = encrypt("Hello world", bob.publicKey);
+
+    expect(() => decryptBytes(ciphertext1, bob)).not.toThrow();
+    expect(() => decryptString(ciphertext2, bob)).not.toThrow();
+
+    expect(() => decryptBytes(ciphertext1, cindy)).toThrow();
+    expect(() => decryptString(ciphertext2, cindy)).toThrow();
   });
 });

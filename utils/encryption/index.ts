@@ -11,17 +11,13 @@ import {
   KeyPair,
 } from "./asymmetric";
 
+export type { KeyPair } from "./asymmetric";
 export type SymmetricKey = Uint8Array;
+
 type JsonLiteral = string | number | boolean;
 type JsonValue = JsonLiteral | Array<JsonValue> | { [k: string]: JsonValue };
 
-export function encryptProposal(
-  metadata: JsonValue,
-  actionBytes: Uint8Array
-): {
-  data: { [k: string]: string };
-  symmetricKey: SymmetricKey;
-} {
+export function encryptProposal(metadata: JsonValue, actionBytes: Uint8Array) {
   const symmetricKey = generateSymmetricKey();
 
   const strMetadata = JSON.stringify(metadata);
@@ -34,7 +30,7 @@ export function encryptProposal(
       actions: libsodium.to_base64(encryptedActions),
     },
     symmetricKey,
-  };
+  } as const;
 }
 
 /**
@@ -72,11 +68,11 @@ export function decryptSymmetricKey(
   throw new Error("The given keypair cannot decrypt any of the ciphertext's");
 }
 
-export function decryptProposal(
-  data: { [k: string]: string },
+export function decryptProposal<T = JsonValue>(
+  data: { metadata: string; actions: string },
   symmetricKey: SymmetricKey
 ): {
-  metadata: JsonValue;
+  metadata: T;
   actions: Uint8Array;
 } {
   if (!data["metadata"] || !data["actions"]) throw new Error("Invalid data");
