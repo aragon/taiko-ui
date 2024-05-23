@@ -32,10 +32,8 @@ export const Navbar: React.FC = () => {
               "outline-none focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset" // focus styles
             )}
           >
-            <Image src="/logo-bw-lg.png" width="36" height="36" className="shrink-0" alt="Aragonette" />
-            <span className="hidden py-1 text-lg font-semibold leading-tight text-neutral-700 sm:block md:text-xl">
-              Aragonette
-            </span>
+            <Image src="/logo-tk.svg" width="150" height="36" className="shrink-0" alt="Taiko" />
+            <span className="hidden py-1 text-lg font-semibold leading-tight text-neutral-700 sm:block md:text-xl"></span>
           </Link>
 
           <div className="flex items-center gap-x-2">
