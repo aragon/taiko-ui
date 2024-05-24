@@ -11,6 +11,7 @@ import {
 import * as DOMPurify from "dompurify";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalVariantStatus } from "../../hooks/useProposalVariantStatus";
+import { useAccount } from "wagmi";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_METADATA_SUMMARY = "(The metadata of the proposal is not available)";
@@ -20,11 +21,14 @@ type ProposalInputs = {
 };
 
 export default function ProposalCard(props: ProposalInputs) {
+  const { isConnected, address } = useAccount();
   const { proposal, proposalFetchStatus, vetoes } = useProposalVeto(props.proposalId.toString());
 
   const proposalVariant = useProposalVariantStatus(proposal!);
 
   const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
+
+  const hasVetoed = vetoes?.some((veto) => veto.voter === address);
 
   if (!proposal || showLoading) {
     return (
@@ -66,7 +70,7 @@ export default function ProposalCard(props: ProposalInputs) {
     <Link href={`#/proposals/${props.proposalId}`} className="mb-4 w-full cursor-pointer">
       <ProposalDataListItem.Structure
         {...proposal}
-        voted={false}
+        voted={hasVetoed}
         result={{
           option: "Veto",
           voteAmount: proposal.vetoTally.toString(),

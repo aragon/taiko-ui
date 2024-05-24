@@ -21,7 +21,7 @@ import { useInfiniteQuery, useQueries } from "@tanstack/react-query";
 const DEFAULT_PAGE_SIZE = 6;
 
 export default function Proposals() {
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const canCreate = useCanCreateProposal();
 
   const { data: blockNumber } = useBlockNumber({ watch: true });
