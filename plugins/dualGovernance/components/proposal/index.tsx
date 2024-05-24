@@ -20,18 +20,11 @@ type ProposalInputs = {
 };
 
 export default function ProposalCard(props: ProposalInputs) {
-  const {
-    proposal,
-    proposalFetchStatus,
-    vetoes,
-    canVeto,
-    isConfirming: isConfirmingVeto,
-    vetoProposal,
-  } = useProposalVeto(props.proposalId.toString());
+  const { proposal, proposalFetchStatus, vetoes } = useProposalVeto(props.proposalId.toString());
 
   const proposalVariant = useProposalVariantStatus(proposal!);
 
-  const showLoading = getShowProposalLoading(proposal, status);
+  const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
 
   if (!proposal || showLoading) {
     return (
@@ -54,7 +47,7 @@ export default function ProposalCard(props: ProposalInputs) {
         </Card>
       </Link>
     );
-  } else if (status.metadataReady && !proposal?.title) {
+  } else if (proposalFetchStatus.metadataReady && !proposal?.title) {
     return (
       <Link href={`#/proposals/${props.proposalId}`} className="mb-4 w-full">
         <Card className="p-4">
@@ -67,13 +60,6 @@ export default function ProposalCard(props: ProposalInputs) {
         </Card>
       </Link>
     );
-  }
-
-  function IApprovalThresholdResult(arg0: {
-    approvalAmount: number;
-    approvalThreshold: number;
-  }): import("@aragon/ods").IMajorityVotingResult | import("@aragon/ods").IApprovalThresholdResult {
-    throw new Error("Function not implemented.");
   }
 
   return (
@@ -95,8 +81,8 @@ export default function ProposalCard(props: ProposalInputs) {
 }
 
 function getShowProposalLoading(
-  proposal: ReturnType<typeof useProposal>["proposal"],
-  status: ReturnType<typeof useProposal>["status"]
+  proposal: ReturnType<typeof useProposalVeto>["proposal"],
+  status: ReturnType<typeof useProposalVeto>["proposalFetchStatus"]
 ) {
   if (!proposal || status.proposalLoading) return true;
   else if (status.metadataLoading && !status.metadataError) return true;
