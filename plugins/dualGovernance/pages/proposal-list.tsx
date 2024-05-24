@@ -2,28 +2,35 @@ import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { type ReactNode, useEffect, useState } from "react";
 import ProposalCard from "@/plugins/dualGovernance/components/proposal";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
-import { Button, Card, EmptyState, IconType } from "@aragon/ods";
+import {
+  Button,
+  DataList,
+  IconType,
+  ProposalDataListItem,
+  ProposalDataListItemSkeleton,
+  type DataListState,
+} from "@aragon/ods";
 import { useCanCreateProposal } from "@/plugins/dualGovernance/hooks/useCanCreateProposal";
 import Link from "next/link";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
-import { digestPagination } from "@/utils/pagination";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { useRouter } from "next/router";
+// import { digestPagination } from "@/utils/pagination";
+import { useInfiniteQuery, useQueries } from "@tanstack/react-query";
+
+const DEFAULT_PAGE_SIZE = 6;
 
 export default function Proposals() {
   const { isConnected } = useAccount();
-  const { open } = useWeb3Modal();
-  const { push } = useRouter();
+  const canCreate = useCanCreateProposal();
 
   const { data: blockNumber } = useBlockNumber({ watch: true });
-  const canCreate = useCanCreateProposal();
-  const [currentPage, setCurrentPage] = useState(0);
 
   const {
     data: proposalCountResponse,
+    error: isError,
     isLoading,
+    isFetching: isFetchingNextPage,
     refetch,
   } = useReadContract({
     address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
@@ -31,13 +38,51 @@ export default function Proposals() {
     functionName: "proposalCount",
     chainId: PUB_CHAIN.id,
   });
+  const proposalCount = Number(proposalCountResponse);
 
   useEffect(() => {
     refetch();
   }, [blockNumber]);
 
-  const proposalCount = Number(proposalCountResponse);
-  const { visibleProposalIds, showNext, showPrev } = digestPagination(proposalCount, currentPage);
+  const entityLabel = proposalCount === 1 ? "Proposal" : "Proposals";
+
+  let dataListState: DataListState = "idle";
+  if (isLoading) {
+    dataListState = "initialLoading";
+  } else if (isError) {
+    dataListState = "error";
+  } else if (isFetchingNextPage) {
+    dataListState = "fetchingNextPage";
+  }
+
+  const emptyFilteredState = {
+    heading: "No proposals found",
+    description: "Your applied filters are not matching with any results. Reset and search with other filters!",
+    secondaryButton: {
+      label: "Reset all filters",
+      iconLeft: IconType.RELOAD,
+    },
+  };
+
+  const emptyState = {
+    heading: "No proposals found",
+    description: "Start by creating a proposal",
+    primaryButton: {
+      label: "Create onChain PIP",
+      iconLeft: IconType.PLUS,
+      onClick: () => alert("create proposal"),
+    },
+  };
+
+  const errorState = {
+    heading: "Error loading proposals",
+    description: "There was an error loading the proposals. Try again!",
+    secondaryButton: {
+      label: "Reload proposals",
+      iconLeft: IconType.RELOAD,
+      onClick: () => refetch(),
+    },
+  };
 
   return (
     <MainSection>
@@ -54,75 +99,27 @@ export default function Proposals() {
         </div>
       </SectionView>
       <If condition={proposalCount}>
-        <Then>
-          {visibleProposalIds.map((id) => (
-            <ProposalCard key={id} proposalId={BigInt(id)} />
-          ))}
-          <div className="mb-10 mt-4 flex w-full flex-row justify-end gap-2">
-            <Button
-              variant="tertiary"
-              size="sm"
-              disabled={!showPrev}
-              onClick={() => setCurrentPage((page) => Math.max(page - 1, 0))}
-              iconLeft={IconType.CHEVRON_LEFT}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="tertiary"
-              size="sm"
-              disabled={!showNext}
-              onClick={() => setCurrentPage((page) => page + 1)}
-              iconRight={IconType.CHEVRON_RIGHT}
-            >
-              Next
-            </Button>
-          </div>
-        </Then>
-        <ElseIf condition={isLoading}>
-          <SectionView>
-            <PleaseWaitSpinner />
-          </SectionView>
-        </ElseIf>
-        <ElseIf condition={isConnected}>
-          <SectionView>
-            <Card className="w-full">
-              <EmptyState
-                className="w-full md:w-full lg:w-full xl:w-full"
-                heading="There are no proposals yet"
-                humanIllustration={{
-                  body: "VOTING",
-                  expression: "SMILE",
-                  hairs: "CURLY",
-                }}
-                primaryButton={{
-                  label: "Submit the first one",
-                  iconLeft: IconType.PLUS,
-                  onClick: () => push("#/new"),
-                }}
-              />
-            </Card>
-          </SectionView>
-        </ElseIf>
-        <Else>
-          <SectionView>
-            <Card className="w-full">
-              <EmptyState
-                className="w-full md:w-full lg:w-full xl:w-full"
-                heading="There are no proposals yet"
-                humanIllustration={{
-                  body: "VOTING",
-                  expression: "SMILE",
-                  hairs: "CURLY",
-                }}
-                primaryButton={{
-                  label: "Connect your wallet",
-                  onClick: () => open(),
-                }}
-              />
-            </Card>
-          </SectionView>
-        </Else>
+        <DataList.Root
+          entityLabel={entityLabel}
+          itemsCount={proposalCount}
+          pageSize={DEFAULT_PAGE_SIZE}
+          state={dataListState}
+          //onLoadMore={fetchNextPage}
+        >
+          <DataList.Container
+            SkeletonElement={ProposalDataListItemSkeleton}
+            errorState={errorState}
+            emptyState={emptyState}
+            emptyFilteredState={emptyFilteredState}
+          >
+            {proposalCount &&
+              Array.from(Array(proposalCount)?.keys())?.map((proposal, index) => (
+                // TODO: update with router agnostic ODS DataListItem
+                <ProposalCard key={index} proposalId={BigInt(index)} />
+              ))}
+          </DataList.Container>
+          <DataList.Pagination />
+        </DataList.Root>
       </If>
     </MainSection>
   );

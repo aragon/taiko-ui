@@ -1,6 +1,13 @@
 import Link from "next/link";
-import { useProposal } from "@/plugins/dualGovernance/hooks/useProposal";
-import { Card, Tag, TagVariant } from "@aragon/ods";
+import { useProposalVeto } from "@/plugins/dualGovernance/hooks/useProposalVeto";
+import { Card, ProposalStatus, Tag, TagVariant } from "@aragon/ods";
+import {
+  DataList,
+  IconType,
+  ProposalDataListItem,
+  ProposalDataListItemSkeleton,
+  type DataListState,
+} from "@aragon/ods";
 import * as DOMPurify from "dompurify";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalVariantStatus } from "../../hooks/useProposalVariantStatus";
@@ -13,7 +20,15 @@ type ProposalInputs = {
 };
 
 export default function ProposalCard(props: ProposalInputs) {
-  const { proposal, status } = useProposal(props.proposalId.toString());
+  const {
+    proposal,
+    proposalFetchStatus,
+    vetoes,
+    canVeto,
+    isConfirming: isConfirmingVeto,
+    vetoProposal,
+  } = useProposalVeto(props.proposalId.toString());
+
   const proposalVariant = useProposalVariantStatus(proposal!);
 
   const showLoading = getShowProposalLoading(proposal, status);
@@ -54,24 +69,27 @@ export default function ProposalCard(props: ProposalInputs) {
     );
   }
 
+  function IApprovalThresholdResult(arg0: {
+    approvalAmount: number;
+    approvalThreshold: number;
+  }): import("@aragon/ods").IMajorityVotingResult | import("@aragon/ods").IApprovalThresholdResult {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <Link href={`#/proposals/${props.proposalId}`} className="mb-4 w-full cursor-pointer">
-      <Card className="p-4">
-        <div className="mb-2 flex">
-          <Tag variant={proposalVariant.variant as TagVariant} label={proposalVariant.label} />
-        </div>
-        <div className="overflow-hidden text-ellipsis">
-          <h4 className=" text-dark mb-1 line-clamp-1 text-lg font-semibold">
-            {Number(props.proposalId) + 1} - {proposal.title}
-          </h4>
-          <div
-            className="box line-clamp-2 overflow-hidden text-ellipsis"
-            dangerouslySetInnerHTML={{
-              __html: proposal.summary ? DOMPurify.sanitize(proposal.summary) : DEFAULT_PROPOSAL_METADATA_SUMMARY,
-            }}
-          />
-        </div>
-      </Card>
+      <ProposalDataListItem.Structure
+        {...proposal}
+        voted={false}
+        result={{
+          option: "Veto",
+          voteAmount: proposal.vetoTally.toString(),
+          votePercentage: Number(proposal?.vetoTally / proposal?.parameters?.minVetoVotingPower) * 100,
+        }}
+        publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
+        status={proposalVariant!}
+        type={"majorityVoting"}
+      />
     </Link>
   );
 }

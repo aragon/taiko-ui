@@ -19,31 +19,17 @@ type PluginItem = {
 
 export const plugins: PluginItem[] = [
   {
-    id: "core-proposals",
+    id: "community-proposals",
     folderName: "dualGovernance",
-    title: "Core team proposals",
+    title: "Live Proposals",
     icon: IconType.APP_MEMBERS,
     pluginAddress: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
   },
   {
-    id: "community-proposals",
+    id: "core-proposals",
     folderName: "tokenVoting",
-    title: "Community proposals",
+    title: "Core Team Multisig",
     icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
-  },
-  {
-    id: "lock-to-vote",
-    folderName: "lockToVote",
-    title: "Morpho Vault",
-    icon: IconType.BLOCKCHAIN_BLOCK,
-    pluginAddress: PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
-  },
-  {
-    id: "delegate-wall",
-    folderName: "delegateAnnouncer",
-    title: "Delegation",
-    icon: IconType.FEEDBACK,
-    pluginAddress: PUB_DELEGATION_CONTRACT_ADDRESS,
   },
 ];

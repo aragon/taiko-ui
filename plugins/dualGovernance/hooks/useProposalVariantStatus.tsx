@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
 import { Proposal } from "@/plugins/dualGovernance/utils/types";
+import { ProposalStatus } from "@aragon/ods";
 
 export const useProposalVariantStatus = (proposal: Proposal) => {
-  const [status, setStatus] = useState({ variant: "", label: "" });
+  const [status, setStatus] = useState<ProposalStatus>();
 
   useEffect(() => {
     if (!proposal || !proposal?.parameters) return;
     setStatus(
       proposal?.vetoTally >= proposal?.parameters?.minVetoVotingPower
-        ? { variant: "critical", label: "Defeated" }
+        ? "vetoed"
         : proposal?.active
-          ? { variant: "info", label: "Active" }
+          ? "active"
           : proposal?.executed
-            ? { variant: "primary", label: "Executed" }
-            : { variant: "success", label: "Executable" }
+            ? "executed"
+            : "accepted"
     );
   }, [proposal?.vetoTally, proposal?.active, proposal?.executed, proposal?.parameters?.minVetoVotingPower]);
 
