@@ -10,7 +10,7 @@ import {
 } from "@aragon/ods";
 import * as DOMPurify from "dompurify";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useProposalVariantStatus } from "../../hooks/useProposalVariantStatus";
+import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
 import { useAccount } from "wagmi";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
@@ -24,7 +24,7 @@ export default function ProposalCard(props: ProposalInputs) {
   const { isConnected, address } = useAccount();
   const { proposal, proposalFetchStatus, vetoes } = useProposalVeto(props.proposalId.toString());
 
-  const proposalVariant = useProposalVariantStatus(proposal!);
+  const proposalVariant = useProposalStatus(proposal!);
 
   const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
 
