@@ -7,16 +7,16 @@
     --tw-text-opacity: 1;
     
     /* Primary */
-    --ods-color-primary-50: 255 198 233;
-    --ods-color-primary-100: 255 198 233;
-    --ods-color-primary-200: 255 198 233;
-    --ods-color-primary-300: 255 111 200;
-    --ods-color-primary-400: 255 111 200;
-    --ods-color-primary-500: 232 24 153;
-    --ods-color-primary-600: 232 24 153;
-    --ods-color-primary-700: 216 14 139;
-    --ods-color-primary-800: 216 14 139;
-    --ods-color-primary-900: 154 0 96; /* former: 4,31,77 */
+    --ods-color-primary-50: 254 241 249;
+    --ods-color-primary-100: 252 222 241;
+    --ods-color-primary-200: 248 185 224;
+    --ods-color-primary-300: 243 134 201;
+    --ods-color-primary-400: 233 24 152;
+    --ods-color-primary-500: 214 20 140;
+    --ods-color-primary-600: 191 18 125;
+    --ods-color-primary-700: 168 16 109;
+    --ods-color-primary-800: 144 14 94;
+    --ods-color-primary-900: 79 8 52; /* former: 4,31,77 */
 
     /* Secondary */
     --ods-color-secondary-50: 238 226 254;
