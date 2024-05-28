@@ -31,6 +31,7 @@ export default function Create() {
   const { push } = useRouter();
   const [title, setTitle] = useState<string>("");
   const [summary, setSummary] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const [actions, setActions] = useState<Action[]>([]);
   const { addAlert } = useAlerts();
   const { writeContract: createProposalWrite, data: createTxHash, error, status } = useWriteContract();
@@ -84,8 +85,7 @@ export default function Create() {
         type: "error",
       });
 
-    const plainSummary = getPlainText(summary).trim();
-    if (!plainSummary.trim())
+    if (!summary.trim())
       return addAlert("Invalid proposal details", {
         description: "Please, enter a summary of what the proposal is about",
         type: "error",
@@ -112,7 +112,7 @@ export default function Create() {
         }
     }
 
-    const proposalMetadataJsonObject = { title, summary };
+    const proposalMetadataJsonObject = { title, summary, description };
     const blob = new Blob([JSON.stringify(proposalMetadataJsonObject)], {
       type: "application/json",
     });
@@ -129,6 +129,10 @@ export default function Create() {
 
   const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event?.target?.value);
+  };
+
+  const handleSummaryInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSummary(event?.target?.value);
   };
 
   const showLoading = status === "pending" || isConfirming;
@@ -149,11 +153,22 @@ export default function Create() {
           />
         </div>
         <div className="mb-6">
-          <TextAreaRichText
+          <InputText
+            className=""
             label="Summary"
-            className="pt-2"
+            maxLength={280}
+            placeholder="A short summary that outlines the main purpose of the proposal"
+            variant="default"
             value={summary}
-            onChange={setSummary}
+            onChange={handleSummaryInput}
+          />
+        </div>
+        <div className="mb-6">
+          <TextAreaRichText
+            label="Description"
+            className="pt-2"
+            value={description}
+            onChange={setDescription}
             placeholder="A description for what the proposal is all about"
           />
         </div>

@@ -32,4 +32,18 @@ export const plugins: PluginItem[] = [
     icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
   },
+  {
+    id: "emergency-proposals",
+    folderName: "tokenVoting",
+    title: "Emergency Multisig",
+    icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
+    pluginAddress: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+  },
+  {
+    id: "members",
+    folderName: "delegateAnnouncer",
+    title: "Taiko Delegates",
+    icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
+    pluginAddress: PUB_DELEGATION_CONTRACT_ADDRESS,
+  },
 ];

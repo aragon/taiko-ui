@@ -28,12 +28,11 @@ export const Navbar: React.FC = () => {
           <Link
             href="/"
             className={classNames(
-              "flex items-center gap-x-3 rounded-full md:rounded-lg",
+              "ml-10 flex items-center gap-x-5 rounded-full py-3 pb-5 md:rounded-lg",
               "outline-none focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset" // focus styles
             )}
           >
             <Image src="/logo-tk.svg" width="150" height="36" className="shrink-0" alt="Taiko" />
-            <span className="hidden py-1 text-lg font-semibold leading-tight text-neutral-700 sm:block md:text-xl"></span>
           </Link>
 
           <div className="flex items-center gap-x-2">

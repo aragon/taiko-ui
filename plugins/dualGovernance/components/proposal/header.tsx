@@ -8,6 +8,7 @@ import { PleaseWaitSpinner } from "@/components/please-wait";
 import dayjs from "dayjs";
 
 const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
+const DEFAULT_PROPOSAL_SUMMARY = "(No proposal summary)";
 
 interface ProposalHeaderProps {
   proposalNumber: number;
@@ -70,9 +71,11 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
         </div>
       </div>
 
-      <h4 className="mb-1 flex-grow text-3xl font-semibold text-neutral-900">
+      <h2 className="mb-1 flex-grow text-3xl font-semibold text-neutral-900">
         {proposal.title || DEFAULT_PROPOSAL_TITLE}
-      </h4>
+      </h2>
+      <h4 className="mb-4 flex-grow text-lg text-neutral-800">{proposal.summary || DEFAULT_PROPOSAL_SUMMARY}</h4>
+
       <p className="text-l text-body-color dark:text-dark-6 text-base">
         Proposed by <AddressText>{proposal?.creator}</AddressText>,{" "}
         <If condition={ended}>

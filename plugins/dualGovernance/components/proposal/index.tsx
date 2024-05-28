@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Link from "next/link";
 import { useProposalVeto } from "@/plugins/dualGovernance/hooks/useProposalVeto";
 import { Card, ProposalStatus, Tag, TagVariant } from "@aragon/ods";
@@ -12,6 +13,9 @@ import * as DOMPurify from "dompurify";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
 import { useAccount } from "wagmi";
+import { useReadContract } from "wagmi";
+import { parseAbi } from "viem";
+import { PUB_TOKEN_ADDRESS } from "@/constants";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_METADATA_SUMMARY = "(The metadata of the proposal is not available)";
@@ -20,9 +24,17 @@ type ProposalInputs = {
   proposalId: bigint;
 };
 
+const erc20Votes = parseAbi(["function getPastTotalSupply(uint256 blockNumber) view returns (uint256)"]);
+
 export default function ProposalCard(props: ProposalInputs) {
   const { isConnected, address } = useAccount();
   const { proposal, proposalFetchStatus, vetoes } = useProposalVeto(props.proposalId.toString());
+  const { data: pastSupply } = useReadContract({
+    address: PUB_TOKEN_ADDRESS,
+    abi: erc20Votes,
+    functionName: "getPastTotalSupply",
+    args: [proposal?.parameters.snapshotBlock],
+  });
 
   const proposalVariant = useProposalStatus(proposal!);
 
@@ -74,7 +86,7 @@ export default function ProposalCard(props: ProposalInputs) {
         result={{
           option: "Veto",
           voteAmount: proposal.vetoTally.toString(),
-          votePercentage: Number(proposal?.vetoTally / proposal?.parameters?.minVetoVotingPower) * 100,
+          votePercentage: Number((proposal?.vetoTally * BigInt(100)) / pastSupply),
         }}
         publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
         status={proposalVariant!}

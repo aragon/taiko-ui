@@ -30,6 +30,7 @@ export type Proposal = {
 export type ProposalMetadata = {
   title: string;
   summary: string;
+  description: string;
   resources: string[];
 };
 

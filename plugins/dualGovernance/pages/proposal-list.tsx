@@ -113,10 +113,12 @@ export default function Proposals() {
             emptyFilteredState={emptyFilteredState}
           >
             {proposalCount &&
-              Array.from(Array(proposalCount)?.keys())?.map((proposal, index) => (
-                // TODO: update with router agnostic ODS DataListItem
-                <ProposalCard key={index} proposalId={BigInt(index)} />
-              ))}
+              Array.from(Array(proposalCount)?.keys())
+                .reverse()
+                ?.map((proposalIndex, index) => (
+                  // TODO: update with router agnostic ODS DataListItem
+                  <ProposalCard key={proposalIndex} proposalId={BigInt(proposalIndex)} />
+                ))}
           </DataList.Container>
           <DataList.Pagination />
         </DataList.Root>
