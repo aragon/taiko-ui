@@ -5,20 +5,20 @@ export type ProposalInputs = {
   proposalId: bigint;
 };
 
-export type ProposalResultType = readonly [boolean, boolean, ProposalParameters, bigint, readonly Action[], bigint];
+export type ProposalResultType = readonly [boolean, number, ProposalParameters, readonly Action[], bigint];
 
 export type ProposalParameters = {
   startDate: bigint;
   endDate: bigint;
   snapshotBlock: bigint;
-  minVetoVotingPower: bigint;
+  minApprovals: number;
 };
 
 export type Proposal = {
-  active: boolean;
+  // active: boolean;
   executed: boolean;
   parameters: ProposalParameters;
-  vetoTally: bigint;
+  approvals: number;
   actions: Action[];
   allowFailureMap: bigint;
   creator: string;

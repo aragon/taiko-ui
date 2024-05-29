@@ -3,6 +3,7 @@ import {
   PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
   PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
   PUB_LOCK_TO_VOTE_PLUGIN_ADDRESS,
+  PUB_MULTISIG_PLUGIN_ADDRESS,
 } from "@/constants";
 import { IconType } from "@aragon/ods";
 
@@ -27,10 +28,10 @@ export const plugins: PluginItem[] = [
   },
   {
     id: "core-proposals",
-    folderName: "tokenVoting",
+    folderName: "multisig",
     title: "Core Team Multisig",
     icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
-    pluginAddress: PUB_TOKEN_VOTING_PLUGIN_ADDRESS,
+    pluginAddress: PUB_MULTISIG_PLUGIN_ADDRESS,
   },
   {
     id: "emergency-proposals",
