@@ -138,7 +138,7 @@ export default function Create() {
   const showLoading = status === "pending" || isConfirming;
 
   return (
-    <section className="flex w-screen min-w-full max-w-full flex-col items-center">
+    <main className="flex w-full flex-col items-center px-4 py-6 md:w-4/5 md:p-6 lg:w-2/3 xl:py-10 2xl:w-3/5">
       <div className="w-full justify-between py-5">
         <h1 className="mb-10 text-3xl font-semibold text-neutral-900">Create Proposal</h1>
         <div className="mb-6">
@@ -274,6 +274,6 @@ export default function Create() {
           </Else>
         </If>
       </div>
-    </section>
+    </main>
   );
 }

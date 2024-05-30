@@ -1,17 +1,23 @@
-import { Button, Tag } from "@aragon/ods";
-import { Proposal } from "@/plugins/dualGovernance/utils/types";
+import { AvatarIcon, Breadcrumbs, Button, Heading, IBreadcrumbsLink, IconType, Tag, TagVariant } from "@aragon/ods";
+import { Proposal } from "@/plugins/multisig/utils/types";
+
 import { AlertVariant } from "@aragon/ods";
 import { ElseIf, If, Then, Else } from "@/components/if";
 import { AddressText } from "@/components/text/address";
-import { useProposalVariantStatus } from "@/plugins/dualGovernance/hooks/useProposalVariantStatus";
+import { useProposalStatus } from "@/plugins/multisig/hooks/useProposalVariantStatus";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import dayjs from "dayjs";
+import classNames from "classnames";
+import { ReactNode } from "react";
+import { Publisher } from "@/components/publisher";
+import { getSimpleRelativeTimeFromDate } from "@/utils/dates";
 
 const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_SUMMARY = "(No proposal summary)";
 
 interface ProposalHeaderProps {
   proposalNumber: number;
+  breadcrumbs: IBreadcrumbsLink[];
   proposal: Proposal;
   canVeto: boolean;
   canExecute: boolean;
@@ -25,66 +31,109 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposal,
   canVeto,
   canExecute,
+  breadcrumbs,
   transactionConfirming,
   onVetoPressed,
   onExecutePressed,
 }) => {
-  const proposalVariant = useProposalVariantStatus(proposal);
+  const status = useProposalStatus(proposal);
+  const tagVariant = getTagVariantFromStatus(status);
+
   const ended = proposal.parameters.endDate <= Date.now() / 1000;
 
   return (
-    <div className="w-full">
-      <div className="flex h-16 flex-row items-center pb-2">
-        <div className="flex flex-grow justify-between">
-          <div className="flex-col text-center">
-            {/** bg-info-200 bg-success-200 bg-critical-200
-             * text-info-800 text-success-800 text-critical-800
-             */}
-            <div className="flex">
-              <Tag
-                className="text-center text-critical-800"
-                label={proposalVariant.label}
-                variant={proposalVariant.variant as AlertVariant}
-              />
+    <div className="flex w-full justify-center bg-neutral-0">
+      {/* Wrapper */}
+      <MainSection className="flex flex-col gap-y-6 md:px-16 md:py-10">
+        <Breadcrumbs
+          links={breadcrumbs}
+          tag={
+            status && {
+              label: status,
+              className: "capitalize",
+              variant: tagVariant,
+            }
+          }
+        />
+        {/* Title & description */}
+        <div className="flex w-full flex-col gap-y-2">
+          <div className="flex w-full items-center gap-x-4">
+            <Heading size="h1">{proposal.title}</Heading>
+            {/* && <Tag label="Emergency" variant="critical" />*/}
+          </div>
+          <p className="text-lg leading-normal text-neutral-500">{proposal.summary}</p>
+        </div>
+        {/* Metadata */}
+        <div className="flex flex-wrap gap-x-10 gap-y-2">
+          {proposal.parameters.startDate && (
+            <div className="flex items-center gap-x-2">
+              <AvatarIcon icon={IconType.CALENDAR} size="sm" variant="primary" />
+              <div className="flex gap-x-1 text-base leading-tight ">
+                <span className="text-neutral-500">Published at</span>
+                <span className="text-neutral-800">
+                  {dayjs(Number(proposal.parameters.startDate) * 1000).format("MMMM D, h:mm A")}
+                </span>
+              </div>
             </div>
-            <span className="pt-1 text-xl font-semibold text-neutral-700">Proposal {proposalNumber}</span>
+          )}
+          <div className="flex items-center gap-x-2">
+            <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
+            <Publisher publisher={[{ address: proposal.creator }]} />
+          </div>
+          <div className="flex items-center gap-x-2">
+            <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
+            <div className="flex gap-x-1 text-base leading-tight ">
+              <span className="text-neutral-800">
+                {getSimpleRelativeTimeFromDate(dayjs(Number(proposal.parameters.endDate) * 1000))}
+              </span>
+              <span className="text-neutral-500">left until expiration</span>
+            </div>
           </div>
         </div>
-        <div className="flex">
-          <If condition={transactionConfirming}>
-            <Then>
-              <div>
-                <PleaseWaitSpinner fullMessage="Confirming..." />
-              </div>
-            </Then>
-            <ElseIf condition={canVeto}>
-              <Button className="flex h-5 items-center" size="lg" variant="primary" onClick={() => onVetoPressed()}>
-                Submit veto
-              </Button>
-            </ElseIf>
-            <ElseIf condition={canExecute}>
-              <Button className="flex h-5 items-center" size="lg" variant="success" onClick={() => onExecutePressed()}>
-                Execute
-              </Button>
-            </ElseIf>
-          </If>
-        </div>
-      </div>
-
-      <h2 className="mb-1 flex-grow text-3xl font-semibold text-neutral-900">
-        {proposal.title || DEFAULT_PROPOSAL_TITLE}
-      </h2>
-      <h4 className="mb-4 flex-grow text-lg text-neutral-800">{proposal.summary || DEFAULT_PROPOSAL_SUMMARY}</h4>
-
-      <p className="text-l text-body-color dark:text-dark-6 text-base">
-        Proposed by <AddressText>{proposal?.creator}</AddressText>,{" "}
-        <If condition={ended}>
-          <Then>ended on {dayjs(Number(proposal.parameters.endDate) * 1000).format("D MMM YYYY HH:mm")}h</Then>
-          <Else>ending on {dayjs(Number(proposal.parameters.endDate) * 1000).format("D MMM YYYY HH:mm")}h</Else>
-        </If>
-      </p>
+      </MainSection>
     </div>
   );
 };
 
 export default ProposalHeader;
+
+interface IMainSectionProps {
+  children?: ReactNode;
+  className?: string;
+}
+const MainSection: React.FC<IMainSectionProps> = (props) => {
+  const { children, className } = props;
+
+  return <div className={classNames("mx-auto w-full max-w-screen-xl px-4 py-6", className)}>{children}</div>;
+};
+
+const getTagVariantFromStatus = (status: string | undefined): TagVariant => {
+  switch (status) {
+    case "accepted":
+      return "success";
+    case "active":
+      return "info";
+    case "challenged":
+      return "warning";
+    case "draft":
+      return "neutral";
+    case "executed":
+      return "success";
+    case "expired":
+      return "critical";
+    case "failed":
+      return "critical";
+    case "partiallyExecuted":
+      return "warning";
+    case "pending":
+      return "neutral";
+    case "queued":
+      return "success";
+    case "rejected":
+      return "critical";
+    case "vetoed":
+      return "warning";
+    default:
+      return "neutral";
+  }
+};

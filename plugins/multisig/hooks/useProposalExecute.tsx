@@ -15,7 +15,7 @@ export function useProposalExecute(proposalId: string) {
     isLoading: isCanVoteLoading,
   } = useReadContract({
     address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-    abi: OptimisticTokenVotingPluginAbi,
+    abi: MultisigPluginAbi,
     chainId: PUB_CHAIN.id,
     functionName: "canExecute",
     args: [BigInt(proposalId)],
@@ -33,7 +33,7 @@ export function useProposalExecute(proposalId: string) {
 
     executeWrite({
       chainId: PUB_CHAIN.id,
-      abi: OptimisticTokenVotingPluginAbi,
+      abi: MultisigPluginAbi,
       address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
       functionName: "execute",
       args: [BigInt(proposalId)],
