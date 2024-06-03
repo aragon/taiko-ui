@@ -12,6 +12,7 @@ import { useProposalVeto } from "@/plugins/multisig/hooks/useProposalVeto";
 import { useProposalExecute } from "@/plugins/multisig/hooks/useProposalExecute";
 import { generateBreadcrumbs } from "@/utils/nav";
 import { useRouter } from "next/router";
+import { BodySection } from "@/components/proposal/proposalBodySection";
 
 type BottomSection = "description" | "vetoes";
 
@@ -55,6 +56,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       />
 
       <div className="flex w-full flex-col items-center px-4 py-6 md:w-4/5 md:p-6 lg:w-2/3 xl:py-10 2xl:w-3/5">
+        <BodySection body={proposal.description || "No description was provided"} />
         <div className="my-10 grid w-full gap-10 lg:grid-cols-2 xl:grid-cols-3">
           <ApprovalTally
             approvalCount={proposal?.approvals}
