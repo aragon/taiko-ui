@@ -8,12 +8,6 @@ const DEFAULT_PROPOSAL_METADATA_SUMMARY = "No description provided.";
 export default function ProposalDescription(proposal: Proposal) {
   return (
     <div className="pt-2">
-      <div
-        className="pb-6"
-        dangerouslySetInnerHTML={{
-          __html: proposal.description ? DOMPurify.sanitize(proposal.description) : DEFAULT_PROPOSAL_METADATA_SUMMARY,
-        }}
-      />
       <h2 className="flex-grow pb-3 pt-10 text-2xl font-semibold text-neutral-900">Actions</h2>
       <div className="">
         <If not={proposal.actions.length}>

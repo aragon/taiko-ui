@@ -13,6 +13,7 @@ import { useProposalExecute } from "@/plugins/multisig/hooks/useProposalExecute"
 import { generateBreadcrumbs } from "@/utils/nav";
 import { useRouter } from "next/router";
 import { BodySection } from "@/components/proposal/proposalBodySection";
+import { ITransformedStage, ProposalStages, ProposalVoting } from "../components/proposal/proposalVoting";
 
 type BottomSection = "description" | "vetoes";
 
@@ -30,6 +31,36 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   } = useProposalVeto(proposalId);
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
+
+  const proposalStage: ITransformedStage[] = [
+    {
+      id: "1",
+      type: ProposalStages.DRAFT,
+      variant: "success",
+      title: "Draft",
+      status: "active",
+      disabled: false,
+      proposalId: "1",
+      providerId: "1",
+      result: {
+        cta: {
+          disabled: false,
+          isLoading: false,
+          label: "Approve",
+          onClick: () => {},
+        },
+        approvalAmount: 0,
+        approvalThreshold: 0,
+      },
+      details: {
+        censusBlock: 0,
+        startDate: "2021-09-01T00:00:00Z",
+        endDate: "2021-09-01T00:00:00Z",
+        strategy: "approvalThreshold",
+        options: "yes/no",
+      },
+    },
+  ];
 
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
   const breadcrumbs = generateBreadcrumbs(router.asPath);
@@ -57,36 +88,11 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
 
       <div className="flex w-full flex-col items-center px-4 py-6 md:w-4/5 md:p-6 lg:w-2/3 xl:py-10 2xl:w-3/5">
         <BodySection body={proposal.description || "No description was provided"} />
-        <div className="my-10 grid w-full gap-10 lg:grid-cols-2 xl:grid-cols-3">
-          <ApprovalTally
-            approvalCount={proposal?.approvals}
-            approvalPercentage={Number(proposal?.approvals / proposal?.parameters?.minApprovals) * 100}
-          />
+        <div className="my-10 w-full ">
+          <ProposalVoting stages={proposalStage} />
         </div>
         <div className="w-full py-12">
-          <div className="space-between flex flex-row">
-            <h2 className="flex-grow text-3xl font-semibold text-neutral-900">
-              {bottomSection === "description" ? "Description" : "Vetoes"}
-            </h2>
-            <ToggleGroup
-              className="justify-end"
-              value={bottomSection}
-              isMultiSelect={false}
-              onChange={(val: string | undefined) => (val ? setBottomSection(val as BottomSection) : "")}
-            >
-              <Toggle label="Description" value="description" />
-              <Toggle label="Vetoes" value="vetoes" />
-            </ToggleGroup>
-          </div>
-
-          <If condition={bottomSection === "description"}>
-            <Then>
-              <ProposalDescription {...proposal} />
-            </Then>
-            <Else>
-              <VetoesSection vetoes={vetoes} />
-            </Else>
-          </If>
+          <ProposalDescription {...proposal} />
         </div>
       </div>
     </section>
