@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { MultisigPluginAbi } from "../artifacts/MultisigPlugin";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
+import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 
 export function useProposalExecute(proposalId: string) {
   const { reload } = useRouter();
