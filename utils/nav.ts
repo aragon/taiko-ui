@@ -1,7 +1,8 @@
 import { type IBreadcrumbsLink } from "@aragon/ods";
 
 export function generateBreadcrumbs(pathname: string): IBreadcrumbsLink[] {
-  const paths = pathname.split("/").filter(Boolean);
+  const paths = pathname.split("/").filter(Boolean).slice(-2);
+
   let pathAccumulator = "";
 
   return paths.map((path) => {

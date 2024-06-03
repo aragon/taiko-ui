@@ -1,9 +1,9 @@
 import { useProposal } from "@/plugins/multisig/hooks/useProposal";
 import { ToggleGroup, Toggle } from "@aragon/ods";
 import ProposalDescription from "@/plugins/multisig/components/proposal/description";
-import VetoesSection from "@/plugins/multisig/components/vote/vetoes-section";
+import VetoesSection from "@/plugins/multisig/components/approve/vetoes-section";
 import ProposalHeader from "@/plugins/multisig/components/proposal/header";
-import VetoTally from "@/plugins/multisig/components/vote/tally";
+import ApprovalTally from "@/plugins/multisig/components/approve/tally";
 import ProposalDetails from "@/plugins/multisig/components/proposal/details";
 import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
@@ -22,8 +22,8 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const {
     proposal,
     proposalFetchStatus,
-    vetoes,
     canVeto,
+    vetoes,
     isConfirming: isConfirmingVeto,
     vetoProposal,
   } = useProposalVeto(proposalId);
@@ -56,13 +56,9 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
 
       <div className="flex w-full flex-col items-center px-4 py-6 md:w-4/5 md:p-6 lg:w-2/3 xl:py-10 2xl:w-3/5">
         <div className="my-10 grid w-full gap-10 lg:grid-cols-2 xl:grid-cols-3">
-          <VetoTally
-            voteCount={proposal?.approvals}
-            votePercentage={Number(proposal?.vetoTally / proposal?.parameters?.minVetoVotingPower) * 100}
-          />
-          <ProposalDetails
-            minVetoVotingPower={proposal?.parameters?.minVetoVotingPower}
-            snapshotBlock={proposal?.parameters?.snapshotBlock}
+          <ApprovalTally
+            approvalCount={proposal?.approvals}
+            approvalPercentage={Number(proposal?.approvals / proposal?.parameters?.minApprovals) * 100}
           />
         </div>
         <div className="w-full py-12">
