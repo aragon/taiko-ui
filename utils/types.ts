@@ -72,11 +72,11 @@ export interface ITransformedStage<TType extends ProposalType = ProposalType> {
   title: string;
   status: string;
   disabled: boolean;
+  votes: IVote[];
   proposalId?: string;
   providerId?: string;
   result?: IBreakdownApprovalThresholdResult;
   details?: IVotingStageDetails;
-  votes: IVote[];
 }
 
 // General types

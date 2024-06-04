@@ -71,7 +71,7 @@ export const VotingStage: React.FC<IVotingStageProps> = (props) => {
 
   useLayoutEffect(resize, [resize]);
 
-  const defaultTab = status === "active" ? "breakdown" : "details";
+  const defaultTab = status === "active" ? "breakdown" : "breakdown";
   const stageKey = `Stage ${number}`;
   const formattedSnapshotBlock = formatterUtils.formatNumber(details?.censusBlock) ?? "";
   const snapshotBlockURL = `${PUB_CHAIN.blockExplorers?.default.url}/block/${details?.censusBlock}`;

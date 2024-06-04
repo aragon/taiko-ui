@@ -11,7 +11,6 @@ import { PUB_MULTISIG_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 const DEFAULT_PAGE_SIZE = 6;
 
 export default function Proposals() {
-  const { isConnected, address } = useAccount();
   const canCreate = useCanCreateProposal();
 
   const { data: blockNumber } = useBlockNumber({ watch: true });

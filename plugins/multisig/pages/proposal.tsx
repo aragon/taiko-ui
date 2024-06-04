@@ -10,13 +10,13 @@ import { useRouter } from "next/router";
 import { BodySection } from "@/components/proposal/proposalBodySection";
 import { ProposalVoting } from "@/components/proposalVoting";
 import { ITransformedStage, IVote, ProposalStages } from "@/utils/types";
+import { useProposalStatus } from "../hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
 
 type BottomSection = "description" | "vetoes";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const router = useRouter();
-  const [bottomSection, setBottomSection] = useState<BottomSection>("description");
 
   const {
     proposal,
@@ -28,6 +28,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   } = useProposalVeto(proposalId);
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
+  const proposalVariant = useProposalStatus(proposal!);
 
   const proposalStage: ITransformedStage[] = [
     {
@@ -35,13 +36,13 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       type: ProposalStages.MULTISIG_APPROVAL,
       variant: "approvalThreshold",
       title: "Onchain Multisig",
-      status: "failed",
+      status: proposalVariant!,
       disabled: false,
       proposalId: proposalId,
       providerId: "1",
       result: {
         cta: {
-          disabled: canApprove,
+          disabled: !canApprove,
           isLoading: false,
           label: "Approve",
           onClick: approveProposal,

@@ -7,6 +7,10 @@ export function getSimpleRelativeTimeFromDate(value: Dayjs) {
   const now = dayjs();
   const targetDate = dayjs(value);
 
+  if (targetDate.isBefore(now)) {
+    return "0 minutes";
+  }
+
   const diffMins = targetDate.diff(now, "minute");
   const diffHours = targetDate.diff(now, "hour");
   const diffDays = targetDate.diff(now, "day");

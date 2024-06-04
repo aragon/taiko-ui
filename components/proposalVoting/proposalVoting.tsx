@@ -25,7 +25,7 @@ export const ProposalVoting: React.FC<IProposalVotingProps> = ({ stages }) => {
         </p>
       </div>
       {/* Stages */}
-      <AccordionContainer isMulti={true} className="border-t border-t-neutral-100">
+      <AccordionContainer isMulti={false} defaultValue="Stage 1" className="border-t border-t-neutral-100">
         {stages.map((stage, index) => (
           <VotingStage key={stage.id} {...({ ...stage, number: index + 1 } as IVotingStageProps)} />
         ))}

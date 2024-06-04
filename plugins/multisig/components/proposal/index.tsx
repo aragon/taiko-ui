@@ -1,21 +1,11 @@
-import { useEffect } from "react";
 import Link from "next/link";
 import { useProposalVeto } from "@/plugins/multisig/hooks/useProposalVeto";
-import { Card, ProposalStatus, Tag, TagVariant } from "@aragon/ods";
-import {
-  DataList,
-  IconType,
-  ProposalDataListItem,
-  ProposalDataListItemSkeleton,
-  type DataListState,
-} from "@aragon/ods";
-import * as DOMPurify from "dompurify";
+import { Card } from "@aragon/ods";
+import { ProposalDataListItem, type DataListState } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
 import { useAccount } from "wagmi";
-import { useReadContract } from "wagmi";
 import { parseAbi } from "viem";
-import { PUB_TOKEN_ADDRESS } from "@/constants";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_METADATA_SUMMARY = "(The metadata of the proposal is not available)";
@@ -24,17 +14,15 @@ type ProposalInputs = {
   proposalId: bigint;
 };
 
-const erc20Votes = parseAbi(["function getPastTotalSupply(uint256 blockNumber) view returns (uint256)"]);
-
 export default function ProposalCard(props: ProposalInputs) {
-  const { isConnected, address } = useAccount();
-  const { proposal, proposalFetchStatus } = useProposalVeto(props.proposalId.toString());
+  const { address } = useAccount();
+  const { proposal, proposalFetchStatus, approvals } = useProposalVeto(props.proposalId.toString());
 
   const proposalVariant = useProposalStatus(proposal!);
 
   const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
 
-  // const hasVetoed = vetoes?.some((veto) => veto.voter === address);
+  const hasApproved = approvals?.some((veto) => veto.approver === address);
 
   if (!proposal || showLoading) {
     return (
@@ -76,7 +64,7 @@ export default function ProposalCard(props: ProposalInputs) {
     <Link href={`#/proposals/${props.proposalId}`} className="mb-4 w-full cursor-pointer">
       <ProposalDataListItem.Structure
         {...proposal}
-        voted={false}
+        voted={hasApproved}
         result={{
           approvalAmount: proposal.approvals,
           approvalThreshold: proposal.parameters.minApprovals,
