@@ -33,7 +33,7 @@ export default function ProposalCard(props: ProposalInputs) {
     address: PUB_TOKEN_ADDRESS,
     abi: erc20Votes,
     functionName: "getPastTotalSupply",
-    args: [proposal?.parameters.snapshotBlock],
+    args: [proposal?.parameters.snapshotBlock || BigInt(0)],
   });
 
   const proposalVariant = useProposalStatus(proposal!);
@@ -86,7 +86,7 @@ export default function ProposalCard(props: ProposalInputs) {
         result={{
           option: "Veto",
           voteAmount: proposal.vetoTally.toString(),
-          votePercentage: Number((proposal?.vetoTally * BigInt(100)) / pastSupply),
+          votePercentage: pastSupply ? Number((proposal?.vetoTally * BigInt(100)) / pastSupply) : 0,
         }}
         publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
         status={proposalVariant!}

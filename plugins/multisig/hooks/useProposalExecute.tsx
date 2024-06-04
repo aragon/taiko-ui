@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { MultisigPluginAbi } from "../artifacts/MultisigPlugin";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
-import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
+import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
+import { MultisigPluginAbi } from "../artifacts/MultisigPlugin";
 
 export function useProposalExecute(proposalId: string) {
   const { reload } = useRouter();
@@ -14,7 +14,7 @@ export function useProposalExecute(proposalId: string) {
     isError: isCanVoteError,
     isLoading: isCanVoteLoading,
   } = useReadContract({
-    address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
+    address: PUB_MULTISIG_PLUGIN_ADDRESS,
     abi: MultisigPluginAbi,
     chainId: PUB_CHAIN.id,
     functionName: "canExecute",
@@ -34,7 +34,7 @@ export function useProposalExecute(proposalId: string) {
     executeWrite({
       chainId: PUB_CHAIN.id,
       abi: MultisigPluginAbi,
-      address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
+      address: PUB_MULTISIG_PLUGIN_ADDRESS,
       functionName: "execute",
       args: [BigInt(proposalId)],
     });

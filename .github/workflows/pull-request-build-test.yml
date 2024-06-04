@@ -1,4 +1,4 @@
-name: Pull request build
+name: Pull request build and test
 on:
   pull_request:
 
@@ -29,3 +29,6 @@ jobs:
           NEXT_PUBLIC_IPFS_API_KEY: x
           NEXT_PUBLIC_ETHERSCAN_API_KEY: x
           NODE_ENV: production
+
+      - name: Run tests
+        run: bun test
