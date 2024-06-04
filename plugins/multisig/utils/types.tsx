@@ -35,12 +35,11 @@ export type ProposalMetadata = {
   resources: string[];
 };
 
-export type VoteCastResponse = {
-  args: VetoCastEvent[];
+export type ApprovedEventResponse = {
+  args: ApprovedEvent[];
 };
 
-export type VetoCastEvent = {
-  voter: Address;
+export type ApprovedEvent = {
   proposalId: bigint;
-  votingPower: bigint;
+  approver: Address;
 };

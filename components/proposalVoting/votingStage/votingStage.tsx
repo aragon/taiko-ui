@@ -1,17 +1,15 @@
 import { PUB_CHAIN } from "@/constants";
-import { Proposal } from "@/plugins/multisig/utils/types";
 import { getSimpleRelativeTimeFromDate } from "@/utils/dates";
 import { AccordionItem, AccordionItemContent, AccordionItemHeader, Heading, Tabs, formatterUtils } from "@aragon/ods";
 import { Tabs as RadixTabsRoot } from "@radix-ui/react-tabs";
 import dayjs from "dayjs";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
-// import { type ProposalStages } from "../../../services";
-// import { VotesDataList } from "../votesDataList";
-// import { VotingBreakdown, type IBreakdownMajorityVotingResult, type ProposalType } from "../votingBreakdown";
-// import { type IBreakdownApprovalThresholdResult } from "../votingBreakdown/approvalThresholdResult";
-// import { VotingDetails } from "../votingDetails";
-// import { VotingStageStatus } from "./votingStageStatus";
-// import { type VotingCta } from "../votingBreakdown/types";
+import { VotingBreakdown, type IBreakdownMajorityVotingResult, type ProposalType } from "../votingBreakdown";
+import { type IBreakdownApprovalThresholdResult } from "../votingBreakdown/approvalThresholdResult";
+import { VotingDetails } from "../votingDetails";
+import { VotingStageStatus } from "./votingStageStatus";
+import { IVote } from "@/utils/types";
+import { VotesDataList } from "../votesDataList/votesDataList";
 
 export interface IVotingStageDetails {
   censusBlock: number;
@@ -21,7 +19,7 @@ export interface IVotingStageDetails {
   options: string;
 }
 
-export interface IVotingStageProps<TType extends Proposal = Proposal> {
+export interface IVotingStageProps<TType extends ProposalType = ProposalType> {
   title: string;
   number: number;
   disabled: boolean;
@@ -29,13 +27,13 @@ export interface IVotingStageProps<TType extends Proposal = Proposal> {
 
   variant: TType;
   proposalId?: string;
-  // result?: TType extends "approvalThreshold" ? IBreakdownApprovalThresholdResult : IBreakdownMajorityVotingResult;
+  result?: TType extends "approvalThreshold" ? IBreakdownApprovalThresholdResult : IBreakdownMajorityVotingResult;
   details?: IVotingStageDetails;
-  // cta?: VotingCta;
+  votes?: IVote[];
 }
 
 export const VotingStage: React.FC<IVotingStageProps> = (props) => {
-  const { cta, details, disabled, title, number, result, proposalId = "", status, variant } = props;
+  const { details, disabled, title, number, result, proposalId = "", status, variant, votes } = props;
 
   const [node, setNode] = useState<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -91,7 +89,7 @@ export const VotingStage: React.FC<IVotingStageProps> = (props) => {
             <Heading size="h3" className="line-clamp-1 text-left">
               {title}
             </Heading>
-            {/*<VotingStageStatus status={status} endDate={getSimpleRelativeTimeFromDate(dayjs(details?.endDate))} /> */}
+            <VotingStageStatus status={status} endDate={getSimpleRelativeTimeFromDate(dayjs(details?.endDate))} />
           </div>
           <span className="hidden leading-tight text-neutral-500 sm:block">{stageKey}</span>
         </div>
@@ -105,16 +103,17 @@ export const VotingStage: React.FC<IVotingStageProps> = (props) => {
             <Tabs.Trigger value="details" label="Details" />
           </Tabs.List>
           <Tabs.Content value="breakdown" asChild={true}>
-            {/*<div className="py-4 pb-8">{result && <VotingBreakdown cta={cta} variant={variant} result={result} />}</div>*/}
+            <div className="py-4 pb-8">
+              {result && <VotingBreakdown cta={result.cta} variant={variant} result={result} />}
+            </div>
           </Tabs.Content>
           <Tabs.Content value="votes">
             <div className="py-4 pb-8">
-              {/*<VotesDataList proposalId={proposalId} stageTitle={title as ProposalStages} />*/}
+              <VotesDataList votes={votes} proposalId={proposalId} stageTitle={title as ProposalStages} />
             </div>
           </Tabs.Content>
           <Tabs.Content value="details">
             <div className="py-4 pb-8">
-              {/*
               {details && (
                 <VotingDetails
                   snapshotBlock={formattedSnapshotBlock}
@@ -125,7 +124,6 @@ export const VotingStage: React.FC<IVotingStageProps> = (props) => {
                   options={details.options}
                 />
               )}
-                */}
             </div>
           </Tabs.Content>
         </RadixTabsRoot>

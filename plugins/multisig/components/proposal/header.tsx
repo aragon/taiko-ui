@@ -19,7 +19,7 @@ interface ProposalHeaderProps {
   proposalNumber: number;
   breadcrumbs: IBreadcrumbsLink[];
   proposal: Proposal;
-  canVeto: boolean;
+  canApprove: boolean;
   canExecute: boolean;
   transactionConfirming: boolean;
   onVetoPressed: () => void;
@@ -29,7 +29,7 @@ interface ProposalHeaderProps {
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   proposalNumber,
   proposal,
-  canVeto,
+  canApprove,
   canExecute,
   breadcrumbs,
   transactionConfirming,

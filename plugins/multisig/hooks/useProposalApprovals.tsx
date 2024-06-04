@@ -1,26 +1,26 @@
 import { useState, useEffect } from "react";
 import { Address, getAbiItem } from "viem";
 import { PublicClient } from "viem";
-import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
-import { Proposal, VetoCastEvent, VoteCastResponse } from "@/plugins/dualGovernance/utils/types";
+import { Proposal, ApprovedEvent, ApprovedEventResponse } from "@/plugins/multisig/utils/types";
+import { MultisigPluginAbi } from "../artifacts/MultisigPlugin";
 
 const event = getAbiItem({
-  abi: OptimisticTokenVotingPluginAbi,
-  name: "VetoCast",
+  abi: MultisigPluginAbi,
+  name: "Approved",
 });
 
-export function useProposalVetoes(
+export function useProposalApprovals(
   publicClient: PublicClient,
   address: Address,
   proposalId: string,
   proposal: Proposal | null
 ) {
-  const [proposalLogs, setLogs] = useState<VetoCastEvent[]>([]);
+  const [proposalLogs, setLogs] = useState<ApprovedEvent[]>([]);
 
   async function getLogs() {
     if (!proposal?.parameters?.snapshotBlock) return;
 
-    const logs: VoteCastResponse[] = (await publicClient.getLogs({
+    const logs: ApprovedEventResponse[] = (await publicClient.getLogs({
       address,
       event: event as any,
       args: {

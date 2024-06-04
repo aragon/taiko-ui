@@ -1,6 +1,6 @@
 import WalletContainer from "@/components/WalletContainer";
 import { plugins } from "@/plugins";
-import { AvatarIcon, IconType } from "@aragon/ods";
+// import { AvatarIcon, IconType } from "@aragon/ods";
 import classNames from "classnames";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,7 +12,7 @@ export const Navbar: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   const navLinks: INavLink[] = [
-    { path: "/", id: "dashboard", name: "Dashboard", icon: IconType.APP_DASHBOARD },
+    { path: "/", id: "dashboard", name: "Dashboard", icon: undefined },
     ...plugins.map((p) => ({
       id: p.id,
       name: p.title,
@@ -48,7 +48,7 @@ export const Navbar: React.FC = () => {
                 "outline-none focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset" // focus styles
               )}
             >
-              <AvatarIcon size="lg" icon={IconType.MENU} />
+              {/*<AvatarIcon size="lg" icon={IconType.MENU} />*/}
             </button>
           </div>
         </div>
@@ -60,7 +60,7 @@ export const Navbar: React.FC = () => {
           ))}
         </ul>
       </nav>
-      <MobileNavDialog open={open} navLinks={navLinks} onOpenChange={setOpen} />
+      {/*<MobileNavDialog open={open} navLinks={navLinks} onOpenChange={setOpen} />*/}
     </>
   );
 };

@@ -1,11 +1,6 @@
 import { useProposal } from "@/plugins/multisig/hooks/useProposal";
-import { ToggleGroup, Toggle } from "@aragon/ods";
 import ProposalDescription from "@/plugins/multisig/components/proposal/description";
-import VetoesSection from "@/plugins/multisig/components/approve/vetoes-section";
 import ProposalHeader from "@/plugins/multisig/components/proposal/header";
-import ApprovalTally from "@/plugins/multisig/components/approve/tally";
-import ProposalDetails from "@/plugins/multisig/components/proposal/details";
-import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useState } from "react";
 import { useProposalVeto } from "@/plugins/multisig/hooks/useProposalVeto";
@@ -13,7 +8,9 @@ import { useProposalExecute } from "@/plugins/multisig/hooks/useProposalExecute"
 import { generateBreadcrumbs } from "@/utils/nav";
 import { useRouter } from "next/router";
 import { BodySection } from "@/components/proposal/proposalBodySection";
-import { ITransformedStage, ProposalStages, ProposalVoting } from "../components/proposal/proposalVoting";
+import { ProposalVoting } from "@/components/proposalVoting";
+import { ITransformedStage, IVote, ProposalStages } from "@/utils/types";
+import dayjs from "dayjs";
 
 type BottomSection = "description" | "vetoes";
 
@@ -24,10 +21,10 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const {
     proposal,
     proposalFetchStatus,
-    canVeto,
-    vetoes,
-    isConfirming: isConfirmingVeto,
-    vetoProposal,
+    canApprove,
+    approvals,
+    isConfirming: isConfirmingApproval,
+    approveProposal,
   } = useProposalVeto(proposalId);
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
@@ -35,30 +32,31 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const proposalStage: ITransformedStage[] = [
     {
       id: "1",
-      type: ProposalStages.DRAFT,
-      variant: "success",
-      title: "Draft",
-      status: "active",
+      type: ProposalStages.MULTISIG_APPROVAL,
+      variant: "approvalThreshold",
+      title: "Onchain Multisig",
+      status: "failed",
       disabled: false,
-      proposalId: "1",
+      proposalId: proposalId,
       providerId: "1",
       result: {
         cta: {
-          disabled: false,
+          disabled: canApprove,
           isLoading: false,
           label: "Approve",
-          onClick: () => {},
+          onClick: approveProposal,
         },
-        approvalAmount: 0,
-        approvalThreshold: 0,
+        approvalAmount: proposal?.approvals || 0,
+        approvalThreshold: proposal?.parameters.minApprovals || 0,
       },
       details: {
-        censusBlock: 0,
-        startDate: "2021-09-01T00:00:00Z",
-        endDate: "2021-09-01T00:00:00Z",
+        censusBlock: Number(proposal?.parameters.snapshotBlock),
+        startDate: dayjs(Number(proposal?.parameters.startDate) * 1000).toString(),
+        endDate: dayjs(Number(proposal?.parameters.endDate) * 1000).toString(),
         strategy: "approvalThreshold",
-        options: "yes/no",
+        options: "approve",
       },
+      votes: approvals.map(({ approver }) => ({ address: approver, variant: "approve" }) as IVote),
     },
   ];
 
@@ -79,10 +77,10 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         proposalNumber={Number(proposalId) + 1}
         proposal={proposal}
         breadcrumbs={breadcrumbs}
-        transactionConfirming={isConfirmingVeto || isConfirmingExecution}
-        canVeto={canVeto}
+        transactionConfirming={isConfirmingApproval || isConfirmingExecution}
+        canApprove={canApprove}
         canExecute={canExecute}
-        onVetoPressed={() => vetoProposal()}
+        onVetoPressed={() => approveProposal()}
         onExecutePressed={() => executeProposal()}
       />
 
