@@ -8,8 +8,7 @@ export type ProposalInputs = {
 export type ProposalResultType = readonly [boolean, number, ProposalParameters, string, readonly Action[], Address];
 
 export type ProposalParameters = {
-  startDate: bigint;
-  endDate: bigint;
+  expirationDate: bigint;
   snapshotBlock: bigint;
   minApprovals: number;
 };

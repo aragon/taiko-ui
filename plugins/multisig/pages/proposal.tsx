@@ -1,8 +1,6 @@
 import { useProposal } from "@/plugins/multisig/hooks/useProposal";
-import ProposalDescription from "@/plugins/multisig/components/proposal/description";
 import ProposalHeader from "@/plugins/multisig/components/proposal/header";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useState } from "react";
 import { useProposalVeto } from "@/plugins/multisig/hooks/useProposalVeto";
 import { useProposalExecute } from "@/plugins/multisig/hooks/useProposalExecute";
 import { generateBreadcrumbs } from "@/utils/nav";

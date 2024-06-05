@@ -8,6 +8,11 @@ import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
 import { useAction } from "@/hooks/useAction";
 
+const ProposalCreatedEvent = getAbiItem({
+  abi: MultisigPluginAbi,
+  name: "ProposalCreated",
+});
+
 type ProposalCreatedLogResponse = {
   args: {
     actions: IAction[];
@@ -20,15 +25,9 @@ type ProposalCreatedLogResponse = {
   };
 };
 
-const ProposalCreatedEvent = getAbiItem({
-  abi: MultisigPluginAbi,
-  name: "ProposalCreated",
-});
-
 export function useProposal(proposalId: string, autoRefresh = false) {
   const publicClient = usePublicClient();
   const [proposalCreationEvent, setProposalCreationEvent] = useState<ProposalCreatedLogResponse["args"]>();
-  const [metadataUri, setMetadata] = useState<string>();
   const { data: blockNumber } = useBlockNumber({ watch: true });
 
   // Proposal on-chain data
@@ -59,6 +58,31 @@ export function useProposal(proposalId: string, autoRefresh = false) {
   } = useMetadata<ProposalMetadata>(proposalData?.metadataUri);
 
   const proposal = arrangeProposalData(proposalData, proposalCreationEvent, metadataContent);
+
+  useEffect(() => {
+    if (!proposalData || !publicClient || proposalCreationEvent) return;
+
+    publicClient
+      .getLogs({
+        address: PUB_MULTISIG_PLUGIN_ADDRESS,
+        event: ProposalCreatedEvent as any,
+        args: {
+          proposalId,
+        } as any,
+        fromBlock: proposalData.parameters.snapshotBlock,
+        toBlock: "latest",
+      })
+      .then((logs) => {
+        if (!logs || !logs.length) throw new Error("No creation logs");
+
+        const log: ProposalCreatedLogResponse = logs[0] as any;
+        setProposalCreationEvent(log.args);
+      })
+      .catch((err) => {
+        console.error("Could not fetch the proposal details", err);
+        return null;
+      });
+  }, [proposalData, !!publicClient]);
 
   return {
     proposal,
@@ -110,7 +134,12 @@ function arrangeProposalData(
   return {
     actions: proposalData.actions,
     executed: proposalData.executed,
-    parameters: proposalData.parameters,
+    parameters: {
+      snapshotBlock: proposalData.parameters.snapshotBlock,
+      startDate: BigInt(0),
+      endDate: proposalData.parameters.expirationDate,
+      minApprovals: proposalData.parameters.minApprovals,
+    },
     approvals: proposalData.approvals,
     allowFailureMap: BigInt(0),
     creator: creationEvent?.creator || "",
