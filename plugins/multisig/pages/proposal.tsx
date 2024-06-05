@@ -12,6 +12,7 @@ import { ProposalVoting } from "@/components/proposalVoting";
 import { ITransformedStage, IVote, ProposalStages } from "@/utils/types";
 import { useProposalStatus } from "../hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
+import { ProposalAction } from "@/components/proposalAction/proposalAction";
 
 type BottomSection = "description" | "vetoes";
 
@@ -91,7 +92,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
           <ProposalVoting stages={proposalStage} />
         </div>
         <div className="w-full py-12">
-          <ProposalDescription {...proposal} />
+          <ProposalAction actions={proposal.actions} />
         </div>
       </div>
     </section>

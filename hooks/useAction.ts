@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-import { Action } from "@/utils/types";
+import { IAction, RawAction } from "@/utils/types";
 import { AbiFunction, Address, Hex, decodeFunctionData, toFunctionSelector } from "viem";
 import { useAbi } from "./useAbi";
 
-type EvmValue = string | Hex | Address | number | bigint | boolean;
-
-export function useAction(action: Action) {
+export function useAction(action: RawAction) {
   const { abi, isLoading } = useAbi(action.to as Address);
   const [functionName, setFunctionName] = useState<string | null>(null);
   const [functionAbi, setFunctionAbi] = useState<AbiFunction | null>(null);

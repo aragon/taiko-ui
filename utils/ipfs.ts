@@ -24,12 +24,8 @@ async function fetchFromIPFS(ipfsUri: string): Promise<Response> {
   const path = resolvePath(ipfsUri);
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), 800);
-  const response = await fetch(`${PUB_IPFS_ENDPOINT}/cat?arg=${path}`, {
-    method: "POST",
-    headers: {
-      "X-API-KEY": PUB_IPFS_API_KEY,
-      Accept: "application/json",
-    },
+  const response = await fetch(`${PUB_IPFS_ENDPOINT}/${path}`, {
+    method: "GET",
     signal: controller.signal,
   });
   clearTimeout(id);

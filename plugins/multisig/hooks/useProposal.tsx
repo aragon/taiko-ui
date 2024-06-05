@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
-import { Hex, fromHex, getAbiItem } from "viem";
+import { Address, Hex, fromHex, getAbiItem } from "viem";
 import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin";
-import { Action } from "@/utils/types";
+import { IAction, RawAction, RawOnchainAction } from "@/utils/types";
 import { Proposal, ProposalMetadata, ProposalParameters, ProposalResultType } from "@/plugins/multisig/utils/types";
 import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
+import { useAction } from "@/hooks/useAction";
 
 type ProposalCreatedLogResponse = {
   args: {
-    actions: Action[];
+    actions: IAction[];
     allowFailureMap: bigint;
     creator: string;
     endDate: bigint;
@@ -109,9 +110,19 @@ function decodeProposalResultData(data?: ProposalResultType) {
     executed: data[0] as boolean,
     approvals: data[1] as number,
     parameters: data[2] as ProposalParameters,
-    actions: data[3] as Array<Action>,
+    actions: getProposalActions(data[3] as Array<RawAction>),
     allowFailureMap: data[4] as bigint,
   };
+}
+
+function getProposalActions(chainActions: RawAction[]): IAction[] {
+  return chainActions.map((tx) => {
+    const { data, to, value } = tx;
+    const rawAction = { data, to, value };
+    const decoded = useAction(tx);
+
+    return { raw: rawAction, decoded };
+  });
 }
 
 function arrangeProposalData(

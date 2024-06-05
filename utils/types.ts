@@ -1,12 +1,25 @@
 import { IVotesDataListVariant } from "@/components/proposalVoting/votesDataList/votesDataListItemStructure";
 import { IApprovalThresholdResult, IButtonProps, ProposalType } from "@aragon/ods";
-import { Address, Hex } from "viem";
+import { Address, Hex, AbiFunction } from "viem";
 
-export type Action = {
-  to: Address;
+type EvmValue = string | Hex | Address | number | bigint | boolean;
+
+export interface DecodedAction {
+  functionName: string | null;
+  functionAbi: AbiFunction | null;
+  args: EvmValue[];
+}
+
+export type RawAction = {
+  to: string;
   value: bigint;
-  data: Hex;
+  data: string;
 };
+
+export interface IAction {
+  decoded?: DecodedAction;
+  raw: RawAction;
+}
 
 export interface IAlert {
   id: number;
@@ -29,7 +42,7 @@ export type Proposal = {
   executed: boolean;
   parameters: ProposalParameters;
   approvals: number;
-  actions: Action[];
+  actions: IAction[];
   allowFailureMap: bigint;
   creator: string;
   title: string;
