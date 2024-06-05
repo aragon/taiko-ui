@@ -37,6 +37,18 @@ export type ProposalParameters = {
   minApprovals: number;
 };
 
+export type ProposalMetadata = {
+  title: string;
+  summary: string;
+  description: string;
+  resources: IProposalResource[];
+};
+
+export type IProposalResource = {
+  name: string;
+  url: string;
+};
+
 export type Proposal = {
   // active: boolean;
   executed: boolean;
@@ -48,7 +60,7 @@ export type Proposal = {
   title: string;
   summary: string;
   description: string;
-  resources: string[];
+  resources: IProposalResource[];
 };
 
 export enum ProposalStages {

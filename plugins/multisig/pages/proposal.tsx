@@ -13,6 +13,7 @@ import { ITransformedStage, IVote, ProposalStages } from "@/utils/types";
 import { useProposalStatus } from "../hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
 import { ProposalAction } from "@/components/proposalAction/proposalAction";
+import { CardResources } from "@/components/proposal/cardResources";
 
 type BottomSection = "description" | "vetoes";
 
@@ -86,13 +87,16 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         onExecutePressed={() => executeProposal()}
       />
 
-      <div className="flex w-full flex-col items-center px-4 py-6 md:w-4/5 md:p-6 lg:w-2/3 xl:py-10 2xl:w-3/5">
-        <BodySection body={proposal.description || "No description was provided"} />
-        <div className="my-10 w-full ">
-          <ProposalVoting stages={proposalStage} />
-        </div>
-        <div className="w-full py-12">
-          <ProposalAction actions={proposal.actions} />
+      <div className="mx-auto w-full max-w-screen-xl px-4 py-6 md:px-16 md:pb-20 md:pt-10">
+        <div className="flex w-full flex-col gap-x-12 gap-y-6 md:flex-row">
+          <div className="flex flex-col gap-y-6 md:w-[63%] md:shrink-0">
+            <BodySection body={proposal.description || "No description was provided"} />
+            <ProposalVoting stages={proposalStage} />
+            <ProposalAction actions={proposal.actions} />
+          </div>
+          <div className="flex flex-col gap-y-6 md:w-[33%]">
+            <CardResources resources={proposal.resources} title="Resources" />
+          </div>
         </div>
       </div>
     </section>

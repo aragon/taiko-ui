@@ -28,13 +28,6 @@ export type Proposal = {
   resources: string[];
 };
 
-export type ProposalMetadata = {
-  title: string;
-  summary: string;
-  description: string;
-  resources: string[];
-};
-
 export type ApprovedEventResponse = {
   args: ApprovedEvent[];
 };
