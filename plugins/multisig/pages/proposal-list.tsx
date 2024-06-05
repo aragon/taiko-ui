@@ -3,7 +3,7 @@ import { type ReactNode, useEffect, useState } from "react";
 import ProposalCard from "@/plugins/multisig/components/proposal";
 import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin";
 import { Button, DataList, IconType, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
-import { useCanCreateProposal } from "@/plugins/dualGovernance/hooks/useCanCreateProposal";
+import { useCanCreateProposal } from "@/plugins/multisig/hooks/useCanCreateProposal";
 import Link from "next/link";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PUB_MULTISIG_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
@@ -78,7 +78,7 @@ export default function Proposals() {
       <SectionView>
         <h1 className="justify-self-start align-middle text-3xl font-semibold">Proposals</h1>
         <div className="justify-self-end">
-          <If condition={canCreate && proposalCount}>
+          <If condition={canCreate}>
             <Link href="#/new">
               <Button iconLeft={IconType.PLUS} size="md" variant="primary">
                 Submit Proposal
