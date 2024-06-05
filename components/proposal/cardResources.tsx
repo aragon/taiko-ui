@@ -9,11 +9,15 @@ interface ICardResourcesProps {
 }
 
 export const CardResources: React.FC<ICardResourcesProps> = (props) => {
-  const { displayLink = true, resources, title } = props;
+  const { displayLink = true, title } = props;
+  let { resources } = props;
 
   if (resources == null || resources.length === 0) {
     return <CardEmptyState objectIllustration={{ object: "ARCHIVE" }} heading="No resources were added" />;
   }
+
+  // Check that resources is not a empty but not an array
+  if (!Array.isArray(resources)) resources = [resources];
 
   return (
     <Card className="flex flex-col gap-y-4 p-6 shadow-neutral">

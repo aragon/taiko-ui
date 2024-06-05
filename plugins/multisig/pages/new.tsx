@@ -123,7 +123,7 @@ export default function Create() {
       title,
       summary,
       description,
-      resources: { name: "Taiko", url: "https://taiko.xyz" },
+      resources: [{ name: "Taiko", url: "https://taiko.xyz" }],
     };
 
     const ipfsPin = await uploadToPinata(proposalMetadataJsonObject);
