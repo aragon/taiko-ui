@@ -12,6 +12,31 @@ export function uploadToIPFS(client: IPFSHTTPClient, blob: Blob) {
   });
 }
 
+export function uploadToPinata(data: any): Promise<string> {
+  const pinataData = {
+    pinataOptions: {
+      cidVersion: 1,
+    },
+    pinataContent: {
+      ...data,
+    },
+  };
+  return fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${PUB_IPFS_API_KEY}`,
+      "Content-Type": "application/json",
+      "x-pinata-origin": "sdk",
+      "x-version": "2.1.1",
+    },
+    body: JSON.stringify(pinataData),
+  })
+    .then((res) => res.json())
+    .then((json) => {
+      return "ipfs://" + json.IpfsHash;
+    });
+}
+
 async function fetchFromIPFS(ipfsUri: string): Promise<Response> {
   if (!ipfsUri) throw new Error("Invalid IPFS URI");
   else if (ipfsUri.startsWith("0x")) {
