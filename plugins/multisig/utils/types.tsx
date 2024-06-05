@@ -5,7 +5,7 @@ export type ProposalInputs = {
   proposalId: bigint;
 };
 
-export type ProposalResultType = readonly [boolean, number, ProposalParameters, readonly Action[], bigint];
+export type ProposalResultType = readonly [boolean, number, ProposalParameters, string, readonly Action[], Address];
 
 export type ProposalParameters = {
   startDate: bigint;

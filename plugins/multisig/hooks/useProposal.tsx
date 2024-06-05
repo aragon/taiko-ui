@@ -51,39 +51,12 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     if (autoRefresh) proposalRefetch();
   }, [blockNumber]);
 
-  // Creation event
-  useEffect(() => {
-    if (!proposalData || !publicClient) return;
-
-    publicClient
-      .getLogs({
-        address: PUB_MULTISIG_PLUGIN_ADDRESS,
-        event: ProposalCreatedEvent as any,
-        args: {
-          proposalId,
-        } as any,
-        fromBlock: proposalData.parameters.snapshotBlock,
-        toBlock: proposalData.parameters.startDate,
-      })
-      .then((logs) => {
-        if (!logs || !logs.length) throw new Error("No creation logs");
-
-        const log: ProposalCreatedLogResponse = logs[0] as any;
-        setProposalCreationEvent(log.args);
-        setMetadata(fromHex(log.args.metadata as Hex, "string"));
-      })
-      .catch((err) => {
-        console.error("Could not fetch the proposal details", err);
-        return null;
-      });
-  }, [proposalData?.approvals, !!publicClient]);
-
   // JSON metadata
   const {
     data: metadataContent,
     isLoading: metadataLoading,
     error: metadataError,
-  } = useMetadata<ProposalMetadata>(metadataUri);
+  } = useMetadata<ProposalMetadata>(proposalData?.metadataUri);
 
   const proposal = arrangeProposalData(proposalData, proposalCreationEvent, metadataContent);
 
@@ -110,12 +83,14 @@ function decodeProposalResultData(data?: ProposalResultType) {
     executed: data[0] as boolean,
     approvals: data[1] as number,
     parameters: data[2] as ProposalParameters,
-    actions: getProposalActions(data[3] as Array<RawAction>),
-    allowFailureMap: data[4] as bigint,
+    metadataUri: data[3] as string,
+    actions: getProposalActions(data[4] as Array<RawAction>),
   };
 }
 
 function getProposalActions(chainActions: RawAction[]): IAction[] {
+  if (!chainActions) return [];
+
   return chainActions.map((tx) => {
     const { data, to, value } = tx;
     const rawAction = { data, to, value };
@@ -137,7 +112,7 @@ function arrangeProposalData(
     executed: proposalData.executed,
     parameters: proposalData.parameters,
     approvals: proposalData.approvals,
-    allowFailureMap: proposalData.allowFailureMap,
+    allowFailureMap: BigInt(0),
     creator: creationEvent?.creator || "",
     title: metadata?.title || "",
     summary: metadata?.summary || "",
