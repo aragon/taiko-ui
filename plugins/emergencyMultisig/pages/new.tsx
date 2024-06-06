@@ -1,8 +1,8 @@
-import { Button, IconType, Icon, InputText, TextAreaRichText } from "@aragon/ods";
+import { Button, IconType, Icon, InputText, TextAreaRichText, IllustrationHuman } from "@aragon/ods";
 import React, { ReactNode, useEffect, useState } from "react";
 import { uploadToPinata } from "@/utils/ipfs";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { Hex, keccak256, toHex } from "viem";
+import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { Hex, keccak256, toHex, encodeAbiParameters, getAbiItem } from "viem";
 import { useAlerts } from "@/context/Alerts";
 import WithdrawalInput from "@/components/input/withdrawal";
 import { FunctionCallForm } from "@/components/input/function-call-form";
@@ -15,6 +15,8 @@ import { ActionCard } from "@/components/actions/action";
 import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin";
 import { encryptProposal, encryptSymmetricKey } from "@/utils/encryption";
 import { EncryptedProposalMetadata } from "../utils/types";
+import { usePublicKeyRegistry } from "../hooks/usePublicKeyRegistry";
+import { hexToUint8Array } from "@/utils/hex";
 
 enum ActionType {
   Signaling,
@@ -32,6 +34,12 @@ export default function Create() {
   const { writeContract: createProposalWrite, data: createTxHash, error, status } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: createTxHash });
   const [actionType, setActionType] = useState<ActionType>(ActionType.Signaling);
+  const { address: selfAddress, isConnected } = useAccount();
+  const {
+    data: { publicKeys, addresses: registeredSigners },
+    registerPublicKey,
+    isLoading: pubKeysLoading,
+  } = usePublicKeyRegistry();
 
   const changeActionType = (actionType: ActionType) => {
     setActions([]);
@@ -116,13 +124,13 @@ export default function Create() {
 
     // Encrypt the proposal data
 
-    // TODO: abi.encode actions[] locally
-    const actionsBytes = new Uint8Array();
-    // TODO: Fetch from the registry
-    const publicKeys: Array<Uint8Array> = [];
+    const actionsBytes = encodeAbiParameters([ACTION_ARRAY_ABI], [actions]);
 
-    const { data: cipherData, symmetricKey } = encryptProposal(privateMetadata, actionsBytes);
-    const encryptedSymKeys = encryptSymmetricKey(symmetricKey, publicKeys);
+    const { data: cipherData, symmetricKey } = encryptProposal(privateMetadata, hexToUint8Array(actionsBytes));
+    const encryptedSymKeys = encryptSymmetricKey(
+      symmetricKey,
+      publicKeys.map((pk) => hexToUint8Array(pk))
+    );
     const actionsHash = keccak256(actionsBytes);
 
     const publicMetadataJson: EncryptedProposalMetadata = {
@@ -159,143 +167,188 @@ export default function Create() {
       <SectionView>
         <div className="w-full justify-between py-5">
           <h1 className="mb-10 text-3xl font-semibold text-neutral-900">Create Proposal</h1>
-          <div className="mb-6">
-            <InputText
-              className=""
-              label="Title"
-              maxLength={100}
-              placeholder="A short title that describes the main purpose"
-              variant="default"
-              value={title}
-              onChange={handleTitleInput}
-            />
-          </div>
-          <div className="mb-6">
-            <InputText
-              className=""
-              label="Summary"
-              maxLength={280}
-              placeholder="A short summary that outlines the main purpose of the proposal"
-              variant="default"
-              value={summary}
-              onChange={handleSummaryInput}
-            />
-          </div>
-          <div className="mb-6">
-            <TextAreaRichText
-              label="Description"
-              className="pt-2"
-              value={description}
-              onChange={setDescription}
-              placeholder="A description for what the proposal is all about"
-            />
-          </div>
-          <div className="mb-6">
-            <span className="mb-2 block text-lg font-normal text-neutral-900 ">Select the type of proposal</span>
-            <div className="mt-2 grid h-24 grid-cols-3 gap-5">
-              <div
-                onClick={() => {
-                  changeActionType(ActionType.Signaling);
-                }}
-                className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
-                  actionType === ActionType.Signaling ? "border-primary-300" : "border-neutral-100"
-                }`}
-              >
-                <Icon
-                  className={
-                    "mt-2 !h-12 !w-10 p-2 " +
-                    (actionType === ActionType.Signaling ? "text-primary-400" : "text-neutral-400")
-                  }
-                  icon={IconType.INFO}
-                  size="lg"
-                />
-                <span className="text-center text-sm text-neutral-400">Signaling</span>
-              </div>
-              <div
-                onClick={() => changeActionType(ActionType.Withdrawal)}
-                className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
-                  actionType === ActionType.Withdrawal ? "border-primary-300" : "border-neutral-100"
-                }`}
-              >
-                <Icon
-                  className={
-                    "mt-2 !h-12 !w-10 p-2 " +
-                    (actionType === ActionType.Withdrawal ? "text-primary-400" : "text-neutral-400")
-                  }
-                  icon={IconType.WITHDRAW}
-                  size="lg"
-                />
-                <span className="text-center text-sm text-neutral-400">DAO Payment</span>
-              </div>
-              <div
-                onClick={() => changeActionType(ActionType.Custom)}
-                className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
-                  actionType === ActionType.Custom ? "border-primary-300" : "border-neutral-100"
-                }`}
-              >
-                <Icon
-                  className={
-                    "mt-2 !h-12 !w-10 p-2 " +
-                    (actionType === ActionType.Custom ? "text-primary-400" : "text-neutral-400")
-                  }
-                  icon={IconType.BLOCKCHAIN_BLOCKCHAIN}
-                  size="lg"
-                />
-                <span className="text-center text-sm text-neutral-400">Custom action</span>
-              </div>
-            </div>
-            <div className="mb-6">
-              {actionType === ActionType.Withdrawal && <WithdrawalInput setActions={setActions} />}
-              {actionType === ActionType.Custom && (
-                <FunctionCallForm onAddAction={(action) => setActions(actions.concat([action]))} />
-              )}
-            </div>
-          </div>
 
-          <If condition={showLoading}>
+          <If condition={pubKeysLoading}>
             <Then>
+              {/* No public keys yet */}
               <div className="mb-6 mt-14">
-                <PleaseWaitSpinner fullMessage="Confirming transaction..." />
+                <PleaseWaitSpinner fullMessage="Loading the signer public keys..." />
               </div>
             </Then>
-            <ElseIf condition={actionType !== ActionType.Custom}>
-              <Button className="mb-6 mt-14" size="lg" variant="primary" onClick={() => submitProposal()}>
-                Submit proposal
-              </Button>
+            <ElseIf condition={!selfAddress || !isConnected}>
+              {/* Not connected */}
+              <div>
+                <p className="text-md text-neutral-400">You are not connected to the network</p>
+                <Illustration />
+              </div>
+            </ElseIf>
+            <ElseIf condition={selfAddress && !registeredSigners.includes(selfAddress)}>
+              {/* Public key not registered yet */}
+              <div className="w-full">
+                <p className="text-md text-neutral-400">
+                  You haven&apos;t registered a public key yet. A public key is necessary in order for proposals to have
+                  private data that only members can decrypt. You will sign a deterministic text, which will be used to
+                  generate an encryption key only for this DAO.
+                </p>
+                <Illustration />
+                <div className="flex justify-center">
+                  <Button size="md" variant="primary" onClick={() => registerPublicKey()}>
+                    <span>Register your public key</span>
+                  </Button>
+                </div>
+              </div>
             </ElseIf>
             <Else>
-              <div className="mb-6 mt-14">
-                <If not={actions.length}>
-                  <Then>
-                    <p>Add the first action to continue</p>
-                  </Then>
-                  <Else>
-                    <p className="flex-grow pb-3 text-lg font-semibold text-neutral-900">Actions</p>
-                    <div className="mb-10">
-                      {actions?.map?.((action, i) => (
-                        <div className="mb-3" key={`${i}-${action.to}-${action.data}`}>
-                          <ActionCard action={action} idx={i} />
-                        </div>
-                      ))}
-                    </div>
-                  </Else>
-                </If>
-                <Button
-                  className="mt-3"
-                  size="lg"
-                  variant="primary"
-                  disabled={!actions.length}
-                  onClick={() => submitProposal()}
-                >
-                  Submit proposal
-                </Button>
+              {/* All ready */}
+              {/* Form */}
+              <div className="mb-6">
+                <InputText
+                  className=""
+                  label="Title"
+                  maxLength={100}
+                  placeholder="A short title that describes the main purpose"
+                  variant="default"
+                  value={title}
+                  onChange={handleTitleInput}
+                />
               </div>
+              <div className="mb-6">
+                <InputText
+                  className=""
+                  label="Summary"
+                  maxLength={280}
+                  placeholder="A short summary that outlines the main purpose of the proposal"
+                  variant="default"
+                  value={summary}
+                  onChange={handleSummaryInput}
+                />
+              </div>
+              <div className="mb-6">
+                <TextAreaRichText
+                  label="Description"
+                  className="pt-2"
+                  value={description}
+                  onChange={setDescription}
+                  placeholder="A description for what the proposal is all about"
+                />
+              </div>
+              <div className="mb-6">
+                <span className="mb-2 block text-lg font-normal text-neutral-900 ">Select the type of proposal</span>
+                <div className="mt-2 grid h-24 grid-cols-3 gap-5">
+                  <div
+                    onClick={() => {
+                      changeActionType(ActionType.Signaling);
+                    }}
+                    className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
+                      actionType === ActionType.Signaling ? "border-primary-300" : "border-neutral-100"
+                    }`}
+                  >
+                    <Icon
+                      className={
+                        "mt-2 !h-12 !w-10 p-2 " +
+                        (actionType === ActionType.Signaling ? "text-primary-400" : "text-neutral-400")
+                      }
+                      icon={IconType.INFO}
+                      size="lg"
+                    />
+                    <span className="text-center text-sm text-neutral-400">Signaling</span>
+                  </div>
+                  <div
+                    onClick={() => changeActionType(ActionType.Withdrawal)}
+                    className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
+                      actionType === ActionType.Withdrawal ? "border-primary-300" : "border-neutral-100"
+                    }`}
+                  >
+                    <Icon
+                      className={
+                        "mt-2 !h-12 !w-10 p-2 " +
+                        (actionType === ActionType.Withdrawal ? "text-primary-400" : "text-neutral-400")
+                      }
+                      icon={IconType.WITHDRAW}
+                      size="lg"
+                    />
+                    <span className="text-center text-sm text-neutral-400">DAO Payment</span>
+                  </div>
+                  <div
+                    onClick={() => changeActionType(ActionType.Custom)}
+                    className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
+                      actionType === ActionType.Custom ? "border-primary-300" : "border-neutral-100"
+                    }`}
+                  >
+                    <Icon
+                      className={
+                        "mt-2 !h-12 !w-10 p-2 " +
+                        (actionType === ActionType.Custom ? "text-primary-400" : "text-neutral-400")
+                      }
+                      icon={IconType.BLOCKCHAIN_BLOCKCHAIN}
+                      size="lg"
+                    />
+                    <span className="text-center text-sm text-neutral-400">Custom action</span>
+                  </div>
+                </div>
+                <div className="mb-6">
+                  {actionType === ActionType.Withdrawal && <WithdrawalInput setActions={setActions} />}
+                  {actionType === ActionType.Custom && (
+                    <FunctionCallForm onAddAction={(action) => setActions(actions.concat([action]))} />
+                  )}
+                </div>
+              </div>
+              <div>
+                <span className="text-md mb-2 block font-normal text-neutral-700 ">
+                  {registeredSigners.length} signer(s) registered a public key
+                </span>
+              </div>
+
+              <If condition={showLoading}>
+                <Then>
+                  <div className="mb-6 mt-14">
+                    <PleaseWaitSpinner fullMessage="Confirming transaction..." />
+                  </div>
+                </Then>
+                <ElseIf condition={actionType !== ActionType.Custom}>
+                  <Button className="mb-6 mt-14" size="lg" variant="primary" onClick={() => submitProposal()}>
+                    Submit proposal
+                  </Button>
+                </ElseIf>
+                <Else>
+                  <div className="mb-6 mt-14">
+                    <If not={actions.length}>
+                      <Then>
+                        <p>Add the first action to continue</p>
+                      </Then>
+                      <Else>
+                        <p className="flex-grow pb-3 text-lg font-semibold text-neutral-900">Actions</p>
+                        <div className="mb-10">
+                          {actions?.map?.((action, i) => (
+                            <div className="mb-3" key={`${i}-${action.to}-${action.data}`}>
+                              <ActionCard action={action} idx={i} />
+                            </div>
+                          ))}
+                        </div>
+                      </Else>
+                    </If>
+                    <Button
+                      className="mt-3"
+                      size="lg"
+                      variant="primary"
+                      disabled={!actions.length}
+                      onClick={() => submitProposal()}
+                    >
+                      Submit proposal
+                    </Button>
+                  </div>
+                </Else>
+              </If>
             </Else>
           </If>
         </div>
       </SectionView>
     </MainSection>
   );
+}
+
+function Illustration() {
+  return <IllustrationHuman className="mx-auto mb-10 max-w-96" body="BLOCKS" expression="SMILE_WINK" hairs="CURLY" />;
 }
 
 function MainSection({ children }: { children: ReactNode }) {
@@ -309,3 +362,26 @@ function MainSection({ children }: { children: ReactNode }) {
 function SectionView({ children }: { children: ReactNode }) {
   return <div className="mb-6 flex w-full flex-row content-center justify-between">{children}</div>;
 }
+
+const ACTION_ARRAY_ABI = {
+  name: "_actions",
+  type: "tuple[]",
+  internalType: "struct IDAO.Action[]",
+  components: [
+    {
+      name: "to",
+      type: "address",
+      internalType: "address",
+    },
+    {
+      name: "value",
+      type: "uint256",
+      internalType: "uint256",
+    },
+    {
+      name: "data",
+      type: "bytes",
+      internalType: "bytes",
+    },
+  ],
+} as const;
