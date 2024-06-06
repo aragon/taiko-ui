@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
-import { Hex, fromHex, getAbiItem } from "viem";
+import { type Hex, fromHex, getAbiItem } from "viem";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
-import { Action } from "@/utils/types";
+import { type Action } from "@/utils/types";
 import {
-  Proposal,
-  ProposalMetadata,
-  ProposalParameters,
-  ProposalResultType,
+  type Proposal,
+  type ProposalMetadata,
+  type ProposalParameters,
+  type ProposalResultType,
 } from "@/plugins/dualGovernance/utils/types";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
+import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisticTokenVotingPlugin.sol";
 
 type ProposalCreatedLogResponse = {
   args: {
@@ -25,14 +26,14 @@ type ProposalCreatedLogResponse = {
 };
 
 const ProposalCreatedEvent = getAbiItem({
-  abi: OptimisticTokenVotingPluginAbi,
+  abi: TaikoOptimisticTokenVotingPluginAbi,
   name: "ProposalCreated",
 });
 
-export function useProposal(proposalId: string, autoRefresh = false) {
+export function useProposal(proposalIndex: string, autoRefresh = false) {
   const publicClient = usePublicClient();
   const [proposalCreationEvent, setProposalCreationEvent] = useState<ProposalCreatedLogResponse["args"]>();
-  const [metadataUri, setMetadata] = useState<string>();
+  const [proposalId, setProposalId] = useState<bigint>(BigInt(0));
   const { data: blockNumber } = useBlockNumber({ watch: true });
 
   // Proposal on-chain data
@@ -43,9 +44,9 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     refetch: proposalRefetch,
   } = useReadContract({
     address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-    abi: OptimisticTokenVotingPluginAbi,
+    abi: TaikoOptimisticTokenVotingPluginAbi,
     functionName: "getProposal",
-    args: [BigInt(proposalId)],
+    args: [proposalId!],
     chainId: PUB_CHAIN.id,
   });
 
@@ -63,31 +64,29 @@ export function useProposal(proposalId: string, autoRefresh = false) {
       .getLogs({
         address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
         event: ProposalCreatedEvent as any,
-        args: {
-          proposalId,
-        } as any,
-        fromBlock: proposalData.parameters.snapshotBlock,
-        toBlock: proposalData.parameters.startDate,
+        args: {} as any,
+        fromBlock: BigInt(6012935),
+        toBlock: "latest",
       })
       .then((logs) => {
         if (!logs || !logs.length) throw new Error("No creation logs");
 
-        const log: ProposalCreatedLogResponse = logs[0] as any;
+        const log: ProposalCreatedLogResponse = logs[Number(proposalIndex)] as any;
+        setProposalId(log.args.proposalId);
         setProposalCreationEvent(log.args);
-        setMetadata(fromHex(log.args.metadata as Hex, "string"));
       })
       .catch((err) => {
         console.error("Could not fetch the proposal details", err);
         return null;
       });
-  }, [proposalData?.vetoTally, !!publicClient]);
+  }, [!!publicClient]);
 
   // JSON metadata
   const {
     data: metadataContent,
     isLoading: metadataLoading,
     error: metadataError,
-  } = useMetadata<ProposalMetadata>(metadataUri);
+  } = useMetadata<ProposalMetadata>(proposalData?.metadataUri);
 
   const proposal = arrangeProposalData(proposalData, proposalCreationEvent, metadataContent);
 
@@ -115,8 +114,9 @@ function decodeProposalResultData(data?: ProposalResultType) {
     executed: data[1] as boolean,
     parameters: data[2] as ProposalParameters,
     vetoTally: data[3] as bigint,
-    actions: data[4] as Array<Action>,
-    allowFailureMap: data[5] as bigint,
+    metadataUri: data[4] as string,
+    actions: data[5] as Array<Action>,
+    allowFailureMap: data[6] as bigint,
   };
 }
 
@@ -127,6 +127,9 @@ function arrangeProposalData(
 ): Proposal | null {
   if (!proposalData) return null;
 
+  // console.log('Metadata: ', metadata)
+  // console.log('Proposal: ', proposalData)
+
   return {
     actions: proposalData.actions,
     active: proposalData.active,
@@ -134,10 +137,10 @@ function arrangeProposalData(
     parameters: proposalData.parameters,
     vetoTally: proposalData.vetoTally,
     allowFailureMap: proposalData.allowFailureMap,
-    creator: creationEvent?.creator || "",
-    title: metadata?.title || "",
-    summary: metadata?.summary || "",
-    description: metadata?.description || "",
-    resources: metadata?.resources || [],
+    creator: creationEvent?.creator ?? "",
+    title: metadata?.title ?? "",
+    summary: metadata?.summary ?? "",
+    description: metadata?.description ?? "",
+    resources: metadata?.resources ?? [],
   };
 }

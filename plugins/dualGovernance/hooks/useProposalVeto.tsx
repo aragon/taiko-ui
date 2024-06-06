@@ -4,7 +4,7 @@ import { useProposal } from "./useProposal";
 import { useProposalVetoes } from "@/plugins/dualGovernance/hooks/useProposalVetoes";
 import { useUserCanVeto } from "@/plugins/dualGovernance/hooks/useUserCanVeto";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
-import { useAlerts, AlertContextProps } from "@/context/Alerts";
+import { useAlerts, type AlertContextProps } from "@/context/Alerts";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 
 export function useProposalVeto(proposalId: string) {
@@ -26,7 +26,6 @@ export function useProposalVeto(proposalId: string) {
           timeout: 4 * 1000,
         });
       } else {
-        console.error(vetoingError);
         addAlert("Could not create the proposal", { type: "error" });
       }
       return;

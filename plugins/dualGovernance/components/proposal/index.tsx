@@ -27,7 +27,7 @@ type ProposalInputs = {
 const erc20Votes = parseAbi(["function getPastTotalSupply(uint256 blockNumber) view returns (uint256)"]);
 
 export default function ProposalCard(props: ProposalInputs) {
-  const { isConnected, address } = useAccount();
+  const { address } = useAccount();
   const { proposal, proposalFetchStatus, vetoes } = useProposalVeto(props.proposalId.toString());
   const { data: pastSupply } = useReadContract({
     address: PUB_TOKEN_ADDRESS,

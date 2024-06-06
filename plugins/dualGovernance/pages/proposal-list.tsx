@@ -7,13 +7,13 @@ import { useCanCreateProposal } from "@/plugins/dualGovernance/hooks/useCanCreat
 import Link from "next/link";
 import { If } from "@/components/if";
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
+import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisticTokenVotingPlugin.sol";
 // import { digestPagination } from "@/utils/pagination";
 
 const DEFAULT_PAGE_SIZE = 6;
 
 export default function Proposals() {
   const { isConnected, address } = useAccount();
-  const canCreate = useCanCreateProposal();
 
   const { data: blockNumber } = useBlockNumber({ watch: true });
 
@@ -25,7 +25,7 @@ export default function Proposals() {
     refetch,
   } = useReadContract({
     address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-    abi: OptimisticTokenVotingPluginAbi,
+    abi: TaikoOptimisticTokenVotingPluginAbi,
     functionName: "proposalCount",
     chainId: PUB_CHAIN.id,
   });
@@ -79,15 +79,6 @@ export default function Proposals() {
     <MainSection>
       <SectionView>
         <h1 className="justify-self-start align-middle text-3xl font-semibold">Proposals</h1>
-        <div className="justify-self-end">
-          <If condition={canCreate && proposalCount}>
-            <Link href="#/new">
-              <Button iconLeft={IconType.PLUS} size="md" variant="primary">
-                Submit Proposal
-              </Button>
-            </Link>
-          </If>
-        </div>
       </SectionView>
       <If condition={proposalCount}>
         <DataList.Root
