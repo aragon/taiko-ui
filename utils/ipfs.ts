@@ -1,15 +1,8 @@
 import { PUB_IPFS_ENDPOINT, PUB_IPFS_API_KEY } from "@/constants";
-import { CID, IPFSHTTPClient } from "ipfs-http-client";
 import { Hex, fromHex } from "viem";
 
 export function fetchJsonFromIpfs(ipfsUri: string) {
   return fetchFromIPFS(ipfsUri).then((res) => res.json());
-}
-
-export function uploadToIPFS(client: IPFSHTTPClient, blob: Blob) {
-  return client.add(blob).then(({ cid }: { cid: CID }) => {
-    return "ipfs://" + cid.toString();
-  });
 }
 
 export function uploadToPinata(data: any): Promise<string> {

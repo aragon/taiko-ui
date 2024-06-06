@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { IAction, RawAction } from "@/utils/types";
+import { RawAction } from "@/utils/types";
 import { AbiFunction, Address, Hex, decodeFunctionData, toFunctionSelector } from "viem";
 import { useAbi } from "./useAbi";
 
