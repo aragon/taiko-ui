@@ -9,16 +9,11 @@ const event = getAbiItem({
   name: "VetoCast",
 });
 
-export function useProposalVetoes(
-  publicClient: PublicClient,
-  address: Address,
-  proposalId: string,
-  proposal: Proposal | null
-) {
+export function useProposalVetoes(publicClient: PublicClient, address: Address, proposalId: bigint | undefined) {
   const [proposalLogs, setLogs] = useState<VetoCastEvent[]>([]);
 
   async function getLogs() {
-    if (!proposal?.parameters?.snapshotBlock) return;
+    if (!proposalId) return;
 
     const logs: VoteCastResponse[] = (await publicClient.getLogs({
       address,
@@ -26,7 +21,6 @@ export function useProposalVetoes(
       args: {
         proposalId,
       } as any,
-      fromBlock: proposal.parameters.snapshotBlock,
       toBlock: "latest", // TODO: Make this variable between 'latest' and proposal last block
     })) as any;
 
@@ -36,7 +30,7 @@ export function useProposalVetoes(
 
   useEffect(() => {
     getLogs();
-  }, [proposal?.parameters?.snapshotBlock]);
+  }, [proposalId]);
 
   return proposalLogs;
 }

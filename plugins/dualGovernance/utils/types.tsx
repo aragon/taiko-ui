@@ -16,13 +16,14 @@ export type ProposalResultType = readonly [
 ];
 
 export type ProposalParameters = {
-  startDate: bigint;
-  endDate: bigint;
-  snapshotBlock: bigint;
-  minVetoVotingPower: bigint;
+  snapshotTimestamp: number;
+  vetoEndDate: number;
+  minVetoRatio: number;
+  skipL2: boolean;
 };
 
 export type Proposal = {
+  id: bigint;
   active: boolean;
   executed: boolean;
   parameters: ProposalParameters;

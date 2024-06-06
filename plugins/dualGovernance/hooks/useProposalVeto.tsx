@@ -11,7 +11,7 @@ export function useProposalVeto(proposalId: string) {
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
 
   const { proposal, status: proposalFetchStatus, refetch: refetchProposal } = useProposal(proposalId, true);
-  const vetoes = useProposalVetoes(publicClient!, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, proposalId, proposal);
+  const vetoes = useProposalVetoes(publicClient!, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, proposal?.id);
 
   const { addAlert } = useAlerts() as AlertContextProps;
   const { writeContract: vetoWrite, data: vetoTxHash, error: vetoingError, status: vetoingStatus } = useWriteContract();

@@ -54,7 +54,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       <div className="my-10 grid w-full gap-10 lg:grid-cols-2 xl:grid-cols-3">
         <VetoTally
           voteCount={proposal?.vetoTally}
-          votePercentage={Number(proposal?.vetoTally / proposal?.parameters?.minVetoVotingPower) * 100}
+          votePercentage={Number(Number(proposal?.vetoTally) / Number(proposal?.parameters?.minVetoVotingPower)) * 100}
         />
         <ProposalDetails
           minVetoVotingPower={proposal?.parameters?.minVetoVotingPower}

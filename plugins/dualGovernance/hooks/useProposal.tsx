@@ -127,14 +127,18 @@ function arrangeProposalData(
 ): Proposal | null {
   if (!proposalData) return null;
 
-  // console.log('Metadata: ', metadata)
-  // console.log('Proposal: ', proposalData)
-
   return {
+    id: creationEvent?.proposalId ?? BigInt(0),
     actions: proposalData.actions,
     active: proposalData.active,
     executed: proposalData.executed,
-    parameters: proposalData.parameters,
+    parameters: {
+      startDate: BigInt(proposalData.parameters.snapshotTimestamp),
+      endDate: BigInt(proposalData.parameters.vetoEndDate),
+      snapshotBlock: BigInt(proposalData.parameters.snapshotTimestamp),
+      minApprovals: proposalData.parameters.minVetoRatio,
+      minVetoVotingPower: BigInt(proposalData.parameters.minVetoRatio),
+    },
     vetoTally: proposalData.vetoTally,
     allowFailureMap: proposalData.allowFailureMap,
     creator: creationEvent?.creator ?? "",
