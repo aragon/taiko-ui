@@ -6,17 +6,11 @@ import { Hex, keccak256, toHex } from "viem";
 import { useAlerts } from "@/context/Alerts";
 import WithdrawalInput from "@/components/input/withdrawal";
 import { FunctionCallForm } from "@/components/input/function-call-form";
-import { Action } from "@/utils/types";
+import { RawAction } from "@/utils/types";
 import { useRouter } from "next/router";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import {
-  PUB_IPFS_ENDPOINT,
-  PUB_IPFS_API_KEY,
-  PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-  PUB_CHAIN,
-  PUB_MULTISIG_PLUGIN_ADDRESS,
-} from "@/constants";
+import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { ActionCard } from "@/components/actions/action";
 import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin";
 import { encryptProposal, encryptSymmetricKey } from "@/utils/encryption";
@@ -33,7 +27,7 @@ export default function Create() {
   const [title, setTitle] = useState<string>("");
   const [summary, setSummary] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [actions, setActions] = useState<Action[]>([]);
+  const [actions, setActions] = useState<RawAction[]>([]);
   const { addAlert } = useAlerts();
   const { writeContract: createProposalWrite, data: createTxHash, error, status } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: createTxHash });

@@ -11,9 +11,9 @@ export interface DecodedAction {
 }
 
 export type RawAction = {
-  to: string;
+  to: Address;
   value: bigint;
-  data: string;
+  data: Hex;
 };
 
 export interface IAction {

@@ -1,15 +1,7 @@
-import { useEffect } from "react";
 import Link from "next/link";
 import { useProposalVeto } from "@/plugins/dualGovernance/hooks/useProposalVeto";
 import { Card, ProposalStatus, Tag, TagVariant } from "@aragon/ods";
-import {
-  DataList,
-  IconType,
-  ProposalDataListItem,
-  ProposalDataListItemSkeleton,
-  type DataListState,
-} from "@aragon/ods";
-import * as DOMPurify from "dompurify";
+import { ProposalDataListItem } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
 import { useAccount } from "wagmi";

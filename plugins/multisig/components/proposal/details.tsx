@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { useVotingToken } from "../../hooks/useVotingToken";
 import { formatEther } from "viem";
 import { compactNumber } from "@/utils/numbers";
 
@@ -9,7 +8,6 @@ interface ProposalDetailsProps {
 }
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ minVetoVotingPower, snapshotBlock }) => {
-  const { symbol } = useVotingToken();
   return (
     <>
       <Card>
@@ -17,8 +15,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ minVetoVotingPower, s
         <div className="items-right flex-wrap text-right">
           <span className="text-xl font-semibold">
             {minVetoVotingPower ? compactNumber(formatEther(minVetoVotingPower)) : null}
-          </span>{" "}
-          <span>{symbol ?? ""}</span>
+          </span>
         </div>
       </Card>
       <Card>

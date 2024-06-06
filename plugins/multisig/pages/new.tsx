@@ -1,25 +1,16 @@
-import { create } from "ipfs-http-client";
 import { Button, IconType, Icon, InputText, TextAreaRichText } from "@aragon/ods";
-import React, { useEffect, useState } from "react";
-import { uploadToIPFS, uploadToPinata } from "@/utils/ipfs";
+import React, { ReactNode, useEffect, useState } from "react";
+import { uploadToPinata } from "@/utils/ipfs";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { toHex } from "viem";
-import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { useAlerts } from "@/context/Alerts";
 import WithdrawalInput from "@/components/input/withdrawal";
 import { FunctionCallForm } from "@/components/input/function-call-form";
-import { Action } from "@/utils/types";
-import { getPlainText } from "@/utils/html";
+import { RawAction } from "@/utils/types";
 import { useRouter } from "next/router";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import {
-  PUB_IPFS_ENDPOINT,
-  PUB_IPFS_API_KEY,
-  PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-  PUB_CHAIN,
-  PUB_MULTISIG_PLUGIN_ADDRESS,
-} from "@/constants";
+import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { ActionCard } from "@/components/actions/action";
 import { MultisigPluginAbi } from "../artifacts/MultisigPlugin";
 
@@ -29,17 +20,12 @@ enum ActionType {
   Custom,
 }
 
-const ipfsClient = create({
-  url: PUB_IPFS_ENDPOINT,
-  headers: { "X-API-KEY": PUB_IPFS_API_KEY, Accept: "application/json" },
-});
-
 export default function Create() {
   const { push } = useRouter();
   const [title, setTitle] = useState<string>("");
   const [summary, setSummary] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [actions, setActions] = useState<Action[]>([]);
+  const [actions, setActions] = useState<RawAction[]>([]);
   const { addAlert } = useAlerts();
   const { writeContract: createProposalWrite, data: createTxHash, error, status } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: createTxHash });
