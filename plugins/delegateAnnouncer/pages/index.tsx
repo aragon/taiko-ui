@@ -7,7 +7,7 @@ import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useDelegateAnnouncements } from "../hooks/useDelegateAnnouncements";
 import { DelegateCard } from "@/plugins/delegateAnnouncer/components/DelegateCard";
 import { SelfDelegationProfileCard } from "../components/UserDelegateCard";
-import { PUB_DAO_ADDRESS, PUB_DELEGATION_CONTRACT_ADDRESS, PUB_TOKEN_ADDRESS } from "@/constants";
+import { PUB_DAO_ADDRESS, PUB_DELEGATION_WALL_CONTRACT_ADDRESS, PUB_TOKEN_ADDRESS } from "@/constants";
 
 export default function DelegateAnnouncements() {
   const publicClient = usePublicClient();
@@ -20,7 +20,7 @@ export default function DelegateAnnouncements() {
   });
   const { delegateAnnouncements, isLoading: delegateAnnouncementsIsLoading } = useDelegateAnnouncements(
     publicClient as PublicClient,
-    PUB_DELEGATION_CONTRACT_ADDRESS,
+    PUB_DELEGATION_WALL_CONTRACT_ADDRESS,
     PUB_DAO_ADDRESS
   );
 

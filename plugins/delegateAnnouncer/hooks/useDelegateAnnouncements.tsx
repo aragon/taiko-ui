@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { DelegateAnnouncerAbi } from "@/plugins/delegateAnnouncer/artifacts/DelegateAnnouncer.sol";
 import { Address, PublicClient, getAbiItem, fromHex } from "viem";
 import { DelegateAnnounce } from "../utils/types";
-import { PUB_DELEGATION_ANNOUNCEMENTS_START_BLOCK } from "@/constants";
 
 const AnnounceDelegationEvent = getAbiItem({ abi: DelegateAnnouncerAbi, name: "AnnounceDelegation" });
 
@@ -19,7 +18,7 @@ export function useDelegateAnnouncements(publicClient: PublicClient, delegationC
         args: {
           dao: daoAddress,
         } as any,
-        fromBlock: PUB_DELEGATION_ANNOUNCEMENTS_START_BLOCK,
+        fromBlock: BigInt(0),
         toBlock: "latest",
       })
       .then((logs) => {
