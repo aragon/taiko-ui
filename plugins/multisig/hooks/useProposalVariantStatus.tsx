@@ -13,7 +13,7 @@ export const useProposalVariantStatus = (proposal: Proposal) => {
         ? proposal?.executed
           ? { variant: "success", label: "Executed" }
           : { variant: "success", label: "Executable" }
-        : dayjs().isAfter(dayjs(Number(proposal?.parameters.endDate) * 1000))
+        : dayjs().isAfter(dayjs(Number(proposal?.parameters.expirationDate) * 1000))
           ? { variant: "critical", label: "Failed" }
           : { variant: "info", label: "Active" }
     );
@@ -32,7 +32,7 @@ export const useProposalStatus = (proposal: Proposal) => {
         ? proposal?.executed
           ? "executed"
           : "accepted"
-        : dayjs().isAfter(dayjs(Number(proposal?.parameters.endDate) * 1000))
+        : dayjs().isAfter(dayjs(Number(proposal?.parameters.expirationDate) * 1000))
           ? "failed"
           : "active"
     );

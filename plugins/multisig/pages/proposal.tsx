@@ -1,7 +1,7 @@
 import { useProposal } from "@/plugins/multisig/hooks/useProposal";
 import ProposalHeader from "@/plugins/multisig/components/proposal/header";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useProposalVeto } from "@/plugins/multisig/hooks/useProposalVeto";
+import { useProposalApprove } from "@/plugins/multisig/hooks/useProposalApprove";
 import { useProposalExecute } from "@/plugins/multisig/hooks/useProposalExecute";
 import { generateBreadcrumbs } from "@/utils/nav";
 import { useRouter } from "next/router";
@@ -13,8 +13,6 @@ import dayjs from "dayjs";
 import { ProposalAction } from "@/components/proposalAction/proposalAction";
 import { CardResources } from "@/components/proposal/cardResources";
 
-type BottomSection = "description" | "vetoes";
-
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const router = useRouter();
 
@@ -25,7 +23,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     approvals,
     isConfirming: isConfirmingApproval,
     approveProposal,
-  } = useProposalVeto(proposalId);
+  } = useProposalApprove(proposalId);
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalVariant = useProposalStatus(proposal!);

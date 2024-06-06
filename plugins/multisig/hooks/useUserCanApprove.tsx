@@ -1,5 +1,4 @@
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
-import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { useEffect } from "react";
 import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { MultisigPluginAbi } from "../artifacts/MultisigPlugin";

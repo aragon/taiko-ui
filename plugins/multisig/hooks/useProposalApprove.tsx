@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import { usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { useProposal } from "./useProposal";
-import { useUserCanApprove } from "@/plugins/multisig/hooks/useUserCanVeto";
+import { useUserCanApprove } from "@/plugins/multisig/hooks/useUserCanApprove";
 import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin";
 import { useAlerts, AlertContextProps } from "@/context/Alerts";
 import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useProposalApprovals } from "./useProposalApprovals";
 
-export function useProposalVeto(proposalId: string) {
+export function useProposalApprove(proposalId: string) {
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
 
   const { proposal, status: proposalFetchStatus, refetch: refetchProposal } = useProposal(proposalId, true);
