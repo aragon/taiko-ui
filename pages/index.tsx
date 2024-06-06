@@ -9,7 +9,7 @@ export default function Home() {
   const { open } = useWeb3Modal();
 
   return (
-    <main className="w-screen max-w-full flex-col">
+    <main className="w-screen max-w-full flex-col p-12">
       <Card>
         <h1 className="text-2xl font-[700] text-neutral-800">Welcome to Aragonette!</h1>
         <p className="text-md text-neutral-400">

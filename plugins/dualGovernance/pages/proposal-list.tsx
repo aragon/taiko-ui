@@ -2,10 +2,17 @@ import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { type ReactNode, useEffect } from "react";
 import ProposalCard from "@/plugins/dualGovernance/components/proposal";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
-import { Button, DataList, IconType, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
+import {
+  Button,
+  DataList,
+  IconType,
+  IllustrationHuman,
+  ProposalDataListItemSkeleton,
+  type DataListState,
+} from "@aragon/ods";
 import { useCanCreateProposal } from "@/plugins/dualGovernance/hooks/useCanCreateProposal";
 import Link from "next/link";
-import { If } from "@/components/if";
+import { Else, If, Then } from "@/components/if";
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisticTokenVotingPlugin.sol";
 // import { digestPagination } from "@/utils/pagination";
@@ -81,29 +88,39 @@ export default function Proposals() {
         <h1 className="justify-self-start align-middle text-3xl font-semibold">Proposals</h1>
       </SectionView>
       <If condition={proposalCount}>
-        <DataList.Root
-          entityLabel={entityLabel}
-          itemsCount={proposalCount}
-          pageSize={DEFAULT_PAGE_SIZE}
-          state={dataListState}
-          //onLoadMore={fetchNextPage}
-        >
-          <DataList.Container
-            SkeletonElement={ProposalDataListItemSkeleton}
-            errorState={errorState}
-            emptyState={emptyState}
-            emptyFilteredState={emptyFilteredState}
+        <Then>
+          <DataList.Root
+            entityLabel={entityLabel}
+            itemsCount={proposalCount}
+            pageSize={DEFAULT_PAGE_SIZE}
+            state={dataListState}
+            //onLoadMore={fetchNextPage}
           >
-            {proposalCount &&
-              Array.from(Array(proposalCount)?.keys())
-                .reverse()
-                ?.map((proposalIndex) => (
-                  // TODO: update with router agnostic ODS DataListItem
-                  <ProposalCard key={proposalIndex} proposalId={BigInt(proposalIndex)} />
-                ))}
-          </DataList.Container>
-          <DataList.Pagination />
-        </DataList.Root>
+            <DataList.Container
+              SkeletonElement={ProposalDataListItemSkeleton}
+              errorState={errorState}
+              emptyState={emptyState}
+              emptyFilteredState={emptyFilteredState}
+            >
+              {proposalCount &&
+                Array.from(Array(proposalCount)?.keys())
+                  .reverse()
+                  ?.map((proposalIndex) => (
+                    // TODO: update with router agnostic ODS DataListItem
+                    <ProposalCard key={proposalIndex} proposalId={BigInt(proposalIndex)} />
+                  ))}
+            </DataList.Container>
+            <DataList.Pagination />
+          </DataList.Root>
+        </Then>
+        <Else>
+          <div className="w-full">
+            <p className="text-md text-neutral-400">
+              No proposals have been created yet. Here you will see the proposals approved by the Security Council.
+            </p>
+            <IllustrationHuman className="mx-auto mb-10 max-w-72" body="BLOCKS" expression="SMILE_WINK" hairs="CURLY" />
+          </div>
+        </Else>
       </If>
     </MainSection>
   );

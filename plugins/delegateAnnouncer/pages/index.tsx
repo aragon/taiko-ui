@@ -70,7 +70,7 @@ export default function DelegateAnnouncements() {
 }
 
 function MainSection({ children }: { children: ReactNode }) {
-  return <main className="flex w-screen max-w-full flex-col">{children}</main>;
+  return <main className="flex w-screen max-w-full flex-col p-12">{children}</main>;
 }
 
 function SectionView({ children }: { children: ReactNode }) {
