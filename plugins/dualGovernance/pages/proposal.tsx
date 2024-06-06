@@ -1,4 +1,4 @@
-import { useProposal } from "@/plugins/dualGovernance/hooks/useProposal";
+import { type useProposal } from "@/plugins/dualGovernance/hooks/useProposal";
 import { ToggleGroup, Toggle } from "@aragon/ods";
 import ProposalDescription from "@/plugins/dualGovernance/components/proposal/description";
 import VetoesSection from "@/plugins/dualGovernance/components/vote/vetoes-section";

@@ -1,22 +1,13 @@
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect } from "react";
 import ProposalCard from "@/plugins/dualGovernance/components/proposal";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
-import {
-  Button,
-  DataList,
-  IconType,
-  ProposalDataListItem,
-  ProposalDataListItemSkeleton,
-  type DataListState,
-} from "@aragon/ods";
+import { Button, DataList, IconType, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
 import { useCanCreateProposal } from "@/plugins/dualGovernance/hooks/useCanCreateProposal";
 import Link from "next/link";
-import { Else, ElseIf, If, Then } from "@/components/if";
-import { PleaseWaitSpinner } from "@/components/please-wait";
+import { If } from "@/components/if";
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 // import { digestPagination } from "@/utils/pagination";
-import { useInfiniteQuery, useQueries } from "@tanstack/react-query";
 
 const DEFAULT_PAGE_SIZE = 6;
 
@@ -115,7 +106,7 @@ export default function Proposals() {
             {proposalCount &&
               Array.from(Array(proposalCount)?.keys())
                 .reverse()
-                ?.map((proposalIndex, index) => (
+                ?.map((proposalIndex) => (
                   // TODO: update with router agnostic ODS DataListItem
                   <ProposalCard key={proposalIndex} proposalId={BigInt(proposalIndex)} />
                 ))}
