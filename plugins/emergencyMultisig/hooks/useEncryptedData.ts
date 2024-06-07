@@ -2,16 +2,17 @@ import { encodeAbiParameters, keccak256, toHex } from "viem";
 import { EncryptedProposalMetadata } from "../utils/types";
 import { hexToUint8Array } from "@/utils/hex";
 import { encryptProposal, encryptSymmetricKey } from "@/utils/encryption";
-import { RawAction } from "@/utils/types";
+import { ProposalMetadata, RawAction } from "@/utils/types";
 import { usePublicKeyRegistry } from "./usePublicKeyRegistry";
+import { RawActionList } from "../artifacts/RawActionList";
 
 export function useEncryptedData() {
   const {
     data: { publicKeys },
   } = usePublicKeyRegistry();
 
-  const encryptProposalData = (privateMetadata: { [k: string]: any }, actions: RawAction[]) => {
-    const actionsBytes = encodeAbiParameters([ACTION_ARRAY_ABI], [actions]);
+  const encryptProposalData = (privateMetadata: ProposalMetadata, actions: RawAction[]) => {
+    const actionsBytes = encodeAbiParameters(RawActionList, [actions]);
 
     const { data: cipherData, symmetricKey } = encryptProposal(privateMetadata, hexToUint8Array(actionsBytes));
     const encryptedSymKeys = encryptSymmetricKey(
@@ -38,26 +39,3 @@ export function useEncryptedData() {
     encryptProposalData,
   };
 }
-
-const ACTION_ARRAY_ABI = {
-  name: "_actions",
-  type: "tuple[]",
-  internalType: "struct IDAO.Action[]",
-  components: [
-    {
-      name: "to",
-      type: "address",
-      internalType: "address",
-    },
-    {
-      name: "value",
-      type: "uint256",
-      internalType: "uint256",
-    },
-    {
-      name: "data",
-      type: "bytes",
-      internalType: "bytes",
-    },
-  ],
-} as const;

@@ -5,7 +5,7 @@ import { toHex } from "viem";
 import { useAlerts } from "@/context/Alerts";
 import WithdrawalInput from "@/components/input/withdrawal";
 import { FunctionCallForm } from "@/components/input/function-call-form";
-import { RawAction } from "@/utils/types";
+import { ProposalMetadata, RawAction } from "@/utils/types";
 import { useRouter } from "next/router";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
@@ -114,7 +114,7 @@ export default function Create() {
         }
     }
 
-    const privateMetadata = {
+    const privateMetadata: ProposalMetadata = {
       title,
       summary,
       description,
