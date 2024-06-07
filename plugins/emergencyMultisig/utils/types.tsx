@@ -8,11 +8,7 @@ export type ProposalInputs = {
 export type ProposalResultType = readonly [
   executed: boolean,
   approvals: number,
-  parameters: {
-    minApprovals: number;
-    snapshotBlock: bigint;
-    expirationDate: bigint;
-  },
+  parameters: ProposalParameters,
   encryptedPayloadUri: Hex,
   destActionsHash: Hex,
   destinationPlugin: Address,
