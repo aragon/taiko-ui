@@ -10,7 +10,7 @@ import { RawAction } from "@/utils/types";
 import { useRouter } from "next/router";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
+import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN, PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { ActionCard } from "@/components/actions/action";
 import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin";
 import { encryptProposal, encryptSymmetricKey } from "@/utils/encryption";
@@ -146,7 +146,7 @@ export default function Create() {
     createProposalWrite({
       chainId: PUB_CHAIN.id,
       abi: EmergencyMultisigPluginAbi,
-      address: PUB_MULTISIG_PLUGIN_ADDRESS,
+      address: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
       functionName: "createProposal",
       args: [toHex(ipfsPin), actionsHash, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, false],
     });

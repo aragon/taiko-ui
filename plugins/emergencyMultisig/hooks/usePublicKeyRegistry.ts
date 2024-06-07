@@ -1,16 +1,17 @@
 import { useEffect } from "react";
-import { Address, Hex, keccak256 } from "viem";
+import { Hex } from "viem";
 import { PublicKeyRegistryAbi } from "../artifacts/PublicKeyRegistry";
 import { useConfig, useWriteContract } from "wagmi";
-import { readContract, signMessage } from "@wagmi/core";
-import { DETERMINISTIC_EMERGENCY_PAYLOAD, PUB_PUBLIC_KEY_REGISTRY_CONTRACT_ADDRESS } from "@/constants";
+import { readContract } from "@wagmi/core";
+import { PUB_PUBLIC_KEY_REGISTRY_CONTRACT_ADDRESS } from "@/constants";
 import { useQuery } from "@tanstack/react-query";
-import { computePublicKey } from "@/utils/encryption/asymmetric";
-import { hexToUint8Array, uint8ArrayToHex } from "@/utils/hex";
+import { uint8ArrayToHex } from "@/utils/hex";
+import { useDerivedWallet } from "./useDerivedWallet";
 
 export function usePublicKeyRegistry() {
   const config = useConfig();
   const { writeContract, status: registrationStatus } = useWriteContract();
+  const { publicKey, requestSignature } = useDerivedWallet();
 
   const { data, isLoading, isSuccess, error, refetch } = useQuery({
     queryKey: ["public-key-registry-values"],
@@ -46,15 +47,17 @@ export function usePublicKeyRegistry() {
   });
 
   const registerPublicKey = async () => {
-    const privateSignature = await signMessage(config, { message: DETERMINISTIC_EMERGENCY_PAYLOAD });
-    const derivedPrivateKey = keccak256(privateSignature);
-    const pubKey = computePublicKey(hexToUint8Array(derivedPrivateKey));
+    let pubK: Uint8Array | undefined = publicKey;
+    if (!pubK) {
+      const keys = await requestSignature();
+      pubK = keys.publicKey;
+    }
 
     writeContract({
       abi: PublicKeyRegistryAbi,
       address: PUB_PUBLIC_KEY_REGISTRY_CONTRACT_ADDRESS,
       functionName: "setPublicKey",
-      args: [uint8ArrayToHex(pubKey)],
+      args: [uint8ArrayToHex(pubK)],
     });
   };
 
