@@ -1,8 +1,7 @@
-import { Button, IconType, Icon, InputText, TextAreaRichText, IllustrationHuman } from "@aragon/ods";
 import React, { ReactNode, useEffect, useState } from "react";
-import { uploadToPinata } from "@/utils/ipfs";
+import { Button, IconType, Icon, InputText, TextAreaRichText, IllustrationHuman } from "@aragon/ods";
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { Hex, keccak256, toHex, encodeAbiParameters, getAbiItem } from "viem";
+import { toHex } from "viem";
 import { useAlerts } from "@/context/Alerts";
 import WithdrawalInput from "@/components/input/withdrawal";
 import { FunctionCallForm } from "@/components/input/function-call-form";
@@ -12,11 +11,10 @@ import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN, PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { ActionCard } from "@/components/actions/action";
+import { uploadToPinata } from "@/utils/ipfs";
 import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin";
-import { encryptProposal, encryptSymmetricKey } from "@/utils/encryption";
-import { EncryptedProposalMetadata } from "../utils/types";
 import { usePublicKeyRegistry } from "../hooks/usePublicKeyRegistry";
-import { hexToUint8Array } from "@/utils/hex";
+import { useEncryptedData } from "../hooks/useEncryptedData";
 
 enum ActionType {
   Signaling,
@@ -36,10 +34,11 @@ export default function Create() {
   const [actionType, setActionType] = useState<ActionType>(ActionType.Signaling);
   const { address: selfAddress, isConnected } = useAccount();
   const {
-    data: { publicKeys, addresses: registeredSigners },
+    data: { addresses: registeredSigners },
     registerPublicKey,
     isLoading: pubKeysLoading,
   } = usePublicKeyRegistry();
+  const { encryptProposalData } = useEncryptedData();
 
   const changeActionType = (actionType: ActionType) => {
     setActions([]);
@@ -123,23 +122,7 @@ export default function Create() {
     };
 
     // Encrypt the proposal data
-
-    const actionsBytes = encodeAbiParameters([ACTION_ARRAY_ABI], [actions]);
-
-    const { data: cipherData, symmetricKey } = encryptProposal(privateMetadata, hexToUint8Array(actionsBytes));
-    const encryptedSymKeys = encryptSymmetricKey(
-      symmetricKey,
-      publicKeys.map((pk) => hexToUint8Array(pk))
-    );
-    const actionsHash = keccak256(actionsBytes);
-
-    const publicMetadataJson: EncryptedProposalMetadata = {
-      encrypted: {
-        metadata: cipherData.metadata,
-        actions: cipherData.actions,
-        symmetricKeys: encryptedSymKeys.map((k) => toHex(k)),
-      },
-    };
+    const { payload: publicMetadataJson, actionsHash } = encryptProposalData(privateMetadata, actions);
 
     const ipfsPin = await uploadToPinata(publicMetadataJson);
 
@@ -362,26 +345,3 @@ function MainSection({ children }: { children: ReactNode }) {
 function SectionView({ children }: { children: ReactNode }) {
   return <div className="mb-6 flex w-full flex-row content-center justify-between">{children}</div>;
 }
-
-const ACTION_ARRAY_ABI = {
-  name: "_actions",
-  type: "tuple[]",
-  internalType: "struct IDAO.Action[]",
-  components: [
-    {
-      name: "to",
-      type: "address",
-      internalType: "address",
-    },
-    {
-      name: "value",
-      type: "uint256",
-      internalType: "uint256",
-    },
-    {
-      name: "data",
-      type: "bytes",
-      internalType: "bytes",
-    },
-  ],
-} as const;
