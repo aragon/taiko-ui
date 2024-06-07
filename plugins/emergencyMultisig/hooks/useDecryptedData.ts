@@ -6,14 +6,14 @@ import { ProposalMetadata, RawAction } from "@/utils/types";
 import { useDerivedWallet } from "./useDerivedWallet";
 import { RawActionList } from "../artifacts/RawActionList";
 
-export function useDecryptedData(encryptedMetadata: EncryptedProposalMetadata) {
+export function useDecryptedData(encryptedMetadata?: EncryptedProposalMetadata) {
   const { privateKey, publicKey } = useDerivedWallet();
   let privateMetadata: ProposalMetadata | null = null;
   let privateActions: readonly RawAction[] | null = null;
   let error: Error | null = null;
 
   // Attempt to decrypt
-  if (privateKey && publicKey) {
+  if (privateKey && publicKey && encryptedMetadata) {
     const pubKeys = encryptedMetadata.encrypted.symmetricKeys.map((pk) => hexToUint8Array(pk));
     try {
       const proposalSymKey = decryptSymmetricKey(pubKeys, { privateKey, publicKey });

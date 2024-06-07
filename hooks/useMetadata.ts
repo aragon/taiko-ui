@@ -24,3 +24,5 @@ export function useMetadata<T = JsonValue>(ipfsUri?: string) {
     error,
   };
 }
+
+export const useIpfsJsonData = useMetadata;

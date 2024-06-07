@@ -5,7 +5,18 @@ export type ProposalInputs = {
   proposalId: bigint;
 };
 
-export type ProposalResultType = readonly [boolean, number, ProposalParameters, string, readonly RawAction[], Address];
+export type ProposalResultType = readonly [
+  executed: boolean,
+  approvals: number,
+  parameters: {
+    minApprovals: number;
+    snapshotBlock: bigint;
+    expirationDate: bigint;
+  },
+  encryptedPayloadUri: Hex,
+  destActionsHash: Hex,
+  destinationPlugin: Address,
+];
 
 export type ProposalParameters = {
   expirationDate: bigint;

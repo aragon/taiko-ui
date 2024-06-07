@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
-import { Address, Hex, fromHex, getAbiItem } from "viem";
+import { getAbiItem } from "viem";
 import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin";
-import { Proposal, IAction, RawAction, ProposalMetadata } from "@/utils/types";
+import { Proposal, RawAction, ProposalMetadata, IAction } from "@/utils/types";
 import { ProposalParameters, ProposalResultType } from "@/plugins/multisig/utils/types";
 import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
@@ -15,7 +15,7 @@ const ProposalCreatedEvent = getAbiItem({
 
 type ProposalCreatedLogResponse = {
   args: {
-    actions: IAction[];
+    actions: RawAction[];
     allowFailureMap: bigint;
     creator: string;
     endDate: bigint;
