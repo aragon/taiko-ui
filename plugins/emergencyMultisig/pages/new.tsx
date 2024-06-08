@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useState } from "react";
-import { Button, IconType, Icon, InputText, TextAreaRichText, IllustrationHuman } from "@aragon/ods";
+import { Button, IconType, Icon, InputText, TextAreaRichText } from "@aragon/ods";
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { toHex } from "viem";
 import { useAlerts } from "@/context/Alerts";
@@ -15,6 +15,7 @@ import { uploadToPinata } from "@/utils/ipfs";
 import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin";
 import { usePublicKeyRegistry } from "../hooks/usePublicKeyRegistry";
 import { useEncryptedData } from "../hooks/useEncryptedData";
+import { MissingContentView } from "../components/MissingContentView";
 
 enum ActionType {
   Signaling,
@@ -160,26 +161,17 @@ export default function Create() {
             </Then>
             <ElseIf condition={!selfAddress || !isConnected}>
               {/* Not connected */}
-              <div>
-                <p className="text-md text-neutral-400">You are not connected to the network</p>
-                <Illustration />
-              </div>
+              <MissingContentView message="You are not connected to the network" />
             </ElseIf>
             <ElseIf condition={selfAddress && !registeredSigners.includes(selfAddress)}>
               {/* Public key not registered yet */}
-              <div className="w-full">
-                <p className="text-md text-neutral-400">
-                  You haven&apos;t registered a public key yet. A public key is necessary in order for proposals to have
+              <MissingContentView
+                message={`You haven't registered a public key yet. A public key is necessary in order for proposals to have
                   private data that only members can decrypt. You will sign a deterministic text, which will be used to
-                  generate an encryption key only for this DAO.
-                </p>
-                <Illustration />
-                <div className="flex justify-center">
-                  <Button size="md" variant="primary" onClick={() => registerPublicKey()}>
-                    <span>Register your public key</span>
-                  </Button>
-                </div>
-              </div>
+                  generate an encryption key only for this DAO.`}
+                callToAction="Register your public key"
+                onClick={() => registerPublicKey()}
+              />
             </ElseIf>
             <Else>
               {/* All ready */}
@@ -328,10 +320,6 @@ export default function Create() {
       </SectionView>
     </MainSection>
   );
-}
-
-function Illustration() {
-  return <IllustrationHuman className="mx-auto mb-10 max-w-96" body="BLOCKS" expression="SMILE_WINK" hairs="CURLY" />;
 }
 
 function MainSection({ children }: { children: ReactNode }) {

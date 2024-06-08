@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext, createContext, ReactNode } from "react";
 import { keccak256 } from "viem";
 import { signMessage } from "@wagmi/core";
 import { computePublicKey } from "@/utils/encryption/asymmetric";
@@ -11,9 +11,15 @@ type KeyPair = {
   publicKey?: Uint8Array;
 };
 
-export function useDerivedWallet() {
+type Result = KeyPair & {
+  requestSignature: () => any;
+};
+
+const DerivedWalletContext = createContext<Result>({ requestSignature: () => {} });
+
+export function UseDerivedWalletProvider({ children }: { children: ReactNode }) {
   const config = useConfig();
-  const [{ privateKey, publicKey }, setKeys] = useState<KeyPair>({});
+  const [keys, setKeys] = useState<KeyPair>({});
 
   const requestSignature = async () => {
     const privateSignature = await signMessage(config, { message: DETERMINISTIC_EMERGENCY_PAYLOAD });
@@ -28,9 +34,15 @@ export function useDerivedWallet() {
     return { publicKey, privateKey: derivedPrivateKey };
   };
 
-  return {
+  const value = {
     requestSignature,
-    publicKey,
-    privateKey,
+    publicKey: keys.publicKey,
+    privateKey: keys.privateKey,
   };
+
+  return <DerivedWalletContext.Provider value={value}>{children}</DerivedWalletContext.Provider>;
+}
+
+export function useDerivedWallet() {
+  return useContext(DerivedWalletContext);
 }
