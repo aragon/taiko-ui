@@ -2,7 +2,7 @@ import { IVotesDataListVariant } from "@/components/proposalVoting/votesDataList
 import { IApprovalThresholdResult, IButtonProps, ProposalType } from "@aragon/ods";
 import { Address, Hex, AbiFunction } from "viem";
 
-type EvmValue = string | Hex | Address | number | bigint | boolean;
+export type EvmValue = string | Hex | Address | number | bigint | boolean;
 
 export interface DecodedAction {
   functionName: string | null;
