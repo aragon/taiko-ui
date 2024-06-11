@@ -4,22 +4,18 @@ import { Address, Hex, AbiFunction } from "viem";
 
 export type EvmValue = string | Hex | Address | number | bigint | boolean;
 
-export interface DecodedAction {
-  functionName: string | null;
-  functionAbi: AbiFunction | null;
-  args: EvmValue[];
-}
-
 export type RawAction = {
   to: Address;
   value: bigint;
   data: Hex;
 };
 
-export interface IAction {
-  decoded?: DecodedAction;
-  raw: RawAction;
-}
+/** Includes the raw action plus the decoded ABI and parameters of the function call */
+export type DecodedAction = RawAction & {
+  functionName: string | null;
+  functionAbi: AbiFunction | null;
+  args: EvmValue[];
+};
 
 export interface IAlert {
   id: number;
@@ -54,7 +50,7 @@ export type Proposal = {
   executed: boolean;
   parameters: ProposalParameters;
   approvals: number;
-  actions: IAction[];
+  actions: RawAction[];
   allowFailureMap: bigint;
   creator: string;
   title: string;

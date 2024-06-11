@@ -2,11 +2,10 @@ import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
 import { getAbiItem } from "viem";
 import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin";
-import { Proposal, RawAction, ProposalMetadata, IAction } from "@/utils/types";
+import { Proposal, RawAction, ProposalMetadata } from "@/utils/types";
 import { ProposalParameters, ProposalResultType } from "@/plugins/multisig/utils/types";
 import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
-import { useAction } from "@/hooks/useAction";
 
 const ProposalCreatedEvent = getAbiItem({
   abi: MultisigPluginAbi,
@@ -108,20 +107,8 @@ function decodeProposalResultData(data?: ProposalResultType) {
     approvals: data[1] as number,
     parameters: data[2] as ProposalParameters,
     metadataUri: data[3] as string,
-    actions: getProposalActions(data[4] as Array<RawAction>),
+    actions: data[4] as Array<RawAction>,
   };
-}
-
-function getProposalActions(chainActions: RawAction[]): IAction[] {
-  if (!chainActions) return [];
-
-  return chainActions.map((tx) => {
-    const { data, to, value } = tx;
-    const rawAction = { data, to, value };
-    const decoded = useAction(tx);
-
-    return { raw: rawAction, decoded };
-  });
 }
 
 function arrangeProposalData(

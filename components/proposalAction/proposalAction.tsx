@@ -11,10 +11,11 @@ import {
 import Link from "next/link";
 import { CallParamField } from "./callParamField";
 import { EncodedView } from "./encodedView";
-import { IAction } from "@/utils/types";
+import { DecodedAction } from "@/utils/types";
+import { Else, If, Then } from "../if";
 
 interface IProposalActionProps {
-  actions?: IAction[];
+  actions?: DecodedAction[];
 }
 
 export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
@@ -34,10 +35,10 @@ export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
       <AccordionContainer isMulti={true} className="border-t border-t-neutral-100">
         {actions?.map((action, index) => {
           const itemKey = `Action ${index + 1}`;
-          const isEthTransfer = !action.raw.data || action.raw.data === "0x";
-          const functionName = isEthTransfer ? "Withdraw assets" : action.decoded?.functionName;
-          const functionAbi = action.decoded?.functionAbi ?? null;
-          const explorerUrl = `${PUB_CHAIN.blockExplorers?.default.url}/address/${action.raw.to}`;
+          const isEthTransfer = !action.data || action.data === "0x";
+          const functionName = isEthTransfer ? "Withdraw assets" : action.functionName;
+          const functionAbi = action.functionAbi ?? null;
+          const explorerUrl = `${PUB_CHAIN.blockExplorers?.default.url}/address/${action.to}`;
 
           return (
             <AccordionItem className="border-t border-t-neutral-100 bg-neutral-0" key={itemKey} value={itemKey}>
@@ -55,7 +56,7 @@ export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
                     <div className="flex w-full gap-x-6 text-sm leading-tight md:text-base">
                       <Link href={explorerUrl} target="_blank">
                         <span className="flex items-center gap-x-2 text-neutral-500">
-                          {formatHexString(action.raw.to)}
+                          {formatHexString(action.to)}
                           {functionName != null && <AvatarIcon variant="primary" size="sm" icon={IconType.CHECKMARK} />}
                           {functionName == null && (
                             <span className="flex items-center gap-x-2">
@@ -72,12 +73,19 @@ export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
 
               <AccordionItemContent className="!overflow-none">
                 <div className="flex flex-col gap-y-4">
-                  {!action?.decoded && <EncodedView rawAction={action.raw} />}
-                  {action?.decoded?.args?.map((arg, i) => (
-                    <div className="flex" key={i}>
-                      <CallParamField value={arg} idx={i} functionAbi={functionAbi} />
-                    </div>
-                  ))}
+                  <If condition={action?.args?.length}>
+                    <Then>
+                      <EncodedView rawAction={action} />
+                    </Then>
+                    <Else>
+                      {action?.args?.map((arg, i) => (
+                        <div className="flex" key={i}>
+                          <CallParamField value={arg} idx={i} functionAbi={functionAbi} />
+                        </div>
+                      ))}
+                    </Else>
+                  </If>
+                  {}
                 </div>
               </AccordionItemContent>
             </AccordionItem>

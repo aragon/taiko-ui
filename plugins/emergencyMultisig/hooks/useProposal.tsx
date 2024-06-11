@@ -2,12 +2,11 @@ import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
 import { getAbiItem } from "viem";
 import { EmergencyMultisigPluginAbi } from "@/plugins/emergencyMultisig/artifacts/EmergencyMultisigPlugin";
-import { Proposal, IAction, RawAction, ProposalMetadata } from "@/utils/types";
+import { Proposal, RawAction, ProposalMetadata } from "@/utils/types";
 import { EncryptedProposalMetadata, ProposalResultType } from "@/plugins/emergencyMultisig/utils/types";
 import { PUB_CHAIN, PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useDecryptedData } from "./useDecryptedData";
 import { useIpfsJsonData } from "@/hooks/useMetadata";
-import { useAction } from "@/hooks/useAction";
 
 const ProposalCreatedEvent = getAbiItem({
   abi: EmergencyMultisigPluginAbi,
@@ -16,7 +15,7 @@ const ProposalCreatedEvent = getAbiItem({
 
 type ProposalCreatedLogResponse = {
   args: {
-    actions: IAction[];
+    actions: RawAction[];
     allowFailureMap: bigint;
     creator: string;
     endDate: bigint;
@@ -63,7 +62,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
 
   const proposal = arrangeProposalData(
     proposalData,
-    privateActions || undefined,
+    (privateActions || undefined) as any,
     proposalCreationEvent,
     privateMetadata || undefined
   );
@@ -91,7 +90,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
         console.error("Could not fetch the proposal details", err);
         return null;
       });
-  }, [proposalData, !!publicClient]);
+  }, [proposalData, !!publicClient, !!proposalCreationEvent]);
 
   return {
     proposal,
@@ -122,28 +121,16 @@ function decodeProposalResultData(data?: ProposalResultType) {
   };
 }
 
-function getProposalActions(chainActions: readonly RawAction[]): IAction[] {
-  if (!chainActions) return [];
-
-  return chainActions.map((tx) => {
-    const { data, to, value } = tx;
-    const rawAction = { data, to, value };
-    const decoded = useAction(tx);
-
-    return { raw: rawAction, decoded };
-  });
-}
-
 function arrangeProposalData(
   proposalData?: ReturnType<typeof decodeProposalResultData>,
-  actions?: readonly RawAction[],
+  actions?: RawAction[],
   creationEvent?: ProposalCreatedLogResponse["args"],
   metadata?: ProposalMetadata
 ): Proposal | null {
   if (!proposalData) return null;
 
   return {
-    actions: actions ? getProposalActions(actions) : [],
+    actions: actions ?? [],
     executed: proposalData.executed,
     parameters: {
       snapshotBlock: proposalData.parameters.snapshotBlock,

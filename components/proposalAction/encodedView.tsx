@@ -1,11 +1,11 @@
 import { PUB_CHAIN } from "@/constants";
-import { capitalizeFirstLetter } from "@/utils/case";
-import { type Action } from "@/utils/types";
+import { capitalizeFirstLetter } from "@/utils/text";
+import { type RawAction } from "@/utils/types";
 import { InputText, NumberFormat, formatterUtils } from "@aragon/ods";
 import { formatEther } from "viem";
 
 type IEncodedViewProps = {
-  rawAction: Action;
+  rawAction: RawAction;
 };
 
 export const EncodedView: React.FC<IEncodedViewProps> = (props) => {
@@ -16,7 +16,7 @@ export const EncodedView: React.FC<IEncodedViewProps> = (props) => {
   ));
 };
 
-function getEncodedArgs(action: Action) {
+function getEncodedArgs(action: RawAction) {
   const isEthTransfer = !action.data || action.data === "0x";
 
   if (isEthTransfer) {

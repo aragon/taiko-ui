@@ -3,7 +3,7 @@ import { ElseIf, If, Then } from "@/components/if";
 import { InputText, Tag } from "@aragon/ods";
 import { AddressText } from "@/components/text/address";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { type Action } from "@/utils/types";
+import { type RawAction } from "@/utils/types";
 import { useAction } from "@/hooks/useAction";
 import { type AbiFunction, type AbiParameter, type Address, type Hex, formatEther, toFunctionSignature } from "viem";
 import { compactNumber } from "@/utils/numbers";
@@ -11,7 +11,7 @@ import { decodeCamelCase } from "@/utils/case";
 import { type InputValue } from "@/utils/input-values";
 
 type ActionCardProps = {
-  action: Action;
+  action: RawAction;
   idx: number;
 };
 type CallParameterFieldType =
