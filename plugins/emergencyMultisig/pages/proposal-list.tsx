@@ -1,6 +1,7 @@
-import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { type ReactNode, useEffect, useState } from "react";
-import ProposalCard from "@/plugins/emergencyMultisig/_components/proposal";
+import { useAccount, useBlockNumber, useReadContract } from "wagmi";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+import ProposalCard from "@/plugins/emergencyMultisig/components/proposal";
 import { EmergencyMultisigPluginAbi } from "@/plugins/emergencyMultisig/artifacts/EmergencyMultisigPlugin";
 import {
   Button,
@@ -20,6 +21,8 @@ import { MissingContentView } from "../components/MissingContentView";
 const DEFAULT_PAGE_SIZE = 6;
 
 export default function Proposals() {
+  const { isConnected } = useAccount();
+  const { open } = useWeb3Modal();
   const { data: blockNumber } = useBlockNumber({ watch: true });
   const { publicKey, requestSignature } = useDerivedWallet();
   const canCreate = useCanCreateProposal();
@@ -76,7 +79,7 @@ export default function Proposals() {
       <SectionView>
         <h1 className="justify-self-start align-middle text-3xl font-semibold">Proposals</h1>
         <div className="justify-self-end">
-          <If condition={canCreate}>
+          <If condition={isConnected && canCreate}>
             <Link href="#/new">
               <Button iconLeft={IconType.PLUS} size="md" variant="primary">
                 Submit Proposal
@@ -86,14 +89,21 @@ export default function Proposals() {
         </div>
       </SectionView>
 
-      <If condition={!publicKey}>
+      <If condition={!isConnected}>
         <Then>
           <MissingContentView
-            message={`You need to sign in with your wallet in order to decrypt the private proposal data.`}
+            message={`Please, connect your Ethereum wallet in order to continue.`}
+            callToAction="Connect wallet"
+            onClick={() => open()}
+          />
+        </Then>
+        <ElseIf condition={!publicKey}>
+          <MissingContentView
+            message={`Please, sign in with your wallet in order to decrypt the private proposal data.`}
             callToAction="Sign in to continue"
             onClick={() => requestSignature()}
           />
-        </Then>
+        </ElseIf>
         <ElseIf condition={proposalCount}>
           <DataList.Root
             entityLabel={entityLabel}

@@ -16,6 +16,8 @@ import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin
 import { usePublicKeyRegistry } from "../hooks/usePublicKeyRegistry";
 import { useEncryptedData } from "../hooks/useEncryptedData";
 import { MissingContentView } from "../components/MissingContentView";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useDerivedWallet } from "../hooks/useDerivedWallet";
 
 enum ActionType {
   Signaling,
@@ -25,15 +27,17 @@ enum ActionType {
 
 export default function Create() {
   const { push } = useRouter();
+  const { address: selfAddress, isConnected } = useAccount();
+  const { publicKey, requestSignature } = useDerivedWallet();
+  const { open } = useWeb3Modal();
+  const { addAlert } = useAlerts();
   const [title, setTitle] = useState<string>("");
   const [summary, setSummary] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [actions, setActions] = useState<RawAction[]>([]);
-  const { addAlert } = useAlerts();
   const { writeContract: createProposalWrite, data: createTxHash, error, status } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: createTxHash });
   const [actionType, setActionType] = useState<ActionType>(ActionType.Signaling);
-  const { address: selfAddress, isConnected } = useAccount();
   const {
     data: { addresses: registeredSigners },
     registerPublicKey,
@@ -149,19 +153,23 @@ export default function Create() {
   return (
     <MainSection>
       <SectionView>
-        <div className="w-full justify-between py-5">
-          <h1 className="mb-10 text-3xl font-semibold text-neutral-900">Create Proposal</h1>
+        <div className="w-full justify-between">
+          <h1 className="mb-6 text-3xl font-semibold text-neutral-900">Create Proposal</h1>
 
           <If condition={pubKeysLoading}>
             <Then>
               {/* No public keys yet */}
-              <div className="mb-6 mt-14">
+              <div>
                 <PleaseWaitSpinner fullMessage="Loading the signer public keys..." />
               </div>
             </Then>
             <ElseIf condition={!selfAddress || !isConnected}>
               {/* Not connected */}
-              <MissingContentView message="You are not connected to the network" />
+              <MissingContentView
+                message={`Please, connect your Ethereum wallet in order to continue.`}
+                callToAction="Connect wallet"
+                onClick={() => open()}
+              />
             </ElseIf>
             <ElseIf condition={selfAddress && !registeredSigners.includes(selfAddress)}>
               {/* Public key not registered yet */}
@@ -171,6 +179,14 @@ export default function Create() {
                   generate an encryption key only for this DAO.`}
                 callToAction="Register your public key"
                 onClick={() => registerPublicKey()}
+              />
+            </ElseIf>
+            <ElseIf condition={!publicKey}>
+              {/* Not signed in */}
+              <MissingContentView
+                message={`Please, sign in with your wallet in order to decrypt the private proposal data.`}
+                callToAction="Sign in to continue"
+                onClick={() => requestSignature()}
               />
             </ElseIf>
             <Else>
