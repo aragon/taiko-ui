@@ -25,7 +25,7 @@ export default function ProposalCard(props: ProposalInputs) {
     address: PUB_TOKEN_ADDRESS,
     abi: erc20Votes,
     functionName: "getPastTotalSupply",
-    args: [proposal?.parameters.snapshotBlock || BigInt(0)],
+    args: [proposal?.parameters.snapshotTimestamp || BigInt(0)],
   });
 
   const proposalVariant = useProposalStatus(proposal!);

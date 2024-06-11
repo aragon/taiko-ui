@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
-import { type Hex, fromHex, getAbiItem } from "viem";
-import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
-import { type Action } from "@/utils/types";
+import { getAbiItem } from "viem";
+import { type RawAction } from "@/utils/types";
 import {
   type Proposal,
   type ProposalMetadata,
@@ -15,7 +14,7 @@ import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisti
 
 type ProposalCreatedLogResponse = {
   args: {
-    actions: Action[];
+    actions: RawAction[];
     allowFailureMap: bigint;
     creator: string;
     endDate: bigint;
@@ -115,7 +114,7 @@ function decodeProposalResultData(data?: ProposalResultType) {
     parameters: data[2] as ProposalParameters,
     vetoTally: data[3] as bigint,
     metadataUri: data[4] as string,
-    actions: data[5] as Array<Action>,
+    actions: data[5] as Array<RawAction>,
     allowFailureMap: data[6] as bigint,
   };
 }
@@ -133,11 +132,10 @@ function arrangeProposalData(
     active: proposalData.active,
     executed: proposalData.executed,
     parameters: {
-      startDate: BigInt(proposalData.parameters.snapshotTimestamp),
-      endDate: BigInt(proposalData.parameters.vetoEndDate),
-      snapshotBlock: BigInt(proposalData.parameters.snapshotTimestamp),
-      minApprovals: proposalData.parameters.minVetoRatio,
-      minVetoVotingPower: BigInt(proposalData.parameters.minVetoRatio),
+      minVetoRatio: proposalData.parameters.minVetoRatio,
+      skipL2: proposalData.parameters.skipL2,
+      snapshotTimestamp: proposalData.parameters.snapshotTimestamp,
+      vetoEndDate: proposalData.parameters.vetoEndDate,
     },
     vetoTally: proposalData.vetoTally,
     allowFailureMap: proposalData.allowFailureMap,

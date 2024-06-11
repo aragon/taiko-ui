@@ -8,7 +8,7 @@ import { VotingBreakdown, type IBreakdownMajorityVotingResult, type ProposalType
 import { type IBreakdownApprovalThresholdResult } from "../votingBreakdown/approvalThresholdResult";
 import { VotingDetails } from "../votingDetails";
 import { VotingStageStatus } from "./votingStageStatus";
-import { IVote } from "@/utils/types";
+import { IVote, ProposalStages } from "@/utils/types";
 import { VotesDataList } from "../votesDataList/votesDataList";
 
 export interface IVotingStageDetails {
@@ -109,7 +109,7 @@ export const VotingStage: React.FC<IVotingStageProps> = (props) => {
           </Tabs.Content>
           <Tabs.Content value="votes">
             <div className="py-4 pb-8">
-              <VotesDataList votes={votes} proposalId={proposalId} stageTitle={title as ProposalStages} />
+              <VotesDataList votes={votes || []} proposalId={proposalId} stageTitle={title as ProposalStages} />
             </div>
           </Tabs.Content>
           <Tabs.Content value="details">

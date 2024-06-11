@@ -1,5 +1,5 @@
-import { Address } from "viem";
-import { Action } from "@/utils/types";
+import { Address, Hex } from "viem";
+import { RawAction } from "@/utils/types";
 
 export type ProposalInputs = {
   proposalId: bigint;
@@ -10,14 +10,14 @@ export type ProposalResultType = readonly [
   boolean,
   ProposalParameters,
   bigint,
-  string,
-  readonly Action[],
+  Hex,
+  readonly RawAction[],
   bigint,
 ];
 
 export type ProposalParameters = {
-  snapshotTimestamp: number;
-  vetoEndDate: number;
+  snapshotTimestamp: bigint;
+  vetoEndDate: bigint;
   minVetoRatio: number;
   skipL2: boolean;
 };
@@ -28,7 +28,7 @@ export type Proposal = {
   executed: boolean;
   parameters: ProposalParameters;
   vetoTally: bigint;
-  actions: Action[];
+  actions: RawAction[];
   allowFailureMap: bigint;
   creator: string;
   title: string;
