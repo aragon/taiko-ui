@@ -10,7 +10,7 @@ export const useProposalVariantStatus = (proposal: OptimisticProposal) => {
   const { tokenSupply: totalSupply } = useVotingToken();
   const { balance: bridgedBalance } = useVotingTokenBalance(
     PUB_TAIKO_BRIDGE_ADDRESS,
-    proposal.parameters.snapshotTimestamp
+    proposal?.parameters.snapshotTimestamp || BigInt(0)
   );
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export const useProposalStatus = (proposal: OptimisticProposal) => {
   const { tokenSupply: totalSupply } = useVotingToken();
   const { balance: bridgedBalance } = useVotingTokenBalance(
     PUB_TAIKO_BRIDGE_ADDRESS,
-    proposal.parameters.snapshotTimestamp
+    proposal?.parameters.snapshotTimestamp || BigInt(0)
   );
 
   useEffect(() => {
