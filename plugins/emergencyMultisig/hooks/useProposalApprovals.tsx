@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { Address, getAbiItem } from "viem";
 import { PublicClient } from "viem";
-import { ApprovedEvent, ApprovedEventResponse } from "@/plugins/emergencyMultisig/utils/types";
+import { ApprovedEvent, ApprovedEventResponse, EmergencyProposal } from "@/plugins/emergencyMultisig/utils/types";
 import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin";
-import { Proposal } from "@/utils/types";
 
 const event = getAbiItem({
   abi: EmergencyMultisigPluginAbi,
@@ -14,7 +13,7 @@ export function useProposalApprovals(
   publicClient: PublicClient,
   address: Address,
   proposalId: string,
-  proposal: Proposal | null
+  proposal: EmergencyProposal | null
 ) {
   const [proposalLogs, setLogs] = useState<ApprovedEvent[]>([]);
 

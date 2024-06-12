@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Proposal } from "@/utils/types";
 import { ProposalStatus } from "@aragon/ods";
 import dayjs from "dayjs";
+import { EmergencyProposal } from "../utils/types";
 
-export const useProposalVariantStatus = (proposal: Proposal) => {
+export const useProposalVariantStatus = (proposal: EmergencyProposal) => {
   const [status, setStatus] = useState({ variant: "", label: "" });
 
   useEffect(() => {
@@ -13,7 +13,7 @@ export const useProposalVariantStatus = (proposal: Proposal) => {
         ? proposal?.executed
           ? { variant: "success", label: "Executed" }
           : { variant: "success", label: "Executable" }
-        : dayjs().isAfter(dayjs(Number(proposal?.parameters.endDate) * 1000))
+        : dayjs().isAfter(dayjs(Number(proposal?.parameters.expirationDate) * 1000))
           ? { variant: "critical", label: "Failed" }
           : { variant: "info", label: "Active" }
     );
@@ -22,7 +22,7 @@ export const useProposalVariantStatus = (proposal: Proposal) => {
   return status;
 };
 
-export const useProposalStatus = (proposal: Proposal) => {
+export const useProposalStatus = (proposal: EmergencyProposal) => {
   const [status, setStatus] = useState<ProposalStatus>();
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export const useProposalStatus = (proposal: Proposal) => {
         ? proposal?.executed
           ? "executed"
           : "accepted"
-        : dayjs().isAfter(dayjs(Number(proposal?.parameters.endDate) * 1000))
+        : dayjs().isAfter(dayjs(Number(proposal?.parameters.expirationDate) * 1000))
           ? "failed"
           : "active"
     );

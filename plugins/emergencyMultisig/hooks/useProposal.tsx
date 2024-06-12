@@ -2,8 +2,12 @@ import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
 import { getAbiItem } from "viem";
 import { EmergencyMultisigPluginAbi } from "@/plugins/emergencyMultisig/artifacts/EmergencyMultisigPlugin";
-import { Proposal, RawAction, ProposalMetadata } from "@/utils/types";
-import { EncryptedProposalMetadata, ProposalResultType } from "@/plugins/emergencyMultisig/utils/types";
+import { RawAction, ProposalMetadata } from "@/utils/types";
+import {
+  EncryptedProposalMetadata,
+  EmergencyProposal,
+  EmergencyProposalResultType,
+} from "@/plugins/emergencyMultisig/utils/types";
 import { PUB_CHAIN, PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useDecryptedData } from "./useDecryptedData";
 import { useIpfsJsonData } from "@/hooks/useMetadata";
@@ -108,7 +112,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
 
 // Helpers
 
-function decodeProposalResultData(data?: ProposalResultType) {
+function decodeProposalResultData(data?: EmergencyProposalResultType) {
   if (!data?.length) return null;
 
   return {
@@ -126,7 +130,7 @@ function arrangeProposalData(
   actions?: RawAction[],
   creationEvent?: ProposalCreatedLogResponse["args"],
   metadata?: ProposalMetadata
-): Proposal | null {
+): EmergencyProposal | null {
   if (!proposalData) return null;
 
   return {
@@ -134,8 +138,7 @@ function arrangeProposalData(
     executed: proposalData.executed,
     parameters: {
       snapshotBlock: proposalData.parameters.snapshotBlock,
-      startDate: BigInt(0),
-      endDate: proposalData.parameters.expirationDate,
+      expirationDate: proposalData.parameters.expirationDate,
       minApprovals: proposalData.parameters.minApprovals,
     },
     approvals: proposalData.approvals,

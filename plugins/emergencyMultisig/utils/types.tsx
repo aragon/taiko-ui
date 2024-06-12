@@ -1,20 +1,20 @@
 import { Address, Hex } from "viem";
-import { RawAction } from "@/utils/types";
+import { IProposalResource, RawAction } from "@/utils/types";
 
 export type ProposalInputs = {
   proposalId: bigint;
 };
 
-export type ProposalResultType = readonly [
+export type EmergencyProposalResultType = readonly [
   executed: boolean,
   approvals: number,
-  parameters: ProposalParameters,
+  parameters: EmergencyProposalParameters,
   encryptedPayloadUri: Hex,
   destActionsHash: Hex,
   destinationPlugin: Address,
 ];
 
-export type ProposalParameters = {
+export type EmergencyProposalParameters = {
   expirationDate: bigint;
   snapshotBlock: bigint;
   minApprovals: number;
@@ -28,10 +28,10 @@ export type EncryptedProposalMetadata = {
   };
 };
 
-export type Proposal = {
+export type EmergencyProposal = {
   // active: boolean;
   executed: boolean;
-  parameters: ProposalParameters;
+  parameters: EmergencyProposalParameters;
   approvals: number;
   actions: RawAction[];
   allowFailureMap: bigint;
@@ -39,7 +39,7 @@ export type Proposal = {
   title: string;
   summary: string;
   description: string;
-  resources: string[];
+  resources: IProposalResource[];
 };
 
 export type ApprovedEventResponse = {

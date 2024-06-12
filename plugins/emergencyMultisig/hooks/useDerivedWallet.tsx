@@ -13,10 +13,12 @@ type KeyPair = {
 };
 
 type Result = KeyPair & {
-  requestSignature: () => any;
+  requestSignature: () => Promise<{ privateKey: Uint8Array; publicKey: Uint8Array }>;
 };
 
-const DerivedWalletContext = createContext<Result>({ requestSignature: () => {} });
+const DerivedWalletContext = createContext<Result>({
+  requestSignature: () => Promise.resolve({ publicKey: new Uint8Array(), privateKey: new Uint8Array() }),
+});
 
 export function UseDerivedWalletProvider({ children }: { children: ReactNode }) {
   const config = useConfig();
@@ -29,19 +31,21 @@ export function UseDerivedWalletProvider({ children }: { children: ReactNode }) 
       const derivedPrivateKey = keccak256(privateSignature);
       const publicKey = computePublicKey(hexToUint8Array(derivedPrivateKey));
 
-      setKeys({
+      const value = {
         publicKey,
         privateKey: hexToUint8Array(derivedPrivateKey),
-      });
-
-      return { publicKey, privateKey: derivedPrivateKey };
+      };
+      setKeys(value);
+      return value;
     } catch (err) {
       if ((err as Error)?.message.includes("User rejected the request")) {
         addAlert("You canceled the signature");
-      } else if (!err) {
-        addAlert("The signature could not be retrieved", { type: "error" });
+        return;
       }
     }
+
+    addAlert("The signature could not be retrieved", { type: "error" });
+    throw new Error("Could not load");
   };
 
   const value = {
