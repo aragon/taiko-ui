@@ -25,27 +25,28 @@ export function UseDerivedWalletProvider({ children }: { children: ReactNode }) 
   const { addAlert } = useAlerts();
   const [keys, setKeys] = useState<KeyPair>({});
 
-  const requestSignature = async () => {
-    try {
-      const privateSignature = await signMessage(config, { message: DETERMINISTIC_EMERGENCY_PAYLOAD });
-      const derivedPrivateKey = keccak256(privateSignature);
-      const publicKey = computePublicKey(hexToUint8Array(derivedPrivateKey));
+  const requestSignature = () => {
+    return signMessage(config, { message: DETERMINISTIC_EMERGENCY_PAYLOAD })
+      .then((privateSignature) => {
+        const derivedPrivateKey = keccak256(privateSignature);
+        const publicKey = computePublicKey(hexToUint8Array(derivedPrivateKey));
 
-      const value = {
-        publicKey,
-        privateKey: hexToUint8Array(derivedPrivateKey),
-      };
-      setKeys(value);
-      return value;
-    } catch (err) {
-      if ((err as Error)?.message.includes("User rejected the request")) {
-        addAlert("You canceled the signature");
-        return;
-      }
-    }
+        const value = {
+          publicKey,
+          privateKey: hexToUint8Array(derivedPrivateKey),
+        };
+        setKeys(value);
+        return value;
+      })
+      .catch((err) => {
+        if ((err as Error)?.message.includes("User rejected the request")) {
+          addAlert("You canceled the signature");
+          throw err;
+        }
 
-    addAlert("The signature could not be retrieved", { type: "error" });
-    throw new Error("Could not load");
+        addAlert("The signature could not be retrieved", { type: "error" });
+        throw err;
+      });
   };
 
   const value = {
