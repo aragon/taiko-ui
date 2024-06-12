@@ -1,11 +1,6 @@
 import { AvatarIcon, Breadcrumbs, Button, Heading, IBreadcrumbsLink, IconType, Tag, TagVariant } from "@aragon/ods";
-import { Proposal } from "@/plugins/multisig/utils/types";
-
-import { AlertVariant } from "@aragon/ods";
-import { ElseIf, If, Then, Else } from "@/components/if";
-import { AddressText } from "@/components/text/address";
+import { MultisigProposal } from "@/plugins/multisig/utils/types";
 import { useProposalStatus } from "@/plugins/multisig/hooks/useProposalVariantStatus";
-import { PleaseWaitSpinner } from "@/components/please-wait";
 import dayjs from "dayjs";
 import classNames from "classnames";
 import { ReactNode } from "react";
@@ -18,7 +13,7 @@ const DEFAULT_PROPOSAL_SUMMARY = "(No proposal summary)";
 interface ProposalHeaderProps {
   proposalNumber: number;
   breadcrumbs: IBreadcrumbsLink[];
-  proposal: Proposal;
+  proposal: MultisigProposal;
   canApprove: boolean;
   canExecute: boolean;
   transactionConfirming: boolean;
@@ -39,7 +34,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   const status = useProposalStatus(proposal);
   const tagVariant = getTagVariantFromStatus(status);
 
-  const ended = proposal.parameters.endDate <= Date.now() / 1000;
+  const expired = proposal.parameters.expirationDate <= Date.now() / 1000;
 
   return (
     <div className="flex w-full justify-center bg-neutral-0">
@@ -65,17 +60,6 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
         </div>
         {/* Metadata */}
         <div className="flex flex-wrap gap-x-10 gap-y-2">
-          {proposal.parameters.startDate && (
-            <div className="flex items-center gap-x-2">
-              <AvatarIcon icon={IconType.CALENDAR} size="sm" variant="primary" />
-              <div className="flex gap-x-1 text-base leading-tight ">
-                <span className="text-neutral-500">Published at</span>
-                <span className="text-neutral-800">
-                  {dayjs(Number(proposal.parameters.startDate) * 1000).format("MMMM D, h:mm A")}
-                </span>
-              </div>
-            </div>
-          )}
           <div className="flex items-center gap-x-2">
             <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
             <Publisher publisher={[{ address: proposal.creator }]} />
@@ -84,7 +68,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
             <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
             <div className="flex gap-x-1 text-base leading-tight ">
               <span className="text-neutral-800">
-                {getSimpleRelativeTimeFromDate(dayjs(Number(proposal.parameters.endDate) * 1000))}
+                {getSimpleRelativeTimeFromDate(dayjs(Number(proposal.parameters.expirationDate) * 1000))}
               </span>
               <span className="text-neutral-500">left until expiration</span>
             </div>

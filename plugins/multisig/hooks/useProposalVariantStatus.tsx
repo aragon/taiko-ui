@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Proposal } from "@/plugins/multisig/utils/types";
+import { MultisigProposal } from "@/plugins/multisig/utils/types";
 import { ProposalStatus } from "@aragon/ods";
 import dayjs from "dayjs";
 
-export const useProposalVariantStatus = (proposal: Proposal) => {
+export const useProposalVariantStatus = (proposal: MultisigProposal) => {
   const [status, setStatus] = useState({ variant: "", label: "" });
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export const useProposalVariantStatus = (proposal: Proposal) => {
   return status;
 };
 
-export const useProposalStatus = (proposal: Proposal) => {
+export const useProposalStatus = (proposal: MultisigProposal) => {
   const [status, setStatus] = useState<ProposalStatus>();
 
   useEffect(() => {

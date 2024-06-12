@@ -1,6 +1,5 @@
 import { compactNumber } from "@/utils/numbers";
 import { FC, ReactNode } from "react";
-import { formatUnits } from "viem";
 
 interface VoteTallyProps {
   approvalCount: number;

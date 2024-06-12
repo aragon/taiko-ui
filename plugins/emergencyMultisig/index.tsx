@@ -1,7 +1,7 @@
 import { NotFound } from "@/components/not-found";
 import ProposalCreate from "./pages/new";
 import ProposalList from "./pages/proposal-list";
-import ProposalDetail from "./pages/proposal";
+// import ProposalDetail from "./pages/proposal";
 import { useUrl } from "@/hooks/useUrl";
 import { UseDerivedWalletProvider } from "./hooks/useDerivedWallet";
 import { Else, ElseIf, If, Then } from "@/components/if";
@@ -32,7 +32,7 @@ export default function PluginPage() {
   );
 }
 
-const ProposalView = ({ hash }: { hash: string }) => {
-  const id = hash.replace("#/proposals/", "");
-  return <ProposalDetail id={id} />;
-};
+// const ProposalView = ({ hash }: { hash: string }) => {
+//   const id = hash.replace("#/proposals/", "");
+//   return <ProposalDetail id={id} />;
+// };

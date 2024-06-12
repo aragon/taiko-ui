@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useProposalApprove } from "@/plugins/multisig/hooks/useProposalApprove";
 import { Card } from "@aragon/ods";
-import { ProposalDataListItem, type DataListState } from "@aragon/ods";
+import { ProposalDataListItem } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
 import { useAccount } from "wagmi";
@@ -23,7 +23,7 @@ export default function ProposalCard(props: ProposalInputs) {
 
   const hasApproved = approvals?.some((veto) => veto.approver === address);
 
-  if (!proposal || showLoading) {
+  if (!proposal && showLoading) {
     return (
       <section className="mb-4 w-full">
         <Card className="p-4">

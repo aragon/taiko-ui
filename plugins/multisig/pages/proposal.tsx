@@ -28,6 +28,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalVariant = useProposalStatus(proposal!);
 
+  // TODO: This is not revelant anymore
   const proposalStage: ITransformedStage[] = [
     {
       id: "1",
@@ -51,7 +52,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       details: {
         censusBlock: Number(proposal?.parameters.snapshotBlock),
         startDate: dayjs(Number(proposal?.parameters.startDate) * 1000).toString(),
-        endDate: dayjs(Number(proposal?.parameters.endDate) * 1000).toString(),
+        endDate: dayjs(Number(proposal?.parameters.expirationDate) * 1000).toString(),
         strategy: "approvalThreshold",
         options: "approve",
       },

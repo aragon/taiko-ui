@@ -47,7 +47,7 @@ export default function Proposals() {
   const entityLabel = proposalCount === 1 ? "Proposal" : "Proposals";
 
   let dataListState: DataListState = "idle";
-  if (isLoading) {
+  if (isLoading && !proposalCount) {
     dataListState = "initialLoading";
   } else if (isError) {
     dataListState = "error";

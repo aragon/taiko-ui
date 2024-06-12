@@ -1,9 +1,6 @@
 import { Proposal } from "@/plugins/dualGovernance/utils/types";
 import { If } from "@/components/if";
-import * as DOMPurify from "dompurify";
 import { ActionCard } from "@/components/actions/action";
-
-const DEFAULT_PROPOSAL_METADATA_SUMMARY = "No description provided.";
 
 export default function ProposalDescription(proposal: Proposal) {
   return (

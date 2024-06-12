@@ -34,7 +34,7 @@ export default function ProposalCard(props: ProposalInputs) {
 
   const hasVetoed = vetoes?.some((veto) => veto.voter === address);
 
-  if (!proposal || showLoading) {
+  if (!proposal && showLoading) {
     return (
       <section className="mb-4 w-full">
         <Card className="p-4">

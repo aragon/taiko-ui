@@ -1,30 +1,36 @@
 import { Address } from "viem";
-import { Action } from "@/utils/types";
+import { IProposalResource, RawAction } from "@/utils/types";
 
 export type ProposalInputs = {
   proposalId: bigint;
 };
 
-export type ProposalResultType = readonly [boolean, number, ProposalParameters, string, readonly Action[], Address];
+export type MultisigProposalResultType = readonly [
+  boolean,
+  number,
+  MultisigProposalParameters,
+  string,
+  readonly RawAction[],
+  Address,
+];
 
-export type ProposalParameters = {
+export type MultisigProposalParameters = {
   expirationDate: bigint;
   snapshotBlock: bigint;
   minApprovals: number;
 };
 
-export type Proposal = {
-  // active: boolean;
+export type MultisigProposal = {
   executed: boolean;
-  parameters: ProposalParameters;
+  parameters: MultisigProposalParameters;
   approvals: number;
-  actions: Action[];
+  actions: RawAction[];
   allowFailureMap: bigint;
   creator: string;
   title: string;
   summary: string;
   description: string;
-  resources: string[];
+  resources: IProposalResource[];
 };
 
 export type ApprovedEventResponse = {

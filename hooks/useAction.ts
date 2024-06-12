@@ -24,6 +24,9 @@ export function useAction(action: RawAction) {
   }, [action.data, action.to, isLoading]);
 
   return {
+    to: action.to,
+    value: action.value,
+    data: action.data,
     isLoading,
     functionName,
     functionAbi,

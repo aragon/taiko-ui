@@ -1,5 +1,5 @@
-import { useAccount, useBlockNumber, useReadContract } from "wagmi";
-import { type ReactNode, useEffect, useState } from "react";
+import { useBlockNumber, useReadContract } from "wagmi";
+import { type ReactNode, useEffect } from "react";
 import ProposalCard from "@/plugins/multisig/components/proposal";
 import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin";
 import {
@@ -43,7 +43,7 @@ export default function Proposals() {
   const entityLabel = proposalCount === 1 ? "Proposal" : "Proposals";
 
   let dataListState: DataListState = "idle";
-  if (isLoading) {
+  if (isLoading && !proposalCount) {
     dataListState = "initialLoading";
   } else if (isError) {
     dataListState = "error";

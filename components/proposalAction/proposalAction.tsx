@@ -11,11 +11,12 @@ import {
 import Link from "next/link";
 import { CallParamField } from "./callParamField";
 import { EncodedView } from "./encodedView";
-import { DecodedAction } from "@/utils/types";
+import { RawAction } from "@/utils/types";
 import { Else, If, Then } from "../if";
+import { useAction } from "@/hooks/useAction";
 
 interface IProposalActionProps {
-  actions?: DecodedAction[];
+  actions?: RawAction[];
 }
 
 export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
@@ -33,65 +34,68 @@ export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
 
       {/* Content */}
       <AccordionContainer isMulti={true} className="border-t border-t-neutral-100">
-        {actions?.map((action, index) => {
-          const itemKey = `Action ${index + 1}`;
-          const isEthTransfer = !action.data || action.data === "0x";
-          const functionName = isEthTransfer ? "Withdraw assets" : action.functionName;
-          const functionAbi = action.functionAbi ?? null;
-          const explorerUrl = `${PUB_CHAIN.blockExplorers?.default.url}/address/${action.to}`;
-
-          return (
-            <AccordionItem className="border-t border-t-neutral-100 bg-neutral-0" key={itemKey} value={itemKey}>
-              <AccordionItemHeader className="!items-start">
-                <div className="flex w-full gap-x-6">
-                  <div className="flex flex-1 flex-col items-start gap-y-2">
-                    {functionName && (
-                      <div className="flex">
-                        {/* Method name */}
-                        <span className="flex w-full text-left text-lg leading-tight text-neutral-800 md:text-xl">
-                          {functionName}
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex w-full gap-x-6 text-sm leading-tight md:text-base">
-                      <Link href={explorerUrl} target="_blank">
-                        <span className="flex items-center gap-x-2 text-neutral-500">
-                          {formatHexString(action.to)}
-                          {functionName != null && <AvatarIcon variant="primary" size="sm" icon={IconType.CHECKMARK} />}
-                          {functionName == null && (
-                            <span className="flex items-center gap-x-2">
-                              Not Verified <AvatarIcon variant="warning" size="sm" icon={IconType.WARNING} />
-                            </span>
-                          )}
-                        </span>
-                      </Link>
-                    </div>
-                  </div>
-                  <span className="hidden text-sm leading-tight text-neutral-500 sm:block md:text-base">{itemKey}</span>
-                </div>
-              </AccordionItemHeader>
-
-              <AccordionItemContent className="!overflow-none">
-                <div className="flex flex-col gap-y-4">
-                  <If condition={action?.args?.length}>
-                    <Then>
-                      <EncodedView rawAction={action} />
-                    </Then>
-                    <Else>
-                      {action?.args?.map((arg, i) => (
-                        <div className="flex" key={i}>
-                          <CallParamField value={arg} idx={i} functionAbi={functionAbi} />
-                        </div>
-                      ))}
-                    </Else>
-                  </If>
-                  {}
-                </div>
-              </AccordionItemContent>
-            </AccordionItem>
-          );
-        })}
+        {actions?.map((action, index) => <ActionItem key={index} index={index} rawAction={action} />)}
       </AccordionContainer>
     </div>
+  );
+};
+
+const ActionItem = ({ index, rawAction }: { index: number; rawAction: RawAction }) => {
+  const action = useAction(rawAction);
+  const title = `Action ${index + 1}`;
+  const isEthTransfer = !action.data || action.data === "0x";
+  const functionName = isEthTransfer ? "Withdraw assets" : action.functionName;
+  const functionAbi = action.functionAbi ?? null;
+  const explorerUrl = `${PUB_CHAIN.blockExplorers?.default.url}/address/${action.to}`;
+
+  return (
+    <AccordionItem className="border-t border-t-neutral-100 bg-neutral-0" value={title}>
+      <AccordionItemHeader className="!items-start">
+        <div className="flex w-full gap-x-6">
+          <div className="flex flex-1 flex-col items-start gap-y-2">
+            {functionName && (
+              <div className="flex">
+                {/* Method name */}
+                <span className="flex w-full text-left text-lg leading-tight text-neutral-800 md:text-xl">
+                  {functionName}
+                </span>
+              </div>
+            )}
+            <div className="flex w-full gap-x-6 text-sm leading-tight md:text-base">
+              <Link href={explorerUrl} target="_blank">
+                <span className="flex items-center gap-x-2 text-neutral-500">
+                  {formatHexString(action.to)}
+                  {functionName != null && <AvatarIcon variant="primary" size="sm" icon={IconType.CHECKMARK} />}
+                  {functionName == null && (
+                    <span className="flex items-center gap-x-2">
+                      Not Verified <AvatarIcon variant="warning" size="sm" icon={IconType.WARNING} />
+                    </span>
+                  )}
+                </span>
+              </Link>
+            </div>
+          </div>
+          <span className="hidden text-sm leading-tight text-neutral-500 sm:block md:text-base">{title}</span>
+        </div>
+      </AccordionItemHeader>
+
+      <AccordionItemContent className="!overflow-none">
+        <div className="flex flex-col gap-y-4">
+          <If condition={action?.args?.length}>
+            <Then>
+              <EncodedView rawAction={action} />
+            </Then>
+            <Else>
+              {action?.args?.map((arg, i) => (
+                <div className="flex" key={i}>
+                  <CallParamField value={arg} idx={i} functionAbi={functionAbi} />
+                </div>
+              ))}
+            </Else>
+          </If>
+          {}
+        </div>
+      </AccordionItemContent>
+    </AccordionItem>
   );
 };

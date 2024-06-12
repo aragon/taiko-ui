@@ -2,6 +2,9 @@ import { IVotesDataListVariant } from "@/components/proposalVoting/votesDataList
 import { IApprovalThresholdResult, IButtonProps, ProposalType } from "@aragon/ods";
 import { Address, Hex, AbiFunction } from "viem";
 
+// General types
+type JsonLiteral = string | number | boolean;
+export type JsonValue = JsonLiteral | Record<string, JsonLiteral> | Array<JsonLiteral>;
 export type EvmValue = string | Hex | Address | number | bigint | boolean;
 
 export type RawAction = {
@@ -26,13 +29,6 @@ export interface IAlert {
   dismissTimeout?: ReturnType<typeof setTimeout>;
 }
 
-export type ProposalParameters = {
-  startDate: bigint;
-  endDate: bigint;
-  snapshotBlock: bigint;
-  minApprovals: number;
-};
-
 export type ProposalMetadata = {
   title: string;
   summary: string;
@@ -43,20 +39,6 @@ export type ProposalMetadata = {
 export type IProposalResource = {
   name: string;
   url: string;
-};
-
-export type Proposal = {
-  // active: boolean;
-  executed: boolean;
-  parameters: ProposalParameters;
-  approvals: number;
-  actions: RawAction[];
-  allowFailureMap: bigint;
-  creator: string;
-  title: string;
-  summary: string;
-  description: string;
-  resources: IProposalResource[];
 };
 
 export enum ProposalStages {
@@ -99,8 +81,3 @@ export interface ITransformedStage<TType extends ProposalType = ProposalType> {
   result?: IBreakdownApprovalThresholdResult;
   details?: IVotingStageDetails;
 }
-
-// General types
-
-type JsonLiteral = string | number | boolean;
-export type JsonValue = JsonLiteral | Record<string, JsonLiteral> | Array<JsonLiteral>;
