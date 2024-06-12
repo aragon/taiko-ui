@@ -1,7 +1,6 @@
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { type ReactNode, useEffect } from "react";
 import ProposalCard from "@/plugins/dualGovernance/components/proposal";
-import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import {
   Button,
   DataList,
@@ -10,18 +9,13 @@ import {
   ProposalDataListItemSkeleton,
   type DataListState,
 } from "@aragon/ods";
-import { useCanCreateProposal } from "@/plugins/dualGovernance/hooks/useCanCreateProposal";
-import Link from "next/link";
 import { Else, If, Then } from "@/components/if";
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisticTokenVotingPlugin.sol";
-// import { digestPagination } from "@/utils/pagination";
 
 const DEFAULT_PAGE_SIZE = 6;
 
 export default function Proposals() {
-  const { isConnected, address } = useAccount();
-
   const { data: blockNumber } = useBlockNumber({ watch: true });
 
   const {
@@ -107,7 +101,7 @@ export default function Proposals() {
                   .reverse()
                   ?.map((proposalIndex) => (
                     // TODO: update with router agnostic ODS DataListItem
-                    <ProposalCard key={proposalIndex} proposalId={BigInt(proposalIndex)} />
+                    <ProposalCard key={proposalIndex} proposalIndex={proposalIndex} />
                   ))}
             </DataList.Container>
             <DataList.Pagination />

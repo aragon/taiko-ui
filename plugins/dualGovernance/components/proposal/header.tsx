@@ -1,5 +1,5 @@
 import { Button, Tag } from "@aragon/ods";
-import { Proposal } from "@/plugins/dualGovernance/utils/types";
+import { OptimisticProposal } from "@/plugins/dualGovernance/utils/types";
 import { AlertVariant } from "@aragon/ods";
 import { ElseIf, If, Then, Else } from "@/components/if";
 import { AddressText } from "@/components/text/address";
@@ -12,7 +12,7 @@ const DEFAULT_PROPOSAL_SUMMARY = "(No proposal summary)";
 
 interface ProposalHeaderProps {
   proposalNumber: number;
-  proposal: Proposal;
+  proposal: OptimisticProposal;
   canVeto: boolean;
   canExecute: boolean;
   transactionConfirming: boolean;

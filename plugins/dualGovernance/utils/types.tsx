@@ -1,32 +1,31 @@
 import { Address, Hex } from "viem";
-import { RawAction } from "@/utils/types";
+import { IProposalResource, RawAction } from "@/utils/types";
 
 export type ProposalInputs = {
   proposalId: bigint;
 };
 
-export type ProposalResultType = readonly [
+export type OptimisticProposalResultType = readonly [
   boolean,
   boolean,
-  ProposalParameters,
+  OptimisticProposalParameters,
   bigint,
   Hex,
   readonly RawAction[],
   bigint,
 ];
 
-export type ProposalParameters = {
+export type OptimisticProposalParameters = {
   snapshotTimestamp: bigint;
   vetoEndDate: bigint;
   minVetoRatio: number;
   skipL2: boolean;
 };
 
-export type Proposal = {
-  id: bigint;
+export type OptimisticProposal = {
   active: boolean;
   executed: boolean;
-  parameters: ProposalParameters;
+  parameters: OptimisticProposalParameters;
   vetoTally: bigint;
   actions: RawAction[];
   allowFailureMap: bigint;
@@ -34,14 +33,7 @@ export type Proposal = {
   title: string;
   summary: string;
   description: string;
-  resources: string[];
-};
-
-export type ProposalMetadata = {
-  title: string;
-  summary: string;
-  description: string;
-  resources: string[];
+  resources: IProposalResource[];
 };
 
 export type VoteCastResponse = {

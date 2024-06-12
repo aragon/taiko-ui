@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { Proposal } from "@/plugins/dualGovernance/utils/types";
+import { OptimisticProposal } from "@/plugins/dualGovernance/utils/types";
 import { ProposalStatus } from "@aragon/ods";
 
-export const useProposalVariantStatus = (proposal: Proposal) => {
+export const useProposalVariantStatus = (proposal: OptimisticProposal) => {
   const [status, setStatus] = useState({ variant: "", label: "" });
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export const useProposalVariantStatus = (proposal: Proposal) => {
   return status;
 };
 
-export const useProposalStatus = (proposal: Proposal) => {
+export const useProposalStatus = (proposal: OptimisticProposal) => {
   const [status, setStatus] = useState<ProposalStatus>();
 
   useEffect(() => {

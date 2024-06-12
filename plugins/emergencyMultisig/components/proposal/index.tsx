@@ -60,6 +60,7 @@ export default function ProposalCard(props: ProposalInputs) {
     <Link href={`#/proposals/${props.proposalId}`} className="mb-4 w-full cursor-pointer">
       <ProposalDataListItem.Structure
         {...proposal}
+        id={props.proposalId.toString()}
         voted={hasApproved}
         result={{
           approvalAmount: proposal.approvals,

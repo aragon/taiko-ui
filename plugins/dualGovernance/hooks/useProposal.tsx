@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
-import { getAbiItem } from "viem";
-import { type RawAction } from "@/utils/types";
+import { Address, Hex, getAbiItem } from "viem";
+import { ProposalMetadata, type RawAction } from "@/utils/types";
 import {
-  type Proposal,
-  type ProposalMetadata,
-  type ProposalParameters,
-  type ProposalResultType,
+  type OptimisticProposal,
+  type OptimisticProposalParameters,
+  type OptimisticProposalResultType,
 } from "@/plugins/dualGovernance/utils/types";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
@@ -16,10 +15,10 @@ type ProposalCreatedLogResponse = {
   args: {
     actions: RawAction[];
     allowFailureMap: bigint;
-    creator: string;
+    creator: Address;
     endDate: bigint;
     startDate: bigint;
-    metadata: string;
+    metadata: Hex;
     proposalId: bigint;
   };
 };
@@ -29,10 +28,9 @@ const ProposalCreatedEvent = getAbiItem({
   name: "ProposalCreated",
 });
 
-export function useProposal(proposalIndex: string, autoRefresh = false) {
+export function useProposal(proposalId?: bigint, autoRefresh = false) {
   const publicClient = usePublicClient();
   const [proposalCreationEvent, setProposalCreationEvent] = useState<ProposalCreatedLogResponse["args"]>();
-  const [proposalId, setProposalId] = useState<bigint>(BigInt(0));
   const { data: blockNumber } = useBlockNumber({ watch: true });
 
   // Proposal on-chain data
@@ -45,7 +43,7 @@ export function useProposal(proposalIndex: string, autoRefresh = false) {
     address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
     abi: TaikoOptimisticTokenVotingPluginAbi,
     functionName: "getProposal",
-    args: [proposalId!],
+    args: [proposalId ?? BigInt(0)],
     chainId: PUB_CHAIN.id,
   });
 
@@ -63,22 +61,23 @@ export function useProposal(proposalIndex: string, autoRefresh = false) {
       .getLogs({
         address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
         event: ProposalCreatedEvent as any,
-        args: {} as any,
+        // args: {},
         fromBlock: BigInt(6012935),
         toBlock: "latest",
       })
-      .then((logs) => {
+      .then((logs: any) => {
         if (!logs || !logs.length) throw new Error("No creation logs");
 
-        const log: ProposalCreatedLogResponse = logs[Number(proposalIndex)] as any;
-        setProposalId(log.args.proposalId);
-        setProposalCreationEvent(log.args);
+        const event = logs.find((item: any) => item.args.proposalId === proposalId);
+
+        if (!event) return;
+        setProposalCreationEvent((event as any).args);
       })
       .catch((err) => {
         console.error("Could not fetch the proposal details", err);
         return null;
       });
-  }, [!!publicClient]);
+  }, [proposalId, !!proposalData, !!publicClient]);
 
   // JSON metadata
   const {
@@ -105,13 +104,13 @@ export function useProposal(proposalIndex: string, autoRefresh = false) {
 
 // Helpers
 
-function decodeProposalResultData(data?: ProposalResultType) {
+function decodeProposalResultData(data?: OptimisticProposalResultType) {
   if (!data?.length || data.length < 6) return null;
 
   return {
     active: data[0] as boolean,
     executed: data[1] as boolean,
-    parameters: data[2] as ProposalParameters,
+    parameters: data[2] as OptimisticProposalParameters,
     vetoTally: data[3] as bigint,
     metadataUri: data[4] as string,
     actions: data[5] as Array<RawAction>,
@@ -123,11 +122,10 @@ function arrangeProposalData(
   proposalData?: ReturnType<typeof decodeProposalResultData>,
   creationEvent?: ProposalCreatedLogResponse["args"],
   metadata?: ProposalMetadata
-): Proposal | null {
+): OptimisticProposal | null {
   if (!proposalData) return null;
 
   return {
-    id: creationEvent?.proposalId ?? BigInt(0),
     actions: proposalData.actions,
     active: proposalData.active,
     executed: proposalData.executed,

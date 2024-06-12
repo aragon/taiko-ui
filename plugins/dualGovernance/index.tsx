@@ -9,9 +9,10 @@ export default function PluginPage() {
 
   if (!hash || hash === "#/") return <ProposalList />;
   else if (hash.startsWith("#/proposals/")) {
-    const id = hash.replace("#/proposals/", "");
+    const index = parseInt(hash.replace("#/proposals/", ""));
+    if (isNaN(index)) return <NotFound />;
 
-    return <ProposalDetail id={id} />;
+    return <ProposalDetail index={index} />;
   }
 
   // Default not found page

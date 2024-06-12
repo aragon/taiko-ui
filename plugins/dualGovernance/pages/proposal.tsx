@@ -10,12 +10,13 @@ import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useState } from "react";
 import { useProposalVeto } from "@/plugins/dualGovernance/hooks/useProposalVeto";
 import { useProposalExecute } from "@/plugins/dualGovernance/hooks/useProposalExecute";
+import { useProposalId } from "../hooks/useProposalId";
 
 type BottomSection = "description" | "vetoes";
 
-export default function ProposalDetail({ id: proposalId }: { id: string }) {
+export default function ProposalDetail({ index: proposalIndex }: { index: number }) {
   const [bottomSection, setBottomSection] = useState<BottomSection>("description");
-
+  const { proposalId } = useProposalId(proposalIndex);
   const {
     proposal,
     proposalFetchStatus,
@@ -23,7 +24,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     canVeto,
     isConfirming: isConfirmingVeto,
     vetoProposal,
-  } = useProposalVeto(proposalId);
+  } = useProposalVeto(proposalIndex);
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
 
@@ -57,8 +58,8 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
           votePercentage={Number(Number(proposal?.vetoTally) / Number(proposal?.parameters?.minVetoVotingPower)) * 100}
         />
         <ProposalDetails
-          minVetoVotingPower={proposal?.parameters?.minVetoVotingPower}
-          snapshotBlock={proposal?.parameters?.snapshotBlock}
+          minVetoRatio={proposal?.parameters?.minVetoRatio}
+          snapshotTimestamp={proposal?.parameters?.snapshotTimestamp}
         />
       </div>
       <div className="w-full py-12">
