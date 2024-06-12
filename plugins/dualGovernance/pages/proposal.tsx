@@ -11,6 +11,9 @@ import { useState } from "react";
 import { useProposalVeto } from "@/plugins/dualGovernance/hooks/useProposalVeto";
 import { useProposalExecute } from "@/plugins/dualGovernance/hooks/useProposalExecute";
 import { useProposalId } from "../hooks/useProposalId";
+import { useVotingToken } from "../hooks/useVotingToken";
+import { useVotingTokenBalance } from "../hooks/useVotingTokenBalance";
+import { PUB_TAIKO_BRIDGE_ADDRESS } from "@/constants";
 
 type BottomSection = "description" | "vetoes";
 
@@ -27,8 +30,20 @@ export default function ProposalDetail({ index: proposalIndex }: { index: number
   } = useProposalVeto(proposalIndex);
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
-
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
+  const { tokenSupply: totalSupply } = useVotingToken();
+  const { balance: bridgedBalance } = useVotingTokenBalance(
+    PUB_TAIKO_BRIDGE_ADDRESS,
+    proposal?.parameters.snapshotTimestamp ?? BigInt(0)
+  );
+
+  let votingPercentage = 0;
+  if (typeof proposal?.vetoTally !== "undefined" && totalSupply && typeof bridgedBalance !== "undefined") {
+    const effectiveSupply = proposal.parameters.skipL2 ? totalSupply - bridgedBalance : totalSupply;
+
+    // 2 decimals
+    votingPercentage = Number((proposal.vetoTally * BigInt(10_000)) / effectiveSupply) / 100;
+  }
 
   if (!proposal || showProposalLoading) {
     return (
@@ -53,10 +68,7 @@ export default function ProposalDetail({ index: proposalIndex }: { index: number
       </div>
 
       <div className="my-10 grid w-full gap-10 lg:grid-cols-2 xl:grid-cols-3">
-        <VetoTally
-          voteCount={proposal?.vetoTally}
-          votePercentage={Number(Number(proposal?.vetoTally) / Number(proposal?.parameters?.minVetoVotingPower)) * 100}
-        />
+        <VetoTally voteCount={proposal?.vetoTally} votePercentage={votingPercentage} />
         <ProposalDetails
           minVetoRatio={proposal?.parameters?.minVetoRatio}
           snapshotTimestamp={proposal?.parameters?.snapshotTimestamp}

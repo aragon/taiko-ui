@@ -15,6 +15,8 @@ export const PUB_PUBLIC_KEY_REGISTRY_CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC
 export const PUB_DELEGATION_WALL_CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC_DELEGATION_WALL_CONTRACT_ADDRESS ??
   "") as Address;
 
+export const PUB_TAIKO_BRIDGE_ADDRESS = (process.env.NEXT_PUBLIC_TAIKO_BRIDGE_ADDRESS ?? "") as Address;
+
 // Target chain
 export const PUB_CHAIN_NAME = (process.env.NEXT_PUBLIC_CHAIN_NAME ?? "sepolia") as ChainName;
 export const PUB_CHAIN = getChain(PUB_CHAIN_NAME);
