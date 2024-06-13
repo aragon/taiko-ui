@@ -1,7 +1,7 @@
 import { NotFound } from "@/components/not-found";
 import ProposalCreate from "./pages/new";
 import ProposalList from "./pages/proposal-list";
-// import ProposalDetail from "./pages/proposal";
+import ProposalDetail from "./pages/proposal";
 import { useUrl } from "@/hooks/useUrl";
 import { UseDerivedWalletProvider } from "./hooks/useDerivedWallet";
 import { Else, ElseIf, If, Then } from "@/components/if";
@@ -19,9 +19,9 @@ export default function PluginPage() {
         <ElseIf condition={hash === "#/new"}>
           <ProposalCreate />
         </ElseIf>
-        {/* <ElseIf condition={hash.startsWith("#/proposals/")}>
+        <ElseIf condition={hash.startsWith("#/proposals/")}>
           <ProposalView hash={hash} />
-        </ElseIf> */}
+        </ElseIf>
         <Else>
           <main className="flex w-full flex-col items-center px-4 py-6 md:w-4/5 md:p-6 lg:w-2/3 xl:py-10 2xl:w-3/5">
             <NotFound />
@@ -32,7 +32,7 @@ export default function PluginPage() {
   );
 }
 
-// const ProposalView = ({ hash }: { hash: string }) => {
-//   const id = hash.replace("#/proposals/", "");
-//   return <ProposalDetail id={id} />;
-// };
+const ProposalView = ({ hash }: { hash: string }) => {
+  const id = hash.replace("#/proposals/", "");
+  return <ProposalDetail id={id} />;
+};

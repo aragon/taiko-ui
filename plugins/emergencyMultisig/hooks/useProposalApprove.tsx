@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { useProposal } from "./useProposal";
-import { useUserCanApprove } from "@/plugins/multisig/hooks/useUserCanApprove";
+import { useUserCanApprove } from "@/plugins/emergencyMultisig/hooks/useUserCanApprove";
 import { EmergencyMultisigPluginAbi } from "@/plugins/emergencyMultisig/artifacts/EmergencyMultisigPlugin";
 import { useAlerts, AlertContextProps } from "@/context/Alerts";
 import { PUB_CHAIN, PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS } from "@/constants";

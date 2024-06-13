@@ -86,7 +86,13 @@ export function useProposalExecute(proposalId: string) {
 
   return {
     executeProposal,
-    canExecute: !isCanVoteError && !isCanVoteLoading && !isConfirmed && !!canExecute,
+    canExecute:
+      !isCanVoteError &&
+      !isCanVoteLoading &&
+      !isConfirmed &&
+      !!canExecute &&
+      !!privateRawMetadata &&
+      !!proposal?.actions,
     isConfirming,
     isConfirmed,
   };
