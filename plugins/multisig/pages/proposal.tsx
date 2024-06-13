@@ -51,7 +51,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       },
       details: {
         censusBlock: Number(proposal?.parameters.snapshotBlock),
-        startDate: dayjs(Number(proposal?.parameters.startDate) * 1000).toString(),
+        startDate: "",
         endDate: dayjs(Number(proposal?.parameters.expirationDate) * 1000).toString(),
         strategy: "approvalThreshold",
         options: "approve",
