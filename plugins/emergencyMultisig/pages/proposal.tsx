@@ -15,7 +15,6 @@ import { CardResources } from "@/components/proposal/cardResources";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const router = useRouter();
-
   const {
     proposal,
     proposalFetchStatus,
@@ -24,6 +23,8 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     isConfirming: isConfirmingApproval,
     approveProposal,
   } = useProposalApprove(proposalId);
+  const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
+  const breadcrumbs = generateBreadcrumbs(router.asPath);
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalVariant = useProposalStatus(proposal!);
@@ -39,12 +40,23 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       proposalId: proposalId,
       providerId: "1",
       result: {
-        cta: {
-          disabled: !canApprove,
-          isLoading: false,
-          label: "Approve",
-          onClick: approveProposal,
-        },
+        cta: proposal?.executed
+          ? {
+              disabled: true,
+              label: "Executed",
+            }
+          : canExecute
+            ? {
+                isLoading: isConfirmingExecution,
+                label: "Execute",
+                onClick: executeProposal,
+              }
+            : {
+                disabled: !canApprove,
+                isLoading: isConfirmingApproval,
+                label: "Approve",
+                onClick: approveProposal,
+              },
         approvalAmount: proposal?.approvals || 0,
         approvalThreshold: proposal?.parameters.minApprovals || 0,
       },
@@ -58,9 +70,6 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       votes: approvals.map(({ approver }) => ({ address: approver, variant: "approve" }) as IVote),
     },
   ];
-
-  const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
-  const breadcrumbs = generateBreadcrumbs(router.asPath);
 
   if (!proposal || showProposalLoading) {
     return (
