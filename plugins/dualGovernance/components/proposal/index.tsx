@@ -74,7 +74,6 @@ export default function ProposalCard(props: ProposalInputs) {
     <Link href={`#/proposals/${props.proposalIndex}`} className="mb-4 w-full cursor-pointer">
       <ProposalDataListItem.Structure
         {...proposal}
-        id={props.proposalIndex.toString()}
         voted={hasVetoed}
         result={{
           option: "Veto",

@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { useVotingToken } from "../../hooks/useVotingToken";
 import dayjs from "dayjs";
 
 interface ProposalDetailsProps {
@@ -8,14 +7,12 @@ interface ProposalDetailsProps {
 }
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ minVetoRatio, snapshotTimestamp }) => {
-  const { symbol } = useVotingToken();
   return (
     <>
       <Card>
-        <h2 className="flex-grow pr-6 text-xl font-semibold text-neutral-600">Minimum veto power</h2>
+        <h2 className="flex-grow pr-6 text-xl font-semibold text-neutral-600">Minimum veto ratio</h2>
         <div className="items-right flex-wrap text-right">
-          <span className="text-xl font-semibold">{minVetoRatio ? (minVetoRatio / 1000_000).toFixed(2) : null}</span>{" "}
-          <span>{symbol ?? ""}</span>
+          <span className="text-xl font-semibold">{minVetoRatio ? (minVetoRatio / 10000).toFixed(2) : null}%</span>{" "}
         </div>
       </Card>
       <Card>

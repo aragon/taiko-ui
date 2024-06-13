@@ -11,7 +11,7 @@ const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_SUMMARY = "(No proposal summary)";
 
 interface ProposalHeaderProps {
-  proposalNumber: number;
+  proposalIndex: number;
   proposal: OptimisticProposal;
   canVeto: boolean;
   canExecute: boolean;
@@ -21,7 +21,7 @@ interface ProposalHeaderProps {
 }
 
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({
-  proposalNumber,
+  proposalIndex,
   proposal,
   canVeto,
   canExecute,
@@ -47,7 +47,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 variant={proposalVariant.variant as AlertVariant}
               />
             </div>
-            <span className="pt-1 text-xl font-semibold text-neutral-700">Proposal {proposalNumber}</span>
+            <span className="pt-1 text-xl font-semibold text-neutral-700">Proposal {proposalIndex}</span>
           </div>
         </div>
         <div className="flex">

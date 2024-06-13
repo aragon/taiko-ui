@@ -10,6 +10,7 @@ import {
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
 import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisticTokenVotingPlugin.sol";
+import { parseProposalId } from "../utils/proposal-id";
 
 type ProposalCreatedLogResponse = {
   args: {
@@ -86,7 +87,7 @@ export function useProposal(proposalId?: bigint, autoRefresh = false) {
     error: metadataError,
   } = useMetadata<ProposalMetadata>(proposalData?.metadataUri);
 
-  const proposal = arrangeProposalData(proposalData, proposalCreationEvent, metadataContent);
+  const proposal = arrangeProposalData(proposalId, proposalData, proposalCreationEvent, metadataContent);
 
   return {
     proposal,
@@ -119,13 +120,17 @@ function decodeProposalResultData(data?: OptimisticProposalResultType) {
 }
 
 function arrangeProposalData(
+  proposalId?: bigint,
   proposalData?: ReturnType<typeof decodeProposalResultData>,
   creationEvent?: ProposalCreatedLogResponse["args"],
   metadata?: ProposalMetadata
 ): OptimisticProposal | null {
-  if (!proposalData) return null;
+  if (!proposalData || !proposalId) return null;
+
+  const { index, startDate: vetoStartDate } = parseProposalId(proposalId);
 
   return {
+    index,
     actions: proposalData.actions,
     active: proposalData.active,
     executed: proposalData.executed,
@@ -133,6 +138,7 @@ function arrangeProposalData(
       minVetoRatio: proposalData.parameters.minVetoRatio,
       skipL2: proposalData.parameters.skipL2,
       snapshotTimestamp: proposalData.parameters.snapshotTimestamp,
+      vetoStartDate,
       vetoEndDate: proposalData.parameters.vetoEndDate,
     },
     vetoTally: proposalData.vetoTally,

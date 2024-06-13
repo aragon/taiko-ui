@@ -57,7 +57,7 @@ export default function ProposalDetail({ index: proposalIndex }: { index: number
     <main className="flex w-full flex-col items-center px-4 py-6 md:w-4/5 md:p-6 lg:w-2/3 xl:py-10 2xl:w-3/5">
       <div className="flex w-full justify-between py-5">
         <ProposalHeader
-          proposalNumber={Number(proposalId) + 1}
+          proposalIndex={proposalIndex}
           proposal={proposal}
           transactionConfirming={isConfirmingVeto || isConfirmingExecution}
           canVeto={canVeto}

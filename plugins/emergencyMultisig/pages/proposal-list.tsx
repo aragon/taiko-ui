@@ -139,7 +139,7 @@ export default function Proposals() {
               .
             </p>
             <IllustrationHuman className="mx-auto mb-10 max-w-72" body="BLOCKS" expression="SMILE_WINK" hairs="CURLY" />
-            <If condition={canCreate}>
+            <If condition={isConnected && canCreate}>
               <div className="flex justify-center">
                 <Link href="#/new">
                   <Button iconLeft={IconType.PLUS} size="md" variant="primary">

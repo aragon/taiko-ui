@@ -1,4 +1,4 @@
-import { useBlockNumber, useReadContract } from "wagmi";
+import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { type ReactNode, useEffect } from "react";
 import ProposalCard from "@/plugins/multisig/components/proposal";
 import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin";
@@ -18,6 +18,7 @@ import { PUB_MULTISIG_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 const DEFAULT_PAGE_SIZE = 6;
 
 export default function Proposals() {
+  const { isConnected } = useAccount();
   const canCreate = useCanCreateProposal();
 
   const { data: blockNumber } = useBlockNumber({ watch: true });
@@ -75,7 +76,7 @@ export default function Proposals() {
       <SectionView>
         <h1 className="justify-self-start align-middle text-3xl font-semibold">Proposals</h1>
         <div className="justify-self-end">
-          <If condition={canCreate}>
+          <If condition={isConnected && canCreate}>
             <Link href="#/new">
               <Button iconLeft={IconType.PLUS} size="md" variant="primary">
                 Submit Proposal
@@ -120,7 +121,7 @@ export default function Proposals() {
               .
             </p>
             <IllustrationHuman className="mx-auto mb-10 max-w-72" body="BLOCKS" expression="SMILE_WINK" hairs="CURLY" />
-            <If condition={canCreate}>
+            <If condition={isConnected && canCreate}>
               <div className="flex justify-center">
                 <Link href="#/new">
                   <Button iconLeft={IconType.PLUS} size="md" variant="primary">

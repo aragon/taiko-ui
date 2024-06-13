@@ -41,7 +41,6 @@ export const DETERMINISTIC_EMERGENCY_PAYLOAD =
 export const PUB_APP_NAME = "Taiko";
 export const PUB_APP_DESCRIPTION = "Taiko's official UI to interact with the DAO smart contract";
 
+export const PUB_PROJECT_LOGO = "/logo-tk.svg";
 export const PUB_PROJECT_URL = "https://taiko.xyz/";
 export const PUB_WALLET_ICON = "https://avatars.githubusercontent.com/u/37784886";
-
-export const PUB_DISCORD_URL = "https://discord.com/invite/taikoxyz";
