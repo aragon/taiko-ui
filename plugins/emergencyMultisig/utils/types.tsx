@@ -10,6 +10,7 @@ export type EmergencyProposalResultType = readonly [
   approvals: number,
   parameters: EmergencyProposalParameters,
   encryptedPayloadUri: Hex,
+  publicMetadataUriHash: Hex,
   destActionsHash: Hex,
   destinationPlugin: Address,
 ];

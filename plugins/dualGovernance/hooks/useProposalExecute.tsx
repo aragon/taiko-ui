@@ -61,7 +61,7 @@ export function useProposalExecute(proposalId?: bigint) {
     // success
     if (!executeTxHash) return;
     else if (isConfirming) {
-      addAlert("Proposal submitted", {
+      addAlert("Transaction submitted", {
         description: "Waiting for the transaction to be validated",
         type: "info",
         txHash: executeTxHash,

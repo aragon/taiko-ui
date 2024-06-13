@@ -9,7 +9,13 @@ import { ProposalMetadata, RawAction } from "@/utils/types";
 import { useRouter } from "next/router";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN, PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
+import {
+  PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
+  PUB_CHAIN,
+  PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
+  PUB_APP_NAME,
+  PUB_PROJECT_URL,
+} from "@/constants";
 import { ActionCard } from "@/components/actions/action";
 import { uploadToPinata } from "@/utils/ipfs";
 import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin";
@@ -123,20 +129,20 @@ export default function Create() {
       title,
       summary,
       description,
-      resources: [{ name: "Taiko", url: "https://taiko.xyz" }],
+      resources: [{ name: PUB_APP_NAME, url: PUB_PROJECT_URL }],
     };
 
     // Encrypt the proposal data
-    const { payload: publicMetadataJson, actionsHash } = encryptProposalData(privateMetadata, actions);
+    const { payload: publicMetadataJson, hashed } = await encryptProposalData(privateMetadata, actions);
 
-    const ipfsPin = await uploadToPinata(publicMetadataJson);
+    const publicMetadataUri = await uploadToPinata(publicMetadataJson);
 
     createProposalWrite({
       chainId: PUB_CHAIN.id,
       abi: EmergencyMultisigPluginAbi,
       address: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
       functionName: "createProposal",
-      args: [toHex(ipfsPin), actionsHash, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, false],
+      args: [toHex(publicMetadataUri), hashed.metadataUri, hashed.actions, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, false],
     });
   };
 

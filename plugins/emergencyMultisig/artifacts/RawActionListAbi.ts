@@ -1,4 +1,4 @@
-export const RawActionList = [
+export const RawActionListAbi = [
   {
     name: "_actions",
     type: "tuple[]",

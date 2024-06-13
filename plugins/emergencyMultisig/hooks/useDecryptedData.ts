@@ -4,13 +4,15 @@ import { hexToUint8Array } from "@/utils/hex";
 import { decryptProposal, decryptSymmetricKey } from "@/utils/encryption";
 import { ProposalMetadata, RawAction } from "@/utils/types";
 import { useDerivedWallet } from "./useDerivedWallet";
-import { RawActionList } from "../artifacts/RawActionList";
+import { RawActionListAbi } from "../artifacts/RawActionListAbi";
 
 export function useDecryptedData(encryptedMetadata?: EncryptedProposalMetadata) {
   const { privateKey, publicKey } = useDerivedWallet();
   let privateMetadata: ProposalMetadata | null = null;
   let privateActions: readonly RawAction[] | null = null;
   let error: Error | null = null;
+  let privateRawActions: Uint8Array | null = null;
+  let privateRawMetadata: string | null = null;
 
   // Attempt to decrypt
   if (privateKey && publicKey && encryptedMetadata) {
@@ -24,8 +26,10 @@ export function useDecryptedData(encryptedMetadata?: EncryptedProposalMetadata) 
         },
         proposalSymKey
       );
-      privateMetadata = result.metadata as any;
-      const decoded = decodeAbiParameters(RawActionList, result.actions);
+      privateRawActions = result.rawActions;
+      privateRawMetadata = result.rawMetadata;
+      privateMetadata = result.metadata as ProposalMetadata;
+      const decoded = decodeAbiParameters(RawActionListAbi, privateRawActions);
       if (!decoded[0]) throw new Error("The actions parameter can't be recovered");
 
       privateActions = decoded[0];
@@ -37,6 +41,10 @@ export function useDecryptedData(encryptedMetadata?: EncryptedProposalMetadata) 
   return {
     privateActions,
     privateMetadata,
+    raw: {
+      privateRawActions,
+      privateRawMetadata,
+    },
     error,
   };
 }

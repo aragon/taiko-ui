@@ -4,11 +4,16 @@ import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin";
-import { RawAction } from "@/utils/types";
+import { toHex } from "viem";
+import { useProposal } from "./useProposal";
 
-export function useProposalExecute(proposalId: string, actions: RawAction[]) {
+export function useProposalExecute(proposalId: string) {
   const { reload } = useRouter();
   const { addAlert } = useAlerts() as AlertContextProps;
+  const {
+    rawPrivateData: { privateRawMetadata },
+    proposal,
+  } = useProposal(proposalId);
 
   const {
     data: canExecute,
@@ -31,14 +36,14 @@ export function useProposalExecute(proposalId: string, actions: RawAction[]) {
 
   const executeProposal = () => {
     if (!canExecute) return;
-    else if (!actions) return;
+    else if (!privateRawMetadata || !proposal?.actions) return;
 
     executeWrite({
       chainId: PUB_CHAIN.id,
       abi: EmergencyMultisigPluginAbi,
       address: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
       functionName: "execute",
-      args: [BigInt(proposalId), actions],
+      args: [BigInt(proposalId), toHex(privateRawMetadata), proposal.actions],
     });
   };
 
@@ -62,7 +67,7 @@ export function useProposalExecute(proposalId: string, actions: RawAction[]) {
     // success
     if (!executeTxHash) return;
     else if (isConfirming) {
-      addAlert("Proposal submitted", {
+      addAlert("Transaction submitted", {
         description: "Waiting for the transaction to be validated",
         type: "info",
         txHash: executeTxHash,

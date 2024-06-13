@@ -14,7 +14,7 @@ import { useIpfsJsonData } from "@/hooks/useMetadata";
 
 const ProposalCreatedEvent = getAbiItem({
   abi: EmergencyMultisigPluginAbi,
-  name: "ProposalCreated",
+  name: "EmergencyProposalCreated",
 });
 
 type ProposalCreatedLogResponse = {
@@ -62,7 +62,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
   } = useIpfsJsonData<EncryptedProposalMetadata>(proposalData?.encryptedPayloadUri);
 
   // Decrypt metadata and actions
-  const { privateActions, privateMetadata } = useDecryptedData(encryptedProposalData);
+  const { privateActions, privateMetadata, raw: rawPrivateData } = useDecryptedData(encryptedProposalData);
 
   const proposal = arrangeProposalData(
     proposalData,
@@ -98,6 +98,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
 
   return {
     proposal,
+    rawPrivateData,
     refetch: proposalRefetch,
     status: {
       proposalReady: proposalFetchStatus === "idle",
@@ -120,8 +121,9 @@ function decodeProposalResultData(data?: EmergencyProposalResultType) {
     approvals: data[1],
     parameters: data[2],
     encryptedPayloadUri: data[3],
-    destActionsHash: data[4],
-    destinationPlugin: data[5],
+    publicMetadataUriHash: data[4],
+    destActionsHash: data[5],
+    destinationPlugin: data[6],
   };
 }
 
