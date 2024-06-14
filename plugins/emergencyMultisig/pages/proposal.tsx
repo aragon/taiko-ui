@@ -12,9 +12,16 @@ import { useProposalStatus } from "../hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
 import { ProposalAction } from "@/components/proposalAction/proposalAction";
 import { CardResources } from "@/components/proposal/cardResources";
+import { useDerivedWallet } from "../hooks/useDerivedWallet";
+import { MissingContentView } from "../components/MissingContentView";
+import { useAccount } from "wagmi";
+import { Else, ElseIf, If, Then } from "@/components/if";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const router = useRouter();
+  const { isConnected } = useAccount();
+  const { open } = useWeb3Modal();
   const {
     proposal,
     proposalFetchStatus,
@@ -24,6 +31,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     approveProposal,
   } = useProposalApprove(proposalId);
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
+  const { publicKey, requestSignature } = useDerivedWallet();
   const breadcrumbs = generateBreadcrumbs(router.asPath);
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
@@ -92,18 +100,40 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         onExecutePressed={() => executeProposal()}
       />
 
-      <div className="mx-auto w-full max-w-screen-xl px-4 py-6 md:px-16 md:pb-20 md:pt-10">
-        <div className="flex w-full flex-col gap-x-12 gap-y-6 md:flex-row">
-          <div className="flex flex-col gap-y-6 md:w-[63%] md:shrink-0">
-            <BodySection body={proposal.description || "No description was provided"} />
-            <ProposalVoting stages={proposalStage} />
-            <ProposalAction actions={proposal.actions} />
+      <If condition={!isConnected}>
+        <Then>
+          <div className="mt-12">
+            <MissingContentView
+              message={`Please, connect your Ethereum wallet in order to continue.`}
+              callToAction="Connect wallet"
+              onClick={() => open()}
+            />
           </div>
-          <div className="flex flex-col gap-y-6 md:w-[33%]">
-            <CardResources resources={proposal.resources} title="Resources" />
+        </Then>
+        <ElseIf condition={!publicKey}>
+          <div className="mt-12">
+            <MissingContentView
+              message={`Please, sign in with your wallet in order to decrypt the private proposal data.`}
+              callToAction="Sign in to continue"
+              onClick={() => requestSignature()}
+            />
           </div>
-        </div>
-      </div>
+        </ElseIf>
+        <Else>
+          <div className="mx-auto w-full max-w-screen-xl px-4 py-6 md:px-16 md:pb-20 md:pt-10">
+            <div className="flex w-full flex-col gap-x-12 gap-y-6 md:flex-row">
+              <div className="flex flex-col gap-y-6 md:w-[63%] md:shrink-0">
+                <BodySection body={proposal.description || "No description was provided"} />
+                <ProposalVoting stages={proposalStage} />
+                <ProposalAction actions={proposal.actions} />
+              </div>
+              <div className="flex flex-col gap-y-6 md:w-[33%]">
+                <CardResources resources={proposal.resources} title="Resources" />
+              </div>
+            </div>
+          </div>
+        </Else>
+      </If>
     </section>
   );
 }

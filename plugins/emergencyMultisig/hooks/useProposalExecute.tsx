@@ -46,7 +46,7 @@ export function useProposalExecute(proposalId: string) {
           abi: EmergencyMultisigPluginAbi,
           address: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
           functionName: "execute",
-          args: [BigInt(proposalId), keccak256(toHex(metadataUri)), proposal.actions],
+          args: [BigInt(proposalId), toHex(metadataUri), proposal.actions],
         });
       })
       .catch((err) => {
