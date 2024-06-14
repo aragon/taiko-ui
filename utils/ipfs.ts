@@ -1,5 +1,8 @@
 import { PUB_IPFS_ENDPOINT, PUB_IPFS_API_KEY } from "@/constants";
-import { Hex, fromHex } from "viem";
+import { Hex, fromHex, toBytes } from "viem";
+import { CID } from "multiformats/cid";
+import * as raw from "multiformats/codecs/raw";
+import { sha256 } from "multiformats/hashes/sha2";
 
 export function fetchJsonFromIpfs(ipfsUri: string) {
   return fetchFromIPFS(ipfsUri).then((res) => res.json());
@@ -28,6 +31,13 @@ export function uploadToPinata(data: any): Promise<string> {
     .then((json) => {
       return "ipfs://" + json.IpfsHash;
     });
+}
+
+export async function getContentCid(strMetadata: string) {
+  const bytes = raw.encode(toBytes(strMetadata));
+  const hash = await sha256.digest(bytes);
+  const cid = CID.create(1, raw.code, hash);
+  return "ipfs://" + cid.toV1().toString();
 }
 
 async function fetchFromIPFS(ipfsUri: string): Promise<Response> {

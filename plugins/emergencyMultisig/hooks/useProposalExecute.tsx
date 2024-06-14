@@ -4,8 +4,9 @@ import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin";
-import { toHex } from "viem";
+import { keccak256, toHex } from "viem";
 import { useProposal } from "./useProposal";
+import { getContentCid } from "@/utils/ipfs";
 
 export function useProposalExecute(proposalId: string) {
   const { reload } = useRouter();
@@ -38,13 +39,20 @@ export function useProposalExecute(proposalId: string) {
     if (!canExecute) return;
     else if (!privateRawMetadata || !proposal?.actions) return;
 
-    executeWrite({
-      chainId: PUB_CHAIN.id,
-      abi: EmergencyMultisigPluginAbi,
-      address: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
-      functionName: "execute",
-      args: [BigInt(proposalId), toHex(privateRawMetadata), proposal.actions],
-    });
+    getContentCid(privateRawMetadata)
+      .then((metadataUri) => {
+        executeWrite({
+          chainId: PUB_CHAIN.id,
+          abi: EmergencyMultisigPluginAbi,
+          address: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
+          functionName: "execute",
+          args: [BigInt(proposalId), keccak256(toHex(metadataUri)), proposal.actions],
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        addAlert("Could not recover the details to execute the transaction");
+      });
   };
 
   useEffect(() => {
