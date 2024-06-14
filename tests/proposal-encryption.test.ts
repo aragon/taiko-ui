@@ -18,8 +18,8 @@ describe("Proposal data encryption", () => {
       50, 25, 40, 200, 123, 234, 55, 26, 73, 84, 62, 162, 188, 126, 255, 0, 2, 0, 5, 1, 55, 26, 37, 82,
     ]);
 
-    const { data: data1, symmetricKey: symmetricKey1 } = encryptProposal(metadata, actionBytes);
-    const { data: data2, symmetricKey: symmetricKey2 } = encryptProposal(metadata, actionBytes);
+    const { encrypted: data1, symmetricKey: symmetricKey1 } = encryptProposal(JSON.stringify(metadata), actionBytes);
+    const { encrypted: data2, symmetricKey: symmetricKey2 } = encryptProposal(JSON.stringify(metadata), actionBytes);
 
     expect(libsodium.to_hex(data1.metadata)).not.toBe(libsodium.to_hex(data2.metadata));
     expect(libsodium.to_hex(data1.actions)).not.toBe(libsodium.to_hex(data2.actions));
@@ -43,12 +43,12 @@ describe("Proposal data encryption", () => {
     ]);
 
     // Encrypt
-    const { data: data1, symmetricKey: symmetricKey1 } = encryptProposal(metadata1, actionBytes1);
-    const { data: data2, symmetricKey: symmetricKey2 } = encryptProposal(metadata2, actionBytes2);
+    const { encrypted: data1, symmetricKey: symmetricKey1 } = encryptProposal(JSON.stringify(metadata1), actionBytes1);
+    const { encrypted: data2, symmetricKey: symmetricKey2 } = encryptProposal(JSON.stringify(metadata2), actionBytes2);
 
     // Decrypt
-    const { metadata: dMetadata1, actions: dActions1 } = decryptProposal<typeof metadata1>(data1, symmetricKey1);
-    const { metadata: dMetadata2, actions: dActions2 } = decryptProposal<typeof metadata2>(data2, symmetricKey2);
+    const { metadata: dMetadata1, rawActions: dActions1 } = decryptProposal<typeof metadata1>(data1, symmetricKey1);
+    const { metadata: dMetadata2, rawActions: dActions2 } = decryptProposal<typeof metadata2>(data2, symmetricKey2);
 
     // Check
     expect(dMetadata1.title).toBe(metadata1.title);
@@ -71,13 +71,13 @@ describe("Proposal data encryption", () => {
     ]);
 
     // Encrypt
-    const { data, symmetricKey } = encryptProposal(metadata, actionBytes1);
+    const { encrypted: data, symmetricKey } = encryptProposal(JSON.stringify(metadata), actionBytes1);
 
     const otherKeys = new Array(20).fill(0).map(() => generateSymmetricKey());
 
     // Decrypt
     expect(() => {
-      const { metadata: dMetadata, actions: dActions1 } = decryptProposal<typeof metadata>(data, symmetricKey);
+      const { metadata: dMetadata, rawActions: dActions1 } = decryptProposal<typeof metadata>(data, symmetricKey);
 
       expect(dMetadata.title).toBe(metadata.title);
       expect(dMetadata.description).toBe(metadata.description);
