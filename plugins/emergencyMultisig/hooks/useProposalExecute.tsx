@@ -4,9 +4,9 @@ import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin";
-import { keccak256, toHex } from "viem";
+import { toHex } from "viem";
 import { useProposal } from "./useProposal";
-import { getContentCid } from "@/utils/ipfs";
+import { getContentCid, uploadToPinata } from "@/utils/ipfs";
 
 export function useProposalExecute(proposalId: string) {
   const { reload } = useRouter();
@@ -36,17 +36,28 @@ export function useProposalExecute(proposalId: string) {
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: executeTxHash });
 
   const executeProposal = () => {
+    let actualMetadataUri: string;
+
     if (!canExecute) return;
     else if (!privateRawMetadata || !proposal?.actions) return;
 
-    getContentCid(privateRawMetadata)
-      .then((metadataUri) => {
+    return uploadToPinata(privateRawMetadata)
+      .then((uri) => {
+        actualMetadataUri = uri;
+
+        return getContentCid(privateRawMetadata);
+      })
+      .then((expectedMetadataUri) => {
+        if (actualMetadataUri != expectedMetadataUri) {
+          throw new Error("The uploaded metadata URI doesn't match");
+        }
+
         executeWrite({
           chainId: PUB_CHAIN.id,
           abi: EmergencyMultisigPluginAbi,
           address: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
           functionName: "execute",
-          args: [BigInt(proposalId), toHex(metadataUri), proposal.actions],
+          args: [BigInt(proposalId), toHex(expectedMetadataUri), proposal.actions],
         });
       })
       .catch((err) => {

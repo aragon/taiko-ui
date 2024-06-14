@@ -135,7 +135,7 @@ export default function Create() {
     // Encrypt the proposal data
     const { payload: publicMetadataJson, hashed } = await encryptProposalData(privateMetadata, actions);
 
-    const publicMetadataUri = await uploadToPinata(publicMetadataJson);
+    const publicMetadataUri = await uploadToPinata(JSON.stringify(publicMetadataJson));
 
     createProposalWrite({
       chainId: PUB_CHAIN.id,

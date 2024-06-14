@@ -10,7 +10,13 @@ import { RawAction } from "@/utils/types";
 import { useRouter } from "next/router";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
+import {
+  PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
+  PUB_CHAIN,
+  PUB_MULTISIG_PLUGIN_ADDRESS,
+  PUB_APP_NAME,
+  PUB_PROJECT_URL,
+} from "@/constants";
 import { ActionCard } from "@/components/actions/action";
 import { MultisigPluginAbi } from "../artifacts/MultisigPlugin";
 
@@ -109,10 +115,10 @@ export default function Create() {
       title,
       summary,
       description,
-      resources: [{ name: "Taiko", url: "https://taiko.xyz" }],
+      resources: [{ name: PUB_APP_NAME, url: PUB_PROJECT_URL }],
     };
 
-    const ipfsPin = await uploadToPinata(proposalMetadataJsonObject);
+    const ipfsPin = await uploadToPinata(JSON.stringify(proposalMetadataJsonObject));
 
     createProposalWrite({
       chainId: PUB_CHAIN.id,
