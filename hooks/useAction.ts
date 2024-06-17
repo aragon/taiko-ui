@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { IAction, RawAction } from "@/utils/types";
+import { EvmValue, RawAction } from "@/utils/types";
 import { AbiFunction, Address, Hex, decodeFunctionData, toFunctionSelector } from "viem";
 import { useAbi } from "./useAbi";
 
@@ -24,6 +24,9 @@ export function useAction(action: RawAction) {
   }, [action.data, action.to, isLoading]);
 
   return {
+    to: action.to,
+    value: action.value,
+    data: action.data,
     isLoading,
     functionName,
     functionAbi,

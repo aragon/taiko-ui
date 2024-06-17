@@ -6,27 +6,24 @@ import {
   decryptBytes as symmetricDecryptBytes,
 } from "./symmetric";
 import { encrypt as asymmetricEncrypt, decryptBytes as asymmetricDecryptBytes, KeyPair } from "./asymmetric";
+import { JsonValue } from "../types";
 
 export type { KeyPair } from "./asymmetric";
 export type SymmetricKey = Uint8Array;
 
-type JsonLiteral = string | number | boolean;
-type JsonValue = JsonLiteral | Array<JsonValue> | { [k: string]: JsonValue };
-
-export function encryptProposal(metadata: JsonValue, actionBytes: Uint8Array) {
+export function encryptProposal(strMetadata: string, actionBytes: Uint8Array) {
   const symmetricKey = generateSymmetricKey();
 
-  const strMetadata = JSON.stringify(metadata);
   const encryptedMetadata = symmetricEncrypt(strMetadata, symmetricKey);
   const encryptedActions = symmetricEncrypt(actionBytes, symmetricKey);
 
   return {
-    data: {
+    encrypted: {
       metadata: libsodium.to_base64(encryptedMetadata),
       actions: libsodium.to_base64(encryptedActions),
     },
     symmetricKey,
-  } as const;
+  };
 }
 
 /**
@@ -65,11 +62,12 @@ export function decryptProposal<T = JsonValue>(
   symmetricKey: SymmetricKey
 ): {
   metadata: T;
-  actions: Uint8Array;
+  rawMetadata: string;
+  rawActions: Uint8Array;
 } {
-  if (!data["metadata"] || !data["actions"]) throw new Error("Invalid data");
+  if (!data.metadata || !data.actions) throw new Error("Empty data");
 
-  const metadata = symmetricDecryptString(libsodium.from_base64(data["metadata"]), symmetricKey);
-  const actions = symmetricDecryptBytes(libsodium.from_base64(data["actions"]), symmetricKey);
-  return { metadata: JSON.parse(metadata), actions };
+  const rawMetadata = symmetricDecryptString(libsodium.from_base64(data.metadata), symmetricKey);
+  const rawActions = symmetricDecryptBytes(libsodium.from_base64(data.actions), symmetricKey);
+  return { metadata: JSON.parse(rawMetadata), rawMetadata, rawActions };
 }

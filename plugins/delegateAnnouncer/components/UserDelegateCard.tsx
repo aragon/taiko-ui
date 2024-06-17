@@ -11,7 +11,7 @@ import { iVotesAbi } from "../artifacts/iVotes.sol";
 import { formatHexString } from "@/utils/evm";
 import { DelegateAnnouncerAbi } from "@/plugins/delegateAnnouncer/artifacts/DelegateAnnouncer.sol";
 import * as DOMPurify from "dompurify";
-import { PUB_DAO_ADDRESS, PUB_DELEGATION_CONTRACT_ADDRESS } from "@/constants";
+import { PUB_DAO_ADDRESS, PUB_DELEGATION_WALL_CONTRACT_ADDRESS } from "@/constants";
 
 type SelfDelegationProfileCardProps = {
   address: Address;
@@ -59,7 +59,7 @@ export const SelfDelegationProfileCard = ({
   const announceDelegate = () => {
     delegateAnnouncementWrite({
       abi: DelegateAnnouncerAbi,
-      address: PUB_DELEGATION_CONTRACT_ADDRESS,
+      address: PUB_DELEGATION_WALL_CONTRACT_ADDRESS,
       functionName: "announceDelegation",
       args: [PUB_DAO_ADDRESS, toHex(inputDescription!)],
     });

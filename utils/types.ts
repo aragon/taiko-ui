@@ -2,24 +2,23 @@ import { IVotesDataListVariant } from "@/components/proposalVoting/votesDataList
 import { IApprovalThresholdResult, IButtonProps, ProposalType } from "@aragon/ods";
 import { Address, Hex, AbiFunction } from "viem";
 
-type EvmValue = string | Hex | Address | number | bigint | boolean;
+// General types
+type JsonLiteral = string | number | boolean;
+export type JsonValue = JsonLiteral | { [k: string]: JsonValue } | JsonValue[];
+export type EvmValue = string | Hex | Address | number | bigint | boolean;
 
-export interface DecodedAction {
+export type RawAction = {
+  to: Address;
+  value: bigint;
+  data: Hex;
+};
+
+/** Includes the raw action plus the decoded ABI and parameters of the function call */
+export type DecodedAction = RawAction & {
   functionName: string | null;
   functionAbi: AbiFunction | null;
   args: EvmValue[];
-}
-
-export type RawAction = {
-  to: string;
-  value: bigint;
-  data: string;
 };
-
-export interface IAction {
-  decoded?: DecodedAction;
-  raw: RawAction;
-}
 
 export interface IAlert {
   id: number;
@@ -29,13 +28,6 @@ export interface IAlert {
   explorerLink?: string;
   dismissTimeout?: ReturnType<typeof setTimeout>;
 }
-
-export type ProposalParameters = {
-  startDate: bigint;
-  endDate: bigint;
-  snapshotBlock: bigint;
-  minApprovals: number;
-};
 
 export type ProposalMetadata = {
   title: string;
@@ -47,20 +39,6 @@ export type ProposalMetadata = {
 export type IProposalResource = {
   name: string;
   url: string;
-};
-
-export type Proposal = {
-  // active: boolean;
-  executed: boolean;
-  parameters: ProposalParameters;
-  approvals: number;
-  actions: IAction[];
-  allowFailureMap: bigint;
-  creator: string;
-  title: string;
-  summary: string;
-  description: string;
-  resources: IProposalResource[];
 };
 
 export enum ProposalStages {
@@ -103,8 +81,3 @@ export interface ITransformedStage<TType extends ProposalType = ProposalType> {
   result?: IBreakdownApprovalThresholdResult;
   details?: IVotingStageDetails;
 }
-
-// General types
-
-type JsonLiteral = string | number | boolean;
-export type JsonValue = JsonLiteral | Record<string, JsonLiteral> | Array<JsonLiteral>;

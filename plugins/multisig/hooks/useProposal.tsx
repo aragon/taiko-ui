@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
-import { Address, Hex, fromHex, getAbiItem } from "viem";
+import { getAbiItem } from "viem";
 import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin";
-import { Proposal, IAction, RawAction, ProposalMetadata } from "@/utils/types";
-import { ProposalParameters, ProposalResultType } from "@/plugins/multisig/utils/types";
+import { RawAction, ProposalMetadata } from "@/utils/types";
+import {
+  MultisigProposal,
+  MultisigProposalParameters,
+  MultisigProposalResultType,
+} from "@/plugins/multisig/utils/types";
 import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
-import { useAction } from "@/hooks/useAction";
 
 const ProposalCreatedEvent = getAbiItem({
   abi: MultisigPluginAbi,
@@ -15,7 +18,7 @@ const ProposalCreatedEvent = getAbiItem({
 
 type ProposalCreatedLogResponse = {
   args: {
-    actions: IAction[];
+    actions: RawAction[];
     allowFailureMap: bigint;
     creator: string;
     endDate: bigint;
@@ -100,44 +103,31 @@ export function useProposal(proposalId: string, autoRefresh = false) {
 
 // Helpers
 
-function decodeProposalResultData(data?: ProposalResultType) {
+function decodeProposalResultData(data?: MultisigProposalResultType) {
   if (!data?.length) return null;
 
   return {
     executed: data[0] as boolean,
     approvals: data[1] as number,
-    parameters: data[2] as ProposalParameters,
+    parameters: data[2] as MultisigProposalParameters,
     metadataUri: data[3] as string,
-    actions: getProposalActions(data[4] as Array<RawAction>),
+    actions: data[4] as Array<RawAction>,
   };
-}
-
-function getProposalActions(chainActions: RawAction[]): IAction[] {
-  if (!chainActions) return [];
-
-  return chainActions.map((tx) => {
-    const { data, to, value } = tx;
-    const rawAction = { data, to, value };
-    const decoded = useAction(tx);
-
-    return { raw: rawAction, decoded };
-  });
 }
 
 function arrangeProposalData(
   proposalData?: ReturnType<typeof decodeProposalResultData>,
   creationEvent?: ProposalCreatedLogResponse["args"],
   metadata?: ProposalMetadata
-): Proposal | null {
+): MultisigProposal | null {
   if (!proposalData) return null;
 
   return {
     actions: proposalData.actions,
     executed: proposalData.executed,
     parameters: {
+      expirationDate: proposalData.parameters.expirationDate,
       snapshotBlock: proposalData.parameters.snapshotBlock,
-      startDate: BigInt(0),
-      endDate: proposalData.parameters.expirationDate,
       minApprovals: proposalData.parameters.minApprovals,
     },
     approvals: proposalData.approvals,

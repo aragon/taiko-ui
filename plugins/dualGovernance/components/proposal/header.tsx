@@ -1,5 +1,5 @@
 import { Button, Tag } from "@aragon/ods";
-import { Proposal } from "@/plugins/dualGovernance/utils/types";
+import { OptimisticProposal } from "@/plugins/dualGovernance/utils/types";
 import { AlertVariant } from "@aragon/ods";
 import { ElseIf, If, Then, Else } from "@/components/if";
 import { AddressText } from "@/components/text/address";
@@ -11,8 +11,8 @@ const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_SUMMARY = "(No proposal summary)";
 
 interface ProposalHeaderProps {
-  proposalNumber: number;
-  proposal: Proposal;
+  proposalIndex: number;
+  proposal: OptimisticProposal;
   canVeto: boolean;
   canExecute: boolean;
   transactionConfirming: boolean;
@@ -21,7 +21,7 @@ interface ProposalHeaderProps {
 }
 
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({
-  proposalNumber,
+  proposalIndex,
   proposal,
   canVeto,
   canExecute,
@@ -30,7 +30,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
   onExecutePressed,
 }) => {
   const proposalVariant = useProposalVariantStatus(proposal);
-  const ended = proposal.parameters.endDate <= Date.now() / 1000;
+  const ended = proposal.parameters.vetoEndDate <= Date.now() / 1000;
 
   return (
     <div className="w-full">
@@ -47,7 +47,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
                 variant={proposalVariant.variant as AlertVariant}
               />
             </div>
-            <span className="pt-1 text-xl font-semibold text-neutral-700">Proposal {proposalNumber}</span>
+            <span className="pt-1 text-xl font-semibold text-neutral-700">Proposal {proposalIndex}</span>
           </div>
         </div>
         <div className="flex">
@@ -79,8 +79,8 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
       <p className="text-l text-body-color dark:text-dark-6 text-base">
         Proposed by <AddressText>{proposal?.creator}</AddressText>,{" "}
         <If condition={ended}>
-          <Then>ended on {dayjs(Number(proposal.parameters.endDate) * 1000).format("D MMM YYYY HH:mm")}h</Then>
-          <Else>ending on {dayjs(Number(proposal.parameters.endDate) * 1000).format("D MMM YYYY HH:mm")}h</Else>
+          <Then>ended on {dayjs(Number(proposal.parameters.vetoEndDate) * 1000).format("D MMM YYYY HH:mm")}h</Then>
+          <Else>ending on {dayjs(Number(proposal.parameters.vetoEndDate) * 1000).format("D MMM YYYY HH:mm")}h</Else>
         </If>
       </p>
     </div>

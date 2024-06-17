@@ -1,6 +1,5 @@
 import WalletContainer from "@/components/WalletContainer";
 import { plugins } from "@/plugins";
-// import { AvatarIcon, IconType } from "@aragon/ods";
 import classNames from "classnames";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,6 +7,7 @@ import { useState } from "react";
 import { MobileNavDialog } from "./mobileNavDialog";
 import { NavLink, type INavLink } from "./navLink";
 import { AvatarIcon, IconType } from "@aragon/ods";
+import { PUB_APP_NAME, PUB_PROJECT_LOGO } from "@/constants";
 
 export const Navbar: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -35,11 +35,17 @@ export const Navbar: React.FC = () => {
                   "outline-none focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset" // focus styles
                 )}
               >
-                <Image src="/logo-tk.svg" width="164" height="32" className="shrink-0" alt="Taiko" />
+                <Image
+                  src={PUB_PROJECT_LOGO}
+                  width="164"
+                  height="32"
+                  className="shrink-0"
+                  alt={PUB_APP_NAME + " logo"}
+                />
               </Link>
               <div className="flex items-center gap-x-2 px-4">
                 <span className="text-sm leading-tight text-neutral-500">Powered by</span>
-                <Image src="/logo-aragon-bw-sm.png" width="24" height="24" alt="Aragon" />
+                <Image src="/logo-aragon-bw-sm.png" width="18" height="18" alt="Aragon" />
               </div>
             </div>
 

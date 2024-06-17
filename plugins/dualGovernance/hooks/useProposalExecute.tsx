@@ -5,7 +5,7 @@ import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 
-export function useProposalExecute(proposalId: string) {
+export function useProposalExecute(proposalId?: bigint) {
   const { reload } = useRouter();
   const { addAlert } = useAlerts() as AlertContextProps;
 
@@ -18,7 +18,7 @@ export function useProposalExecute(proposalId: string) {
     abi: OptimisticTokenVotingPluginAbi,
     chainId: PUB_CHAIN.id,
     functionName: "canExecute",
-    args: [BigInt(proposalId)],
+    args: [proposalId ?? BigInt("0")],
   });
   const {
     writeContract: executeWrite,
@@ -30,6 +30,7 @@ export function useProposalExecute(proposalId: string) {
 
   const executeProposal = () => {
     if (!canExecute) return;
+    else if (typeof proposalId === "undefined") return;
 
     executeWrite({
       chainId: PUB_CHAIN.id,
@@ -60,7 +61,7 @@ export function useProposalExecute(proposalId: string) {
     // success
     if (!executeTxHash) return;
     else if (isConfirming) {
-      addAlert("Proposal submitted", {
+      addAlert("Transaction submitted", {
         description: "Waiting for the transaction to be validated",
         type: "info",
         txHash: executeTxHash,

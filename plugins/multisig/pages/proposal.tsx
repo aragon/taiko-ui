@@ -1,7 +1,7 @@
 import { useProposal } from "@/plugins/multisig/hooks/useProposal";
 import ProposalHeader from "@/plugins/multisig/components/proposal/header";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useProposalVeto } from "@/plugins/multisig/hooks/useProposalVeto";
+import { useProposalApprove } from "@/plugins/multisig/hooks/useProposalApprove";
 import { useProposalExecute } from "@/plugins/multisig/hooks/useProposalExecute";
 import { generateBreadcrumbs } from "@/utils/nav";
 import { useRouter } from "next/router";
@@ -13,8 +13,6 @@ import dayjs from "dayjs";
 import { ProposalAction } from "@/components/proposalAction/proposalAction";
 import { CardResources } from "@/components/proposal/cardResources";
 
-type BottomSection = "description" | "vetoes";
-
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const router = useRouter();
 
@@ -25,11 +23,15 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     approvals,
     isConfirming: isConfirmingApproval,
     approveProposal,
-  } = useProposalVeto(proposalId);
+  } = useProposalApprove(proposalId);
+
+  const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
+  const breadcrumbs = generateBreadcrumbs(router.asPath);
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalVariant = useProposalStatus(proposal!);
 
+  // TODO: This is not revelant anymore
   const proposalStage: ITransformedStage[] = [
     {
       id: "1",
@@ -41,28 +43,36 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       proposalId: proposalId,
       providerId: "1",
       result: {
-        cta: {
-          disabled: !canApprove,
-          isLoading: false,
-          label: "Approve",
-          onClick: approveProposal,
-        },
+        cta: proposal?.executed
+          ? {
+              disabled: true,
+              label: "Executed",
+            }
+          : canExecute
+            ? {
+                isLoading: isConfirmingExecution,
+                label: "Execute",
+                onClick: executeProposal,
+              }
+            : {
+                disabled: !canApprove,
+                isLoading: isConfirmingApproval,
+                label: "Approve",
+                onClick: approveProposal,
+              },
         approvalAmount: proposal?.approvals || 0,
         approvalThreshold: proposal?.parameters.minApprovals || 0,
       },
       details: {
         censusBlock: Number(proposal?.parameters.snapshotBlock),
-        startDate: dayjs(Number(proposal?.parameters.startDate) * 1000).toString(),
-        endDate: dayjs(Number(proposal?.parameters.endDate) * 1000).toString(),
+        startDate: "",
+        endDate: dayjs(Number(proposal?.parameters.expirationDate) * 1000).toString(),
         strategy: "approvalThreshold",
         options: "approve",
       },
       votes: approvals.map(({ approver }) => ({ address: approver, variant: "approve" }) as IVote),
     },
   ];
-
-  const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
-  const breadcrumbs = generateBreadcrumbs(router.asPath);
 
   if (!proposal || showProposalLoading) {
     return (

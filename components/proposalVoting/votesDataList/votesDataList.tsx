@@ -72,7 +72,7 @@ export const VotesDataList: React.FC<IVotesDataListProps> = (props) => {
     secondaryButton: {
       label: "Reload votes",
       iconLeft: IconType.RELOAD,
-      onClick: () => refetch(),
+      // onClick: () => refetch(),
     },
   };
 

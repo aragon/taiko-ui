@@ -10,12 +10,16 @@ import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useState } from "react";
 import { useProposalVeto } from "@/plugins/dualGovernance/hooks/useProposalVeto";
 import { useProposalExecute } from "@/plugins/dualGovernance/hooks/useProposalExecute";
+import { useProposalId } from "../hooks/useProposalId";
+import { useVotingToken } from "../hooks/useVotingToken";
+import { useVotingTokenBalance } from "../hooks/useVotingTokenBalance";
+import { PUB_TAIKO_BRIDGE_ADDRESS } from "@/constants";
 
 type BottomSection = "description" | "vetoes";
 
-export default function ProposalDetail({ id: proposalId }: { id: string }) {
+export default function ProposalDetail({ index: proposalIndex }: { index: number }) {
   const [bottomSection, setBottomSection] = useState<BottomSection>("description");
-
+  const { proposalId } = useProposalId(proposalIndex);
   const {
     proposal,
     proposalFetchStatus,
@@ -23,11 +27,23 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     canVeto,
     isConfirming: isConfirmingVeto,
     vetoProposal,
-  } = useProposalVeto(proposalId);
+  } = useProposalVeto(proposalIndex);
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
-
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
+  const { tokenSupply: totalSupply } = useVotingToken();
+  const { balance: bridgedBalance } = useVotingTokenBalance(
+    PUB_TAIKO_BRIDGE_ADDRESS,
+    proposal?.parameters.snapshotTimestamp ?? BigInt(0)
+  );
+
+  let votingPercentage = 0;
+  if (typeof proposal?.vetoTally !== "undefined" && totalSupply && typeof bridgedBalance !== "undefined") {
+    const effectiveSupply = proposal.parameters.skipL2 ? totalSupply - bridgedBalance : totalSupply;
+
+    // 2 decimals
+    votingPercentage = Number((proposal.vetoTally * BigInt(10_000)) / effectiveSupply) / 100;
+  }
 
   if (!proposal || showProposalLoading) {
     return (
@@ -41,7 +57,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
     <main className="flex w-full flex-col items-center px-4 py-6 md:w-4/5 md:p-6 lg:w-2/3 xl:py-10 2xl:w-3/5">
       <div className="flex w-full justify-between py-5">
         <ProposalHeader
-          proposalNumber={Number(proposalId) + 1}
+          proposalIndex={proposalIndex}
           proposal={proposal}
           transactionConfirming={isConfirmingVeto || isConfirmingExecution}
           canVeto={canVeto}
@@ -52,13 +68,10 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       </div>
 
       <div className="my-10 grid w-full gap-10 lg:grid-cols-2 xl:grid-cols-3">
-        <VetoTally
-          voteCount={proposal?.vetoTally}
-          votePercentage={Number(Number(proposal?.vetoTally) / Number(proposal?.parameters?.minVetoVotingPower)) * 100}
-        />
+        <VetoTally voteCount={proposal?.vetoTally} votePercentage={votingPercentage} />
         <ProposalDetails
-          minVetoVotingPower={proposal?.parameters?.minVetoVotingPower}
-          snapshotBlock={proposal?.parameters?.snapshotBlock}
+          minVetoRatio={proposal?.parameters?.minVetoRatio}
+          snapshotTimestamp={proposal?.parameters?.snapshotTimestamp}
         />
       </div>
       <div className="w-full py-12">

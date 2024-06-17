@@ -1,4 +1,4 @@
-import { type Action } from "@/utils/types";
+import { type RawAction } from "@/utils/types";
 import { type FC, useEffect, useState } from "react";
 import { InputText, InputNumber, AlertInline } from "@aragon/ods";
 import { type Address, parseEther } from "viem";
@@ -6,7 +6,7 @@ import { isAddress } from "@/utils/evm";
 import { ElseIf, If, Then } from "../if";
 
 interface WithdrawalInputProps {
-  setActions: (actions: Action[]) => any;
+  setActions: (actions: RawAction[]) => any;
 }
 
 const WithdrawalInput: FC<WithdrawalInputProps> = ({ setActions }) => {
@@ -17,7 +17,7 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setActions }) => {
     if (!isAddress(to)) return;
     else if (!isNumeric(value)) return;
 
-    setActions([{ to, value: BigInt(value), data: "" } as unknown as Action]);
+    setActions([{ to, value: BigInt(value), data: "" } as unknown as RawAction]);
   }, [setActions, to, value]);
 
   const handleTo = (event: React.ChangeEvent<HTMLInputElement>) => {

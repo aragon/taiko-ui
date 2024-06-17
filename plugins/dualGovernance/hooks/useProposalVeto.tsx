@@ -6,17 +6,19 @@ import { useUserCanVeto } from "@/plugins/dualGovernance/hooks/useUserCanVeto";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";
 import { useAlerts, type AlertContextProps } from "@/context/Alerts";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
+import { useProposalId } from "./useProposalId";
 
-export function useProposalVeto(proposalId: string) {
+export function useProposalVeto(index: number) {
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
+  const { proposalId } = useProposalId(index);
 
   const { proposal, status: proposalFetchStatus, refetch: refetchProposal } = useProposal(proposalId, true);
-  const vetoes = useProposalVetoes(publicClient!, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, proposal?.id);
+  const vetoes = useProposalVetoes(publicClient!, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, proposalId);
 
   const { addAlert } = useAlerts() as AlertContextProps;
   const { writeContract: vetoWrite, data: vetoTxHash, error: vetoingError, status: vetoingStatus } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: vetoTxHash });
-  const { canVeto, refetch: refetchCanVeto } = useUserCanVeto(BigInt(proposalId));
+  const { canVeto, refetch: refetchCanVeto } = useUserCanVeto(proposalId);
 
   useEffect(() => {
     if (vetoingStatus === "idle" || vetoingStatus === "pending") return;
@@ -55,7 +57,7 @@ export function useProposalVeto(proposalId: string) {
       abi: OptimisticTokenVotingPluginAbi,
       address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
       functionName: "veto",
-      args: [BigInt(proposalId)],
+      args: [proposalId ?? BigInt(0)],
     });
   };
 

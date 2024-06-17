@@ -3,7 +3,7 @@ import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifac
 import { useEffect } from "react";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 
-export function useUserCanVeto(proposalId: bigint) {
+export function useUserCanVeto(proposalId?: bigint) {
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber({ watch: true });
 
@@ -12,7 +12,7 @@ export function useUserCanVeto(proposalId: bigint) {
     address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
     abi: OptimisticTokenVotingPluginAbi,
     functionName: "canVeto",
-    args: [proposalId, address!],
+    args: [proposalId ?? BigInt(0), address!],
     query: {
       enabled: !!address,
     },

@@ -33,7 +33,7 @@ const PluginLoader: FC = () => {
   if (!PageComponent) {
     if (componentLoading) {
       return (
-        <div>
+        <div className="p-12">
           <PleaseWaitSpinner />
         </div>
       );

@@ -1,4 +1,5 @@
 import { type IBreadcrumbsLink } from "@aragon/ods";
+import { capitalizeFirstLetter } from "./text";
 
 export function generateBreadcrumbs(pathname: string): IBreadcrumbsLink[] {
   const paths = pathname.split("/").filter(Boolean).slice(-2);
@@ -12,9 +13,4 @@ export function generateBreadcrumbs(pathname: string): IBreadcrumbsLink[] {
       href: pathAccumulator,
     };
   });
-}
-
-function capitalizeFirstLetter(str: string) {
-  if (!str) return str; // Return the original string if it's empty or undefined
-  return str.charAt(0).toUpperCase() + str.slice(1);
 }

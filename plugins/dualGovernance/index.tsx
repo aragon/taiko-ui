@@ -1,5 +1,4 @@
 import { NotFound } from "@/components/not-found";
-import ProposalCreate from "./pages/new";
 import ProposalList from "./pages/proposal-list";
 import ProposalDetail from "./pages/proposal";
 import { useUrl } from "@/hooks/useUrl";
@@ -9,11 +8,11 @@ export default function PluginPage() {
   const { hash } = useUrl();
 
   if (!hash || hash === "#/") return <ProposalList />;
-  else if (hash === "#/new") return <ProposalCreate />;
   else if (hash.startsWith("#/proposals/")) {
-    const id = hash.replace("#/proposals/", "");
+    const index = parseInt(hash.replace("#/proposals/", ""));
+    if (isNaN(index)) return <NotFound />;
 
-    return <ProposalDetail id={id} />;
+    return <ProposalDetail index={index} />;
   }
 
   // Default not found page

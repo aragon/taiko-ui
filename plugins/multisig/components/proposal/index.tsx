@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { useProposalVeto } from "@/plugins/multisig/hooks/useProposalVeto";
+import { useProposalApprove } from "@/plugins/multisig/hooks/useProposalApprove";
 import { Card } from "@aragon/ods";
-import { ProposalDataListItem, type DataListState } from "@aragon/ods";
+import { ProposalDataListItem } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
 import { useAccount } from "wagmi";
-import { parseAbi } from "viem";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_METADATA_SUMMARY = "(The metadata of the proposal is not available)";
@@ -16,7 +15,7 @@ type ProposalInputs = {
 
 export default function ProposalCard(props: ProposalInputs) {
   const { address } = useAccount();
-  const { proposal, proposalFetchStatus, approvals } = useProposalVeto(props.proposalId.toString());
+  const { proposal, proposalFetchStatus, approvals } = useProposalApprove(props.proposalId.toString());
 
   const proposalVariant = useProposalStatus(proposal!);
 
@@ -24,7 +23,7 @@ export default function ProposalCard(props: ProposalInputs) {
 
   const hasApproved = approvals?.some((veto) => veto.approver === address);
 
-  if (!proposal || showLoading) {
+  if (!proposal && showLoading) {
     return (
       <section className="mb-4 w-full">
         <Card className="p-4">
@@ -78,8 +77,8 @@ export default function ProposalCard(props: ProposalInputs) {
 }
 
 function getShowProposalLoading(
-  proposal: ReturnType<typeof useProposalVeto>["proposal"],
-  status: ReturnType<typeof useProposalVeto>["proposalFetchStatus"]
+  proposal: ReturnType<typeof useProposalApprove>["proposal"],
+  status: ReturnType<typeof useProposalApprove>["proposalFetchStatus"]
 ) {
   if (!proposal || status.proposalLoading) return true;
   else if (status.metadataLoading && !status.metadataError) return true;

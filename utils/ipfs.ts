@@ -1,40 +1,41 @@
 import { PUB_IPFS_ENDPOINT, PUB_IPFS_API_KEY } from "@/constants";
-import { CID, IPFSHTTPClient } from "ipfs-http-client";
-import { Hex, fromHex } from "viem";
+import { Hex, fromHex, toBytes } from "viem";
+import { CID } from "multiformats/cid";
+import * as raw from "multiformats/codecs/raw";
+import { sha256 } from "multiformats/hashes/sha2";
 
 export function fetchJsonFromIpfs(ipfsUri: string) {
   return fetchFromIPFS(ipfsUri).then((res) => res.json());
 }
 
-export function uploadToIPFS(client: IPFSHTTPClient, blob: Blob) {
-  return client.add(blob).then(({ cid }: { cid: CID }) => {
-    return "ipfs://" + cid.toString();
-  });
-}
+export async function uploadToPinata(strBody: string) {
+  const blob = new Blob([strBody], { type: "text/plain" });
+  const file = new File([blob], "metadata.json");
+  const data = new FormData();
+  data.append("file", file);
+  data.append("pinataMetadata", JSON.stringify({ name: "metadata.json" }));
+  data.append("pinataOptions", JSON.stringify({ cidVersion: 1 }));
 
-export function uploadToPinata(data: any): Promise<string> {
-  const pinataData = {
-    pinataOptions: {
-      cidVersion: 1,
-    },
-    pinataContent: {
-      ...data,
-    },
-  };
-  return fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
+  const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${PUB_IPFS_API_KEY}`,
-      "Content-Type": "application/json",
-      "x-pinata-origin": "sdk",
-      "x-version": "2.1.1",
     },
-    body: JSON.stringify(pinataData),
-  })
-    .then((res) => res.json())
-    .then((json) => {
-      return "ipfs://" + json.IpfsHash;
-    });
+    body: data,
+  });
+
+  const resData = await res.json();
+
+  if (resData.error) throw new Error("Request failed: " + resData.error);
+  else if (!resData.IpfsHash) throw new Error("Could not pin the metadata");
+  return "ipfs://" + resData.IpfsHash;
+}
+
+export async function getContentCid(strMetadata: string) {
+  const bytes = raw.encode(toBytes(strMetadata));
+  const hash = await sha256.digest(bytes);
+  const cid = CID.create(1, raw.code, hash);
+  return "ipfs://" + cid.toV1().toString();
 }
 
 async function fetchFromIPFS(ipfsUri: string): Promise<Response> {

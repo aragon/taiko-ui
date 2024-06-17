@@ -3,14 +3,14 @@ import { type Address, type Hex } from "viem";
 import { AlertInline, InputText } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { isAddress } from "@/utils/evm";
-import { type Action } from "@/utils/types";
+import { type RawAction } from "@/utils/types";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { useAbi } from "@/hooks/useAbi";
 import { FunctionSelector } from "./function-selector";
 import { AddressText } from "../text/address";
 
 interface FunctionCallFormProps {
-  onAddAction: (action: Action) => any;
+  onAddAction: (action: RawAction) => any;
 }
 export const FunctionCallForm: FC<FunctionCallFormProps> = ({ onAddAction }) => {
   const [targetContract, setTargetContract] = useState<string>("");

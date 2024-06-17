@@ -1,47 +1,41 @@
-import { Address } from "viem";
-import { Action } from "@/utils/types";
+import { Address, Hex } from "viem";
+import { IProposalResource, RawAction } from "@/utils/types";
 
 export type ProposalInputs = {
   proposalId: bigint;
 };
 
-export type ProposalResultType = readonly [
+export type OptimisticProposalResultType = readonly [
   boolean,
   boolean,
-  ProposalParameters,
+  OptimisticProposalParameters,
   bigint,
-  string,
-  readonly Action[],
+  Hex,
+  readonly RawAction[],
   bigint,
 ];
 
-export type ProposalParameters = {
-  snapshotTimestamp: number;
-  vetoEndDate: number;
+export type OptimisticProposalParameters = {
+  snapshotTimestamp: bigint;
+  vetoStartDate?: bigint;
+  vetoEndDate: bigint;
   minVetoRatio: number;
   skipL2: boolean;
 };
 
-export type Proposal = {
-  id: bigint;
+export type OptimisticProposal = {
+  index: number;
   active: boolean;
   executed: boolean;
-  parameters: ProposalParameters;
+  parameters: OptimisticProposalParameters;
   vetoTally: bigint;
-  actions: Action[];
+  actions: RawAction[];
   allowFailureMap: bigint;
   creator: string;
   title: string;
   summary: string;
   description: string;
-  resources: string[];
-};
-
-export type ProposalMetadata = {
-  title: string;
-  summary: string;
-  description: string;
-  resources: string[];
+  resources: IProposalResource[];
 };
 
 export type VoteCastResponse = {

@@ -1,7 +1,8 @@
+import { If } from "@/components/if";
 import { DefinitionList, Heading, IconType, Link } from "@aragon/ods";
 
 export interface IVotingDetailsProps {
-  startDate: string;
+  startDate?: string;
   endDate: string;
   snapshotBlock: string;
   snapshotBlockURL: string;
@@ -16,9 +17,11 @@ export const VotingDetails: React.FC<IVotingDetailsProps> = (props) => {
       <div>
         <Heading size="h4">Voting</Heading>
         <DefinitionList.Container className="">
-          <DefinitionList.Item term="Starts" className="!gap-y-1 *:text-neutral-500">
-            <div className="w-full text-neutral-800 md:text-right">{startDate}</div>
-          </DefinitionList.Item>
+          <If condition={startDate}>
+            <DefinitionList.Item term="Starts" className="!gap-y-1 *:text-neutral-500">
+              <div className="w-full text-neutral-800 md:text-right">{startDate}</div>
+            </DefinitionList.Item>
+          </If>
           <DefinitionList.Item term="Expires" className="!gap-y-1 *:text-neutral-500">
             <div className="w-full text-neutral-800 md:text-right">{endDate}</div>
           </DefinitionList.Item>
