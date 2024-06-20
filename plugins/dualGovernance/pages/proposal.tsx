@@ -1,49 +1,85 @@
-import { type useProposal } from "@/plugins/dualGovernance/hooks/useProposal";
-import { ToggleGroup, Toggle } from "@aragon/ods";
-import ProposalDescription from "@/plugins/dualGovernance/components/proposal/description";
-import VetoesSection from "@/plugins/dualGovernance/components/vote/vetoes-section";
+import { useProposal } from "@/plugins/dualGovernance/hooks/useProposal";
 import ProposalHeader from "@/plugins/dualGovernance/components/proposal/header";
-import VetoTally from "@/plugins/dualGovernance/components/vote/tally";
-import ProposalDetails from "@/plugins/dualGovernance/components/proposal/details";
-import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useState } from "react";
 import { useProposalVeto } from "@/plugins/dualGovernance/hooks/useProposalVeto";
 import { useProposalExecute } from "@/plugins/dualGovernance/hooks/useProposalExecute";
-import { useProposalId } from "../hooks/useProposalId";
-import { useVotingToken } from "../hooks/useVotingToken";
-import { useVotingTokenBalance } from "../hooks/useVotingTokenBalance";
-import { PUB_TAIKO_BRIDGE_ADDRESS } from "@/constants";
+import { generateBreadcrumbs } from "@/utils/nav";
+import { useRouter } from "next/router";
+import { BodySection } from "@/components/proposal/proposalBodySection";
+import { ProposalVoting } from "@/components/proposalVoting";
+import { ITransformedStage, IVote, ProposalStages } from "@/utils/types";
+import { useProposalStatus } from "../hooks/useProposalVariantStatus";
+import dayjs from "dayjs";
+import { ProposalAction } from "@/components/proposalAction/proposalAction";
+import { CardResources } from "@/components/proposal/cardResources";
 
-type BottomSection = "description" | "vetoes";
+export default function ProposalDetail({ index: proposalId }: { index: number }) {
+  const router = useRouter();
 
-export default function ProposalDetail({ index: proposalIndex }: { index: number }) {
-  const [bottomSection, setBottomSection] = useState<BottomSection>("description");
-  const { proposalId } = useProposalId(proposalIndex);
   const {
     proposal,
     proposalFetchStatus,
-    vetoes,
     canVeto,
-    isConfirming: isConfirmingVeto,
+    vetoes,
+    isConfirming: isConfirmingApproval,
     vetoProposal,
-  } = useProposalVeto(proposalIndex);
+  } = useProposalVeto(proposalId);
+
+  const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(BigInt(proposalId));
+  const breadcrumbs = generateBreadcrumbs(router.asPath);
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
-  const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
-  const { tokenSupply: totalSupply } = useVotingToken();
-  const { balance: bridgedBalance } = useVotingTokenBalance(
-    PUB_TAIKO_BRIDGE_ADDRESS,
-    proposal?.parameters.snapshotTimestamp ?? BigInt(0)
-  );
+  const proposalVariant = useProposalStatus(proposal!);
 
-  let votingPercentage = 0;
-  if (typeof proposal?.vetoTally !== "undefined" && totalSupply && typeof bridgedBalance !== "undefined") {
-    const effectiveSupply = proposal.parameters.skipL2 ? totalSupply - bridgedBalance : totalSupply;
-
-    // 2 decimals
-    votingPercentage = Number((proposal.vetoTally * BigInt(10_000)) / effectiveSupply) / 100;
-  }
+  // TODO: This is not revelant anymore
+  const proposalStage: ITransformedStage[] = [
+    {
+      id: "1",
+      type: ProposalStages.OPTIMISTIC_EXECUTION,
+      variant: "majorityVoting",
+      title: "Onchain Multisig",
+      status: proposalVariant!,
+      disabled: false,
+      proposalId: proposalId.toString(),
+      providerId: "1",
+      result: {
+        cta: proposal?.executed
+          ? {
+              disabled: true,
+              label: "Executed",
+            }
+          : canExecute
+            ? {
+                isLoading: isConfirmingExecution,
+                label: "Execute",
+                onClick: executeProposal,
+              }
+            : {
+                disabled: !canVeto,
+                isLoading: isConfirmingApproval,
+                label: "Veto",
+                onClick: vetoProposal,
+              },
+        votingScores: [
+          {
+            option: "Vetoes",
+            voteAmount: proposal?.vetoTally.toString() || "0",
+            votePercentage: 0,
+            tokenSymbol: "TKO",
+          },
+        ],
+        proposalId: proposalId.toString(),
+      },
+      details: {
+        censusBlock: Number(proposal?.parameters.snapshotTimestamp),
+        startDate: dayjs(Number(proposal?.parameters.vetoStartDate) * 1000).toString(),
+        endDate: dayjs(Number(proposal?.parameters.vetoEndDate) * 1000).toString(),
+        strategy: "approvalThreshold",
+        options: "approve",
+      },
+      votes: vetoes.map(({ approver }) => ({ address: approver, variant: "veto" }) as IVote),
+    },
+  ];
 
   if (!proposal || showProposalLoading) {
     return (
@@ -54,52 +90,31 @@ export default function ProposalDetail({ index: proposalIndex }: { index: number
   }
 
   return (
-    <main className="flex w-full flex-col items-center px-4 py-6 md:w-4/5 md:p-6 lg:w-2/3 xl:py-10 2xl:w-3/5">
-      <div className="flex w-full justify-between py-5">
-        <ProposalHeader
-          proposalIndex={proposalIndex}
-          proposal={proposal}
-          transactionConfirming={isConfirmingVeto || isConfirmingExecution}
-          canVeto={canVeto}
-          canExecute={canExecute}
-          onVetoPressed={() => vetoProposal()}
-          onExecutePressed={() => executeProposal()}
-        />
-      </div>
+    <section className="flex w-screen min-w-full max-w-full flex-col items-center">
+      <ProposalHeader
+        proposalNumber={proposalId + 1}
+        proposal={proposal}
+        breadcrumbs={breadcrumbs}
+        transactionConfirming={isConfirmingApproval || isConfirmingExecution}
+        canApprove={canVeto}
+        canExecute={canExecute}
+        onVetoPressed={() => vetoProposal()}
+        onExecutePressed={() => executeProposal()}
+      />
 
-      <div className="my-10 grid w-full gap-10 lg:grid-cols-2 xl:grid-cols-3">
-        <VetoTally voteCount={proposal?.vetoTally} votePercentage={votingPercentage} />
-        <ProposalDetails
-          minVetoRatio={proposal?.parameters?.minVetoRatio}
-          snapshotTimestamp={proposal?.parameters?.snapshotTimestamp}
-        />
-      </div>
-      <div className="w-full py-12">
-        <div className="space-between flex flex-row">
-          <h2 className="flex-grow text-3xl font-semibold text-neutral-900">
-            {bottomSection === "description" ? "Description" : "Vetoes"}
-          </h2>
-          <ToggleGroup
-            className="justify-end"
-            value={bottomSection}
-            isMultiSelect={false}
-            onChange={(val: string | undefined) => (val ? setBottomSection(val as BottomSection) : "")}
-          >
-            <Toggle label="Description" value="description" />
-            <Toggle label="Vetoes" value="vetoes" />
-          </ToggleGroup>
+      <div className="mx-auto w-full max-w-screen-xl px-4 py-6 md:px-16 md:pb-20 md:pt-10">
+        <div className="flex w-full flex-col gap-x-12 gap-y-6 md:flex-row">
+          <div className="flex flex-col gap-y-6 md:w-[63%] md:shrink-0">
+            <BodySection body={proposal.description || "No description was provided"} />
+            <ProposalVoting stages={proposalStage} />
+            <ProposalAction actions={proposal.actions} />
+          </div>
+          <div className="flex flex-col gap-y-6 md:w-[33%]">
+            <CardResources resources={proposal.resources} title="Resources" />
+          </div>
         </div>
-
-        <If condition={bottomSection === "description"}>
-          <Then>
-            <ProposalDescription {...proposal} />
-          </Then>
-          <Else>
-            <VetoesSection vetoes={vetoes} />
-          </Else>
-        </If>
       </div>
-    </main>
+    </section>
   );
 }
 

@@ -44,6 +44,7 @@ export type IProposalResource = {
 export enum ProposalStages {
   DRAFT = "Draft",
   MULTISIG_APPROVAL = "Multisig Approval",
+  OPTIMISTIC_EXECUTION = "Optimistic Execution",
 }
 
 export type VotingCta = Pick<IButtonProps, "disabled" | "isLoading"> & {
@@ -53,6 +54,12 @@ export type VotingCta = Pick<IButtonProps, "disabled" | "isLoading"> & {
 
 export interface IBreakdownApprovalThresholdResult extends IApprovalThresholdResult {
   cta?: VotingCta;
+}
+
+export interface IBreakdownMajorityVotingResult {
+  votingScores: { option: string; voteAmount: string; votePercentage: number; tokenSymbol: string }[];
+  cta?: VotingCta;
+  proposalId: string;
 }
 
 export interface IVotingStageDetails {
@@ -78,6 +85,6 @@ export interface ITransformedStage<TType extends ProposalType = ProposalType> {
   votes: IVote[];
   proposalId?: string;
   providerId?: string;
-  result?: IBreakdownApprovalThresholdResult;
+  result?: TType extends "approvalThreshold" ? IBreakdownApprovalThresholdResult : IBreakdownMajorityVotingResult;
   details?: IVotingStageDetails;
 }
