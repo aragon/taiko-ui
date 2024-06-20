@@ -10,6 +10,10 @@ export function useAction(action: RawAction) {
   const [actionArgs, setActionArgs] = useState<EvmValue[]>([]);
 
   useEffect(() => {
+    if (!action.data || action.data === "0x") {
+      return;
+    }
+
     const hexSelector = action.data.slice(0, 10) as Hex;
     const func = abi.find((item) => item.type === "function" && hexSelector === toFunctionSelector(item));
     if (!func || func.type !== "function") return;

@@ -14,6 +14,7 @@ import { EncodedView } from "./encodedView";
 import { RawAction } from "@/utils/types";
 import { Else, If, Then } from "../if";
 import { useAction } from "@/hooks/useAction";
+import { formatEther } from "viem";
 
 interface IProposalActionProps {
   actions?: RawAction[];
@@ -34,7 +35,7 @@ export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
 
       {/* Content */}
       <AccordionContainer isMulti={true} className="border-t border-t-neutral-100">
-        {actions?.map((action, index) => <ActionItem key={index} index={index} rawAction={action} />)}
+        {actions?.map((action, index) => <ActionItem key={index} index={index} rawAction={action.raw} />)}
       </AccordionContainer>
     </div>
   );
@@ -64,7 +65,7 @@ const ActionItem = ({ index, rawAction }: { index: number; rawAction: RawAction 
             <div className="flex w-full gap-x-6 text-sm leading-tight md:text-base">
               <Link href={explorerUrl} target="_blank">
                 <span className="flex items-center gap-x-2 text-neutral-500">
-                  {formatHexString(action.to)}
+                  {formatHexString(rawAction.to)}
                   {functionName != null && <AvatarIcon variant="primary" size="sm" icon={IconType.CHECKMARK} />}
                   {functionName == null && (
                     <span className="flex items-center gap-x-2">
@@ -81,7 +82,7 @@ const ActionItem = ({ index, rawAction }: { index: number; rawAction: RawAction 
 
       <AccordionItemContent className="!overflow-none">
         <div className="flex flex-col gap-y-4">
-          <If condition={action?.args?.length}>
+          <If condition={!action?.args?.length}>
             <Then>
               <EncodedView rawAction={action} />
             </Then>
@@ -93,7 +94,6 @@ const ActionItem = ({ index, rawAction }: { index: number; rawAction: RawAction 
               ))}
             </Else>
           </If>
-          {}
         </div>
       </AccordionItemContent>
     </AccordionItem>

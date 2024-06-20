@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
 import { Address, Hex, getAbiItem } from "viem";
-import { ProposalMetadata, type RawAction } from "@/utils/types";
+import { ProposalMetadata, type RawAction, type DecodedAction } from "@/utils/types";
 import {
   type OptimisticProposal,
   type OptimisticProposalParameters,
@@ -11,6 +11,7 @@ import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
 import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisticTokenVotingPlugin.sol";
 import { parseProposalId } from "../utils/proposal-id";
+import { useAction } from "@/hooks/useAction";
 
 type ProposalCreatedLogResponse = {
   args: {
@@ -114,9 +115,21 @@ function decodeProposalResultData(data?: OptimisticProposalResultType) {
     parameters: data[2] as OptimisticProposalParameters,
     vetoTally: data[3] as bigint,
     metadataUri: data[4] as string,
-    actions: data[5] as Array<RawAction>,
+    actions: getProposalActions(data[5] as Array<RawAction>),
     allowFailureMap: data[6] as bigint,
   };
+}
+
+function getProposalActions(chainActions: RawAction[]): IAction[] {
+  if (!chainActions) return [];
+
+  return chainActions.map((tx) => {
+    console.log("tx: ", tx);
+    const { data, to, value } = tx;
+    const decoded = useAction(tx);
+
+    return { raw: tx, decoded };
+  });
 }
 
 function arrangeProposalData(
