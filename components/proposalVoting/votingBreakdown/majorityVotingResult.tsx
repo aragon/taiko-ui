@@ -30,7 +30,7 @@ export const BreakdownMajorityVotingResult: React.FC<IBreakdownMajorityVotingRes
   const [option, setOption] = useState<string>();
 
   const handleVoteClick = () => {
-    if (showOptions) {
+    if (showOptions || votingScores.length === 1) {
       cta?.onClick?.(parseInt(option ?? "0"));
     } else {
       setShowOptions(true);

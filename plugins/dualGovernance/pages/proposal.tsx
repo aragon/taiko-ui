@@ -62,7 +62,7 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
               },
         votingScores: [
           {
-            option: "Vetoes",
+            option: "Veto",
             voteAmount: proposal?.vetoTally.toString() || "0",
             votePercentage: 0,
             tokenSymbol: "TKO",
@@ -77,7 +77,7 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
         strategy: "approvalThreshold",
         options: "approve",
       },
-      votes: vetoes.map(({ approver }) => ({ address: approver, variant: "veto" }) as IVote),
+      votes: vetoes.map(({ voter }) => ({ address: voter, variant: "no" }) as IVote),
     },
   ];
 
