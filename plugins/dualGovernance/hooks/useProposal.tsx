@@ -124,7 +124,6 @@ function getProposalActions(chainActions: RawAction[]): IAction[] {
   if (!chainActions) return [];
 
   return chainActions.map((tx) => {
-    console.log("tx: ", tx);
     const { data, to, value } = tx;
     const decoded = useAction(tx);
 
