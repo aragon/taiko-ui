@@ -92,13 +92,11 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
   return (
     <section className="flex w-screen min-w-full max-w-full flex-col items-center">
       <ProposalHeader
-        proposalNumber={proposalId + 1}
+        proposalIndex={proposalId + 1}
         proposal={proposal}
         breadcrumbs={breadcrumbs}
         transactionConfirming={isConfirmingApproval || isConfirmingExecution}
-        canApprove={canVeto}
         canExecute={canExecute}
-        onVetoPressed={() => vetoProposal()}
         onExecutePressed={() => executeProposal()}
       />
 

@@ -1,4 +1,4 @@
-import { AvatarIcon, Breadcrumbs, Button, Heading, IconType, Tag } from "@aragon/ods";
+import { AvatarIcon, Breadcrumbs, Button, Heading, IBreadcrumbsLink, IconType, Tag, TagVariant } from "@aragon/ods";
 import { Publisher } from "@/components/publisher";
 import classNames from "classnames";
 import { ReactNode } from "react";
@@ -6,7 +6,7 @@ import { OptimisticProposal } from "@/plugins/dualGovernance/utils/types";
 import { AlertVariant } from "@aragon/ods";
 import { ElseIf, If, Then, Else } from "@/components/if";
 import { AddressText } from "@/components/text/address";
-import { useProposalVariantStatus } from "@/plugins/dualGovernance/hooks/useProposalVariantStatus";
+import { useProposalStatus, useProposalVariantStatus } from "@/plugins/dualGovernance/hooks/useProposalVariantStatus";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import dayjs from "dayjs";
 
@@ -16,27 +16,25 @@ const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_SUMMARY = "(No proposal summary)";
 
 interface ProposalHeaderProps {
-  proposalIndex: number;
   proposal: OptimisticProposal;
-  canVeto: boolean;
   canExecute: boolean;
+  breadcrumbs: IBreadcrumbsLink[];
   transactionConfirming: boolean;
-  onVetoPressed: () => void;
   onExecutePressed: () => void;
 }
 
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({
-  proposalIndex,
   proposal,
-  canVeto,
   canExecute,
   breadcrumbs,
   transactionConfirming,
-  onVetoPressed,
   onExecutePressed,
 }) => {
-  const proposalVariant = useProposalVariantStatus(proposal);
-  const ended = proposal.parameters.vetoEndDate <= Date.now() / 1000;
+  const status = useProposalStatus(proposal);
+  const tagVariant = getTagVariantFromStatus(status);
+
+  // TODO: Remake this logic with something less hacky
+  const isEmergency = proposal.parameters.vetoStartDate === 0n;
 
   return (
     <div className="flex w-full justify-center bg-neutral-0">
@@ -55,10 +53,10 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
         {/* Title & description */}
         <div className="flex w-full flex-col gap-y-2">
           <div className="flex w-full items-center gap-x-4">
-            <Heading size="h1">{proposal.title}</Heading>
-            {/* && <Tag label="Emergency" variant="critical" />*/}
+            <Heading size="h1">{proposal.title || DEFAULT_PROPOSAL_TITLE}</Heading>
+            {isEmergency && <Tag label="Emergency" variant="critical" />}
           </div>
-          <p className="text-lg leading-normal text-neutral-500">{proposal.summary}</p>
+          <p className="text-lg leading-normal text-neutral-500">{proposal.summary || DEFAULT_PROPOSAL_SUMMARY}</p>
         </div>
         {/* Metadata */}
         <div className="flex flex-wrap gap-x-10 gap-y-2">
@@ -91,4 +89,35 @@ const MainSection: React.FC<IMainSectionProps> = (props) => {
   const { children, className } = props;
 
   return <div className={classNames("mx-auto w-full max-w-screen-xl px-4 py-6", className)}>{children}</div>;
+};
+
+const getTagVariantFromStatus = (status: string | undefined): TagVariant => {
+  switch (status) {
+    case "accepted":
+      return "success";
+    case "active":
+      return "info";
+    case "challenged":
+      return "warning";
+    case "draft":
+      return "neutral";
+    case "executed":
+      return "success";
+    case "expired":
+      return "critical";
+    case "failed":
+      return "critical";
+    case "partiallyExecuted":
+      return "warning";
+    case "pending":
+      return "neutral";
+    case "queued":
+      return "success";
+    case "rejected":
+      return "critical";
+    case "vetoed":
+      return "warning";
+    default:
+      return "neutral";
+  }
 };

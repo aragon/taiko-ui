@@ -35,7 +35,7 @@ export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
 
       {/* Content */}
       <AccordionContainer isMulti={true} className="border-t border-t-neutral-100">
-        {actions?.map((action, index) => <ActionItem key={index} index={index} rawAction={action.raw} />)}
+        {actions?.map((action, index) => <ActionItem key={index} index={index} rawAction={action} />)}
       </AccordionContainer>
     </div>
   );

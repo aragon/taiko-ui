@@ -115,20 +115,9 @@ function decodeProposalResultData(data?: OptimisticProposalResultType) {
     parameters: data[2] as OptimisticProposalParameters,
     vetoTally: data[3] as bigint,
     metadataUri: data[4] as string,
-    actions: getProposalActions(data[5] as Array<RawAction>),
+    actions: data[5] as Array<RawAction>,
     allowFailureMap: data[6] as bigint,
   };
-}
-
-function getProposalActions(chainActions: RawAction[]): IAction[] {
-  if (!chainActions) return [];
-
-  return chainActions.map((tx) => {
-    const { data, to, value } = tx;
-    const decoded = useAction(tx);
-
-    return { raw: tx, decoded };
-  });
 }
 
 function arrangeProposalData(
