@@ -6,6 +6,7 @@ import {
   AccordionItemContent,
   AccordionItemHeader,
   AvatarIcon,
+  Button,
   IconType,
 } from "@aragon/ods";
 import Link from "next/link";
@@ -14,20 +15,29 @@ import { EncodedView } from "./encodedView";
 import { RawAction } from "@/utils/types";
 import { Else, If, Then } from "../if";
 import { useAction } from "@/hooks/useAction";
-import { formatEther } from "viem";
 
 interface IProposalActionProps {
+  canExecute: boolean;
+  isConfirmingExecution: boolean;
+  onExecute: () => void;
   actions?: RawAction[];
 }
 
 export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
-  const { actions } = props;
+  const { actions, canExecute, onExecute, isConfirmingExecution } = props;
 
   return (
     <div className="overflow-hidden rounded-xl bg-neutral-0 pb-2 shadow-neutral">
       {/* Header */}
       <div className="flex flex-col gap-y-2 px-4 py-4 md:gap-y-3 md:px-6 md:py-6">
-        <p className="text-xl leading-tight text-neutral-800 md:text-2xl">Actions</p>
+        <div className="flex justify-between gap-x-2 gap-y-2">
+          <p className="text-xl leading-tight text-neutral-800 md:text-2xl">Actions</p>
+          {canExecute && (
+            <Button size="md" disabled={isConfirmingExecution} onClick={() => onExecute()} className="">
+              Execute
+            </Button>
+          )}
+        </div>
         <p className="text-base leading-normal text-neutral-500 md:text-lg">
           The proposal must pass all voting stages above before the binding onchain actions are able to be executed.
         </p>

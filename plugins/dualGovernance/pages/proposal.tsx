@@ -92,7 +92,6 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
   return (
     <section className="flex w-screen min-w-full max-w-full flex-col items-center">
       <ProposalHeader
-        proposalIndex={proposalId + 1}
         proposal={proposal}
         breadcrumbs={breadcrumbs}
         transactionConfirming={isConfirmingApproval || isConfirmingExecution}
@@ -105,7 +104,12 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
           <div className="flex flex-col gap-y-6 md:w-[63%] md:shrink-0">
             <BodySection body={proposal.description || "No description was provided"} />
             <ProposalVoting stages={proposalStage} />
-            <ProposalAction actions={proposal.actions} />
+            <ProposalAction
+              canExecute={canExecute}
+              isConfirmingExecution={isConfirmingExecution}
+              onExecute={() => executeProposal()}
+              actions={proposal.actions}
+            />
           </div>
           <div className="flex flex-col gap-y-6 md:w-[33%]">
             <CardResources resources={proposal.resources} title="Resources" />

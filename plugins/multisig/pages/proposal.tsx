@@ -1,4 +1,4 @@
-import { useProposal } from "@/plugins/multisig/hooks/useProposal";
+import { type useProposal } from "@/plugins/multisig/hooks/useProposal";
 import ProposalHeader from "@/plugins/multisig/components/proposal/header";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalApprove } from "@/plugins/multisig/hooks/useProposalApprove";
@@ -7,7 +7,7 @@ import { generateBreadcrumbs } from "@/utils/nav";
 import { useRouter } from "next/router";
 import { BodySection } from "@/components/proposal/proposalBodySection";
 import { ProposalVoting } from "@/components/proposalVoting";
-import { ITransformedStage, IVote, ProposalStages } from "@/utils/types";
+import { type ITransformedStage, type IVote, ProposalStages } from "@/utils/types";
 import { useProposalStatus } from "../hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
 import { ProposalAction } from "@/components/proposalAction/proposalAction";
@@ -100,7 +100,11 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
           <div className="flex flex-col gap-y-6 md:w-[63%] md:shrink-0">
             <BodySection body={proposal.description || "No description was provided"} />
             <ProposalVoting stages={proposalStage} />
-            <ProposalAction actions={proposal.actions} />
+            <ProposalAction
+              onExecutePressed={() => executeProposal()}
+              canExecute={canExecute}
+              actions={proposal.actions}
+            />
           </div>
           <div className="flex flex-col gap-y-6 md:w-[33%]">
             <CardResources resources={proposal.resources} title="Resources" />
