@@ -125,6 +125,11 @@ function getEtherscanAbiLoader() {
         apiKey: PUB_ETHERSCAN_API_KEY,
         baseURL: "https://api-sepolia.etherscan.io/api",
       });
+    case "holesky":
+      return new whatsabi.loaders.EtherscanABILoader({
+        apiKey: PUB_ETHERSCAN_API_KEY,
+        baseURL: "https://api-holesky.etherscan.io/api",
+      });
     case "mumbai":
       return new whatsabi.loaders.EtherscanABILoader({
         apiKey: PUB_ETHERSCAN_API_KEY,
