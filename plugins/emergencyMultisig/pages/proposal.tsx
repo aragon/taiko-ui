@@ -125,7 +125,12 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
               <div className="flex flex-col gap-y-6 md:w-[63%] md:shrink-0">
                 <BodySection body={proposal.description || "No description was provided"} />
                 <ProposalVoting stages={proposalStage} />
-                <ProposalAction actions={proposal.actions} />
+                <ProposalAction
+                  actions={proposal.actions}
+                  canExecute={canExecute}
+                  isConfirmingExecution={isConfirmingExecution}
+                  onExecute={executeProposal}
+                />
               </div>
               <div className="flex flex-col gap-y-6 md:w-[33%]">
                 <CardResources resources={proposal.resources} title="Resources" />

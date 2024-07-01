@@ -101,7 +101,8 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
             <BodySection body={proposal.description || "No description was provided"} />
             <ProposalVoting stages={proposalStage} />
             <ProposalAction
-              onExecutePressed={() => executeProposal()}
+              onExecute={() => executeProposal()}
+              isConfirmingExecution={isConfirmingExecution}
               canExecute={canExecute}
               actions={proposal.actions}
             />
