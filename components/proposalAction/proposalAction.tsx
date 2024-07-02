@@ -12,7 +12,7 @@ import {
 import Link from "next/link";
 import { CallParamField } from "./callParamField";
 import { EncodedView } from "./encodedView";
-import { RawAction } from "@/utils/types";
+import type { RawAction } from "@/utils/types";
 import { Else, If, Then } from "../if";
 import { useAction } from "@/hooks/useAction";
 

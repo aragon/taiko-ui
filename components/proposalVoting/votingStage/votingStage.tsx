@@ -8,7 +8,7 @@ import { VotingBreakdown, type IBreakdownMajorityVotingResult, type ProposalType
 import { type IBreakdownApprovalThresholdResult } from "../votingBreakdown/approvalThresholdResult";
 import { VotingDetails } from "../votingDetails";
 import { VotingStageStatus } from "./votingStageStatus";
-import { IVote, ProposalStages } from "@/utils/types";
+import type { IVote, ProposalStages } from "@/utils/types";
 import { VotesDataList } from "../votesDataList/votesDataList";
 
 export interface IVotingStageDetails {

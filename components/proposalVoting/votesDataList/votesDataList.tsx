@@ -2,8 +2,8 @@
 // import { type ProposalStages } from "@/features/proposals";
 // import { proposalVotes } from "@/features/proposals/services/proposal";
 import { DataList, IconType, type DataListState } from "@aragon/ods";
-import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+// import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
+// import { useEffect, useState } from "react";
 import { isAddressEqual } from "viem";
 import { useAccount } from "wagmi";
 import { VotesDataListItemSkeleton } from "./votesDataListItemSkeleton";

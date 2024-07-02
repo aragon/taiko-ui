@@ -1,4 +1,4 @@
-import { IProposalResource } from "@/utils/types";
+import type { IProposalResource } from "@/utils/types";
 import { Card, CardEmptyState, Heading, IconType, Link } from "@aragon/ods";
 import React from "react";
 
