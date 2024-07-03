@@ -22,7 +22,7 @@ export const VotingDetails: React.FC<IVotingDetailsProps> = (props) => {
               <div className="w-full text-neutral-800 md:text-right">{startDate}</div>
             </DefinitionList.Item>
           </If>
-          <DefinitionList.Item term="Expires" className="!gap-y-1 *:text-neutral-500">
+          <DefinitionList.Item term="Ends" className="!gap-y-1 *:text-neutral-500">
             <div className="w-full text-neutral-800 md:text-right">{endDate}</div>
           </DefinitionList.Item>
           <DefinitionList.Item term="Census Snapshot" className="!gap-y-1 *:text-neutral-500">

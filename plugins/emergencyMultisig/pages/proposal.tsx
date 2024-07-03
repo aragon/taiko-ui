@@ -42,7 +42,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       id: "1",
       type: ProposalStages.MULTISIG_APPROVAL,
       variant: "approvalThreshold",
-      title: "Onchain Multisig",
+      title: "Onchain multisig",
       status: proposalVariant!,
       disabled: false,
       proposalId: proposalId,

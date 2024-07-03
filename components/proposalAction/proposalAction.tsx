@@ -39,7 +39,7 @@ export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
           )}
         </div>
         <p className="text-base leading-normal text-neutral-500 md:text-lg">
-          When the proposal passes the community vote, the following actions are going to be executed by the DAO.
+          When the proposal passes the community vote, the following actions will be executable on the DAO.
         </p>
       </div>
 

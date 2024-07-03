@@ -17,8 +17,8 @@ export type OptimisticProposalResultType = readonly [
 
 export type OptimisticProposalParameters = {
   snapshotTimestamp: bigint;
-  vetoStartDate?: bigint;
-  vetoEndDate: bigint;
+  vetoStartDate?: number | bigint;
+  vetoEndDate: number | bigint;
   minVetoRatio: number;
   skipL2: boolean;
 };

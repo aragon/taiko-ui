@@ -9,7 +9,7 @@ import { AvatarIcon, IconType } from "@aragon/ods";
 import { PUB_APP_NAME, PUB_PROJECT_LOGO } from "@/constants";
 
 export const Navbar: React.FC = () => {
-  const [open, setOpen] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const navLinks: INavLink[] = [
     { path: "/", id: "dashboard", name: "Dashboard", icon: IconType.APP_DASHBOARD },
@@ -51,7 +51,7 @@ export const Navbar: React.FC = () => {
 
               {/* Nav Trigger */}
               <button
-                onClick={() => setOpen(true)}
+                onClick={() => setShowMenu(true)}
                 className={classNames(
                   "rounded-full border border-neutral-100 bg-neutral-0 p-1 md:hidden",
                   "outline-none focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset" // focus styles
@@ -70,7 +70,7 @@ export const Navbar: React.FC = () => {
           </ul>
         </div>
       </nav>
-      <MobileNavDialog open={open} navLinks={navLinks} onOpenChange={setOpen} />
+      <MobileNavDialog open={showMenu} navLinks={navLinks} onOpenChange={setShowMenu} />
     </>
   );
 };

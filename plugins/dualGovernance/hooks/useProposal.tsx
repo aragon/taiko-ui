@@ -11,7 +11,6 @@ import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
 import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisticTokenVotingPlugin.sol";
 import { parseProposalId } from "../utils/proposal-id";
-import { useAction } from "@/hooks/useAction";
 
 type ProposalCreatedLogResponse = {
   args: {
@@ -128,7 +127,7 @@ function arrangeProposalData(
 ): OptimisticProposal | null {
   if (!proposalData || !proposalId) return null;
 
-  const { index, startDate: vetoStartDate } = parseProposalId(proposalId);
+  const { index, startDate: vetoStartDate, endDate: vetoEndDate } = parseProposalId(proposalId);
 
   return {
     index,
@@ -140,7 +139,7 @@ function arrangeProposalData(
       skipL2: proposalData.parameters.skipL2,
       snapshotTimestamp: proposalData.parameters.snapshotTimestamp,
       vetoStartDate,
-      vetoEndDate: proposalData.parameters.vetoEndDate,
+      vetoEndDate,
     },
     vetoTally: proposalData.vetoTally,
     allowFailureMap: proposalData.allowFailureMap,
