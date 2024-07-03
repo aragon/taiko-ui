@@ -11,18 +11,19 @@ dayjs.extend(relativeTime);
 
 interface IProposalVotingProps {
   stages: ITransformedStage[];
+  description?: string;
 }
 
-export const ProposalVoting: React.FC<IProposalVotingProps> = ({ stages }) => {
+const DEFAULT_DESCRIPTION =
+  "The on-chain multisig flow allows the Members to create proposals that, if approved, will be moved to the Optimistic Proposal stage.";
+
+export const ProposalVoting: React.FC<IProposalVotingProps> = ({ stages, description }) => {
   return (
     <Card className="overflow-hidden rounded-xl bg-neutral-0 shadow-neutral">
       {/* Header */}
       <div className="flex flex-col gap-y-2 p-6">
         <Heading size="h2">Voting</Heading>
-        <p className="text-lg leading-normal text-neutral-500">
-          The onchain multisig process allows for the Members to create proposals that if approve will be moved to the
-          Optimistic Proposal Stage.
-        </p>
+        <p className="text-lg leading-normal text-neutral-500">{description || DEFAULT_DESCRIPTION}</p>
       </div>
       {/* Stages */}
       <AccordionContainer isMulti={false} defaultValue="Stage 1" className="border-t border-t-neutral-100">

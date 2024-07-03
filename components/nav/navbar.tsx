@@ -1,7 +1,6 @@
 import WalletContainer from "@/components/WalletContainer";
 import { plugins } from "@/plugins";
 import classNames from "classnames";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { MobileNavDialog } from "./mobileNavDialog";
@@ -35,17 +34,11 @@ export const Navbar: React.FC = () => {
                   "outline-none focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset" // focus styles
                 )}
               >
-                <Image
-                  src={PUB_PROJECT_LOGO}
-                  width="164"
-                  height="32"
-                  className="shrink-0"
-                  alt={PUB_APP_NAME + " logo"}
-                />
+                <img src={PUB_PROJECT_LOGO} width="164" height="32" className="shrink-0" alt={PUB_APP_NAME + " logo"} />
               </Link>
               <div className="flex items-center gap-x-2 px-4">
                 <span className="text-sm leading-tight text-neutral-500">Powered by</span>
-                <Image src="/logo-aragon-bw-sm.png" width="18" height="18" alt="Aragon" />
+                <img src="/logo-aragon-bw-sm.png" width="18" height="18" alt="Aragon" />
               </div>
             </div>
 

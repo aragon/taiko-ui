@@ -22,8 +22,8 @@ export const VotingStageStatus: React.FC<IVotingStageStatus> = (props) => {
       {status === "active" && endDate && (
         <>
           <div className="flex flex-grow items-center gap-x-0.5">
-            <span className="shrink-0 text-primary-500">{endDate}</span>
-            <span className="flex-grow truncate text-neutral-500">left to vote</span>
+            <span className="shrink-0 text-primary-500">{endDate}</span>&nbsp;
+            <span className="flex-grow truncate text-neutral-500">left to participate</span>
           </div>
           <StatePingAnimation variant="primary" className="shrink-0" />
         </>

@@ -25,6 +25,7 @@ export const CardResources: React.FC<ICardResourcesProps> = (props) => {
       <div className="flex flex-col gap-y-4">
         {resources?.map((resource) => (
           <Link
+            target="_blank"
             key={resource.url}
             href={resource.url}
             variant="primary"
