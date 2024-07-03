@@ -31,7 +31,7 @@ export const PUB_ETHERSCAN_API_KEY = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY ?
 export const PUB_WALLET_CONNECT_PROJECT_ID = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? "";
 
 export const PUB_IPFS_ENDPOINT = process.env.NEXT_PUBLIC_IPFS_ENDPOINT ?? "";
-export const PUB_IPFS_API_KEY = process.env.NEXT_PUBLIC_IPFS_API_KEY ?? "";
+export const PUB_PINATA_JWT = process.env.NEXT_PUBLIC_PINATA_JWT ?? "";
 
 // Private multisig
 export const DETERMINISTIC_EMERGENCY_PAYLOAD =
