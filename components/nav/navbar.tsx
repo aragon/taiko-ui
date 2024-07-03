@@ -1,7 +1,6 @@
 import WalletContainer from "@/components/WalletContainer";
 import { plugins } from "@/plugins";
 import classNames from "classnames";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { MobileNavDialog } from "./mobileNavDialog";
@@ -10,16 +9,18 @@ import { AvatarIcon, IconType } from "@aragon/ods";
 import { PUB_APP_NAME, PUB_PROJECT_LOGO } from "@/constants";
 
 export const Navbar: React.FC = () => {
-  const [open, setOpen] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const navLinks: INavLink[] = [
     { path: "/", id: "dashboard", name: "Dashboard", icon: IconType.APP_DASHBOARD },
-    ...plugins.map((p) => ({
-      id: p.id,
-      name: p.title,
-      path: `/plugins/${p.id}/#/`,
-      icon: p.icon,
-    })),
+    ...plugins
+      // .filter((p) => !p.hidden)
+      .map((p) => ({
+        id: p.id,
+        name: p.title,
+        path: `/plugins/${p.id}/#/`,
+        icon: p.icon,
+      })),
   ];
 
   return (
@@ -35,17 +36,11 @@ export const Navbar: React.FC = () => {
                   "outline-none focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset" // focus styles
                 )}
               >
-                <Image
-                  src={PUB_PROJECT_LOGO}
-                  width="164"
-                  height="32"
-                  className="shrink-0"
-                  alt={PUB_APP_NAME + " logo"}
-                />
+                <img src={PUB_PROJECT_LOGO} width="164" height="32" className="shrink-0" alt={PUB_APP_NAME + " logo"} />
               </Link>
               <div className="flex items-center gap-x-2 px-4">
                 <span className="text-sm leading-tight text-neutral-500">Powered by</span>
-                <Image src="/logo-aragon-bw-sm.png" width="18" height="18" alt="Aragon" />
+                <img src="/logo-aragon-bw-sm.png" width="18" height="18" alt="Aragon" />
               </div>
             </div>
 
@@ -56,7 +51,7 @@ export const Navbar: React.FC = () => {
 
               {/* Nav Trigger */}
               <button
-                onClick={() => setOpen(true)}
+                onClick={() => setShowMenu(true)}
                 className={classNames(
                   "rounded-full border border-neutral-100 bg-neutral-0 p-1 md:hidden",
                   "outline-none focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset" // focus styles
@@ -75,7 +70,7 @@ export const Navbar: React.FC = () => {
           </ul>
         </div>
       </nav>
-      <MobileNavDialog open={open} navLinks={navLinks} onOpenChange={setOpen} />
+      <MobileNavDialog open={showMenu} navLinks={navLinks} onOpenChange={setShowMenu} />
     </>
   );
 };

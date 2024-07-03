@@ -39,7 +39,7 @@ export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
           )}
         </div>
         <p className="text-base leading-normal text-neutral-500 md:text-lg">
-          The proposal must pass all voting stages above before the binding onchain actions are able to be executed.
+          When the proposal passes the community vote, the following actions will be executable on the DAO.
         </p>
       </div>
 

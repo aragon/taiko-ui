@@ -6,7 +6,9 @@ interface IBodySectionProps {
 }
 
 export const BodySection: React.FC<IBodySectionProps> = (props) => {
-  const { body } = props;
+  let { body } = props;
+
+  if (!body.trim() || body === "<p></p>") body = "No description was provided";
 
   return (
     <CardCollapsible
@@ -16,7 +18,7 @@ export const BodySection: React.FC<IBodySectionProps> = (props) => {
       className="w-full shadow-neutral"
     >
       <div className="flex flex-col gap-y-4">
-        <Heading size="h2">Proposal Body</Heading>
+        <Heading size="h2">Proposal description</Heading>
         <hr className="rounded-full border-neutral-100" />
         <DocumentParser document={body} className={proseClasses} />
       </div>
