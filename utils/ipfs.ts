@@ -1,4 +1,4 @@
-import { PUB_IPFS_ENDPOINT, PUB_IPFS_API_KEY } from "@/constants";
+import { PUB_IPFS_ENDPOINT, PUB_PINATA_JWT } from "@/constants";
 import { Hex, fromHex, toBytes } from "viem";
 import { CID } from "multiformats/cid";
 import * as raw from "multiformats/codecs/raw";
@@ -19,7 +19,7 @@ export async function uploadToPinata(strBody: string) {
   const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${PUB_IPFS_API_KEY}`,
+      Authorization: `Bearer ${PUB_PINATA_JWT}`,
     },
     body: data,
   });
