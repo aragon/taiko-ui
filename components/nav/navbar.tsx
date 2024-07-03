@@ -13,12 +13,14 @@ export const Navbar: React.FC = () => {
 
   const navLinks: INavLink[] = [
     { path: "/", id: "dashboard", name: "Dashboard", icon: IconType.APP_DASHBOARD },
-    ...plugins.map((p) => ({
-      id: p.id,
-      name: p.title,
-      path: `/plugins/${p.id}/#/`,
-      icon: p.icon,
-    })),
+    ...plugins
+      // .filter((p) => !p.hidden)
+      .map((p) => ({
+        id: p.id,
+        name: p.title,
+        path: `/plugins/${p.id}/#/`,
+        icon: p.icon,
+      })),
   ];
 
   return (

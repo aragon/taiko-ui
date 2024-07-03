@@ -64,7 +64,7 @@ export function useProposal(proposalId?: bigint, autoRefresh = false) {
         address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
         event: ProposalCreatedEvent as any,
         // args: {},
-        fromBlock: BigInt(6012935),
+        fromBlock: BigInt(0),
         toBlock: "latest",
       })
       .then((logs: any) => {

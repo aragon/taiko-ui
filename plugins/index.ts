@@ -15,13 +15,14 @@ type PluginItem = {
   title: string;
   icon: IconType;
   pluginAddress: string;
+  hidden?: boolean;
 };
 
 export const plugins: PluginItem[] = [
   {
     id: "community-proposals",
     folderName: "dualGovernance",
-    title: "Live Proposals",
+    title: "Community vote",
     icon: IconType.APP_MEMBERS,
     pluginAddress: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
   },
@@ -31,6 +32,7 @@ export const plugins: PluginItem[] = [
     title: "Core Team Multisig",
     icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_MULTISIG_PLUGIN_ADDRESS,
+    hidden: true,
   },
   {
     id: "emergency-proposals",
@@ -38,6 +40,7 @@ export const plugins: PluginItem[] = [
     title: "Emergency Multisig",
     icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
+    hidden: true,
   },
   {
     id: "members",
