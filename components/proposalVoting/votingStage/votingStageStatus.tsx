@@ -31,7 +31,7 @@ export const VotingStageStatus: React.FC<IVotingStageStatus> = (props) => {
       {status === "accepted" && (
         <>
           <div className="flex flex-grow items-center gap-x-0.5">
-            <span className="shrink-0 text-neutral-500">Proposal has been</span>
+            <span className="shrink-0 text-neutral-500">The proposal has been</span>
             <span className="flex-grow truncate text-success-800">accepted</span>
           </div>
           <AvatarIcon size="sm" variant="success" icon={IconType.CHECKMARK} className="shrink-0" />
@@ -40,7 +40,7 @@ export const VotingStageStatus: React.FC<IVotingStageStatus> = (props) => {
       {status === "rejected" && (
         <>
           <div className="flex flex-grow items-center gap-x-0.5">
-            <span className="shrink-0 text-neutral-500">Proposal has been</span>
+            <span className="shrink-0 text-neutral-500">The proposal has been</span>
             <span className="flex-grow truncate text-critical-800">rejected</span>
           </div>
           <AvatarIcon size="sm" variant="critical" icon={IconType.CLOSE} className="shrink-0" />

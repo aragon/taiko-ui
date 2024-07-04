@@ -1,6 +1,6 @@
 import { PUB_CHAIN } from "@/constants";
 import { getSimpleRelativeTimeFromDate } from "@/utils/dates";
-import { AccordionItem, AccordionItemContent, AccordionItemHeader, Heading, Tabs, formatterUtils } from "@aragon/ods";
+import { AccordionItem, AccordionItemContent, AccordionItemHeader, Heading, Tabs } from "@aragon/ods";
 import { Tabs as RadixTabsRoot } from "@radix-ui/react-tabs";
 import dayjs from "dayjs";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
@@ -8,16 +8,8 @@ import { VotingBreakdown, type IBreakdownMajorityVotingResult, type ProposalType
 import { type IBreakdownApprovalThresholdResult } from "../votingBreakdown/approvalThresholdResult";
 import { VotingDetails } from "../votingDetails";
 import { VotingStageStatus } from "./votingStageStatus";
-import type { IVote, ProposalStages } from "@/utils/types";
+import type { IVote, IVotingStageDetails, ProposalStages } from "@/utils/types";
 import { VotesDataList } from "../votesDataList/votesDataList";
-
-export interface IVotingStageDetails {
-  censusBlock: number;
-  startDate: string;
-  endDate: string;
-  strategy: string;
-  options: string;
-}
 
 export interface IVotingStageProps<TType extends ProposalType = ProposalType> {
   title: string;
@@ -73,8 +65,14 @@ export const VotingStage: React.FC<IVotingStageProps> = (props) => {
 
   const defaultTab = status === "active" ? "breakdown" : "breakdown";
   const stageKey = `Stage ${number}`;
-  const formattedSnapshotBlock = formatterUtils.formatNumber(details?.censusBlock) ?? "";
-  const snapshotBlockURL = `${PUB_CHAIN.blockExplorers?.default.url}/block/${details?.censusBlock}`;
+  const snapshotTakenAt = details?.censusBlock
+    ? `Block ${details.censusBlock}`
+    : details?.censusTimestamp
+      ? dayjs(details.censusTimestamp * 1000).toString()
+      : "";
+  const snapshotBlockURL = details?.censusBlock
+    ? `${PUB_CHAIN.blockExplorers?.default.url}/block/${details?.censusBlock}`
+    : "";
 
   return (
     <AccordionItem
@@ -116,10 +114,11 @@ export const VotingStage: React.FC<IVotingStageProps> = (props) => {
             <div className="py-4 pb-8">
               {details && (
                 <VotingDetails
-                  snapshotBlock={formattedSnapshotBlock}
                   startDate={details.startDate}
                   endDate={details.endDate}
+                  snapshotTakenAt={snapshotTakenAt}
                   snapshotBlockURL={snapshotBlockURL}
+                  tokenAddress={details.tokenAddress}
                   strategy={details.strategy}
                   options={details.options}
                 />

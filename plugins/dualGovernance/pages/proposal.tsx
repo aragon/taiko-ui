@@ -21,7 +21,7 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
     proposalFetchStatus,
     canVeto,
     vetoes,
-    isConfirming: isConfirmingApproval,
+    isConfirming: isConfirmingVeto,
     vetoProposal,
   } = useProposalVeto(proposalId);
 
@@ -56,7 +56,7 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
               }
             : {
                 disabled: !canVeto,
-                isLoading: isConfirmingApproval,
+                isLoading: isConfirmingVeto,
                 label: "Veto",
                 onClick: vetoProposal,
               },
@@ -71,11 +71,11 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
         proposalId: proposalId.toString(),
       },
       details: {
-        censusBlock: 0,
+        censusTimestamp: Number(proposal?.parameters.snapshotTimestamp || 0) || 0,
         startDate: dayjs(Number(proposal?.parameters.vetoStartDate) * 1000).toString(),
         endDate: dayjs(Number(proposal?.parameters.vetoEndDate) * 1000).toString(),
         strategy: "Optimistic voting",
-        options: "approve",
+        options: "Veto",
       },
       votes: vetoes.map(({ voter }) => ({ address: voter, variant: "no" }) as IVote),
     },
@@ -94,7 +94,7 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
       <ProposalHeader
         proposal={proposal}
         breadcrumbs={breadcrumbs}
-        transactionConfirming={isConfirmingApproval || isConfirmingExecution}
+        transactionConfirming={isConfirmingVeto || isConfirmingExecution}
         canExecute={canExecute}
         onExecutePressed={() => executeProposal()}
       />

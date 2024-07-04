@@ -15,7 +15,7 @@ interface IProposalVotingProps {
 }
 
 const DEFAULT_DESCRIPTION =
-  "The on-chain multisig flow allows the Members to create proposals that, if approved, will be moved to the Optimistic Proposal stage.";
+  "The on-chain multisig flow allows its members to create proposals that, if approved, will be moved to the Optimistic Proposal stage.";
 
 export const ProposalVoting: React.FC<IProposalVotingProps> = ({ stages, description }) => {
   return (

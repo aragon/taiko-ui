@@ -9,7 +9,7 @@ import { useProposal } from "./useProposal";
 import { getContentCid, uploadToPinata } from "@/utils/ipfs";
 
 export function useProposalExecute(proposalId: string) {
-  const { reload } = useRouter();
+  const { push } = useRouter();
   const { addAlert } = useAlerts() as AlertContextProps;
   const {
     rawPrivateData: { privateRawMetadata },
@@ -100,7 +100,7 @@ export function useProposalExecute(proposalId: string) {
       txHash: executeTxHash,
     });
 
-    setTimeout(() => reload(), 1000 * 2);
+    setTimeout(() => push("#/"), 1000 * 2);
   }, [executingStatus, executeTxHash, isConfirming, isConfirmed]);
 
   return {

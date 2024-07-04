@@ -6,8 +6,10 @@ import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin";
 import { useAlerts, AlertContextProps } from "@/context/Alerts";
 import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useProposalApprovals } from "./useProposalApprovals";
+import { useRouter } from "next/router";
 
 export function useProposalApprove(proposalId: string) {
+  const { push } = useRouter();
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
 
   const { proposal, status: proposalFetchStatus, refetch: refetchProposal } = useProposal(proposalId, true);
@@ -21,7 +23,7 @@ export function useProposalApprove(proposalId: string) {
     status: approveStatus,
   } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: approveTxHash });
-  const { canApprove, refetch: refetchCanApprove } = useUserCanApprove(BigInt(proposalId));
+  const { canApprove, refetch: refetchCanApprove } = useUserCanApprove(proposalId);
 
   useEffect(() => {
     if (approveStatus === "idle" || approveStatus === "pending") return;
@@ -52,6 +54,7 @@ export function useProposalApprove(proposalId: string) {
       type: "success",
       txHash: approveTxHash,
     });
+    setTimeout(() => push("#/"), 1000 * 2);
     refetchCanApprove();
     refetchProposal();
   }, [approveStatus, approveTxHash, isConfirming, isConfirmed]);

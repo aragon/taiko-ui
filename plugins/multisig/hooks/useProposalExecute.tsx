@@ -6,7 +6,7 @@ import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { MultisigPluginAbi } from "../artifacts/MultisigPlugin";
 
 export function useProposalExecute(proposalId: string) {
-  const { reload } = useRouter();
+  const { push } = useRouter();
   const { addAlert } = useAlerts() as AlertContextProps;
 
   const {
@@ -74,7 +74,7 @@ export function useProposalExecute(proposalId: string) {
       txHash: executeTxHash,
     });
 
-    setTimeout(() => reload(), 1000 * 2);
+    setTimeout(() => push("#/"), 1000 * 2);
   }, [executingStatus, executeTxHash, isConfirming, isConfirmed]);
 
   return {
