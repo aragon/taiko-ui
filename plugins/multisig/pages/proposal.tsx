@@ -26,7 +26,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   } = useProposalApprove(proposalId);
 
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
-  const breadcrumbs = generateBreadcrumbs(router.asPath);
+  const breadcrumbs = generateBreadcrumbs(router.asPath, "Proposal");
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalVariant = useProposalStatus(proposal!);
