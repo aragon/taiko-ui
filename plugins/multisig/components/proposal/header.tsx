@@ -7,9 +7,6 @@ import { ReactNode } from "react";
 import { Publisher } from "@/components/publisher";
 import { getSimpleRelativeTimeFromDate } from "@/utils/dates";
 
-const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
-const DEFAULT_PROPOSAL_SUMMARY = "(No proposal summary)";
-
 interface ProposalHeaderProps {
   proposalNumber: number;
   breadcrumbs: IBreadcrumbsLink[];
@@ -21,16 +18,7 @@ interface ProposalHeaderProps {
   onExecutePressed: () => void;
 }
 
-const ProposalHeader: React.FC<ProposalHeaderProps> = ({
-  proposalNumber,
-  proposal,
-  canApprove,
-  canExecute,
-  breadcrumbs,
-  transactionConfirming,
-  onVetoPressed,
-  onExecutePressed,
-}) => {
+const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposal, breadcrumbs }) => {
   const status = useProposalStatus(proposal);
   const tagVariant = getTagVariantFromStatus(status);
 

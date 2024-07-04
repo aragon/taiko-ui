@@ -46,12 +46,12 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         cta: proposal?.executed
           ? {
               disabled: true,
-              label: "Executed",
+              label: "Sent to optimistic approval",
             }
           : canExecute
             ? {
                 isLoading: isConfirmingExecution,
-                label: "Execute",
+                label: "Send to optimistic approval",
                 onClick: executeProposal,
               }
             : {

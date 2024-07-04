@@ -11,7 +11,7 @@ export const useProposalVariantStatus = (proposal: MultisigProposal) => {
     setStatus(
       proposal?.approvals >= proposal?.parameters?.minApprovals
         ? proposal?.executed
-          ? { variant: "success", label: "Executed" }
+          ? { variant: "success", label: "Sent to optimistic approval" }
           : { variant: "success", label: "Executable" }
         : dayjs().isAfter(dayjs(Number(proposal?.parameters.expirationDate) * 1000))
           ? { variant: "critical", label: "Failed" }
