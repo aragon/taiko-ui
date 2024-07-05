@@ -34,11 +34,13 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalVariant = useProposalStatus(proposal!);
-  const vetoPercentage = proposal?.vetoTally
-    ? Number(
-        (BigInt(100) * proposal.vetoTally) / ((pastSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(1000000))
-      )
-    : 0;
+  const vetoPercentage =
+    proposal?.vetoTally && pastSupply && proposal.parameters.minVetoRatio
+      ? Number(
+          (BigInt(100) * proposal.vetoTally) /
+            ((pastSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(1000000))
+        )
+      : 0;
 
   // TODO: This is not revelant anymore
   const proposalStage: ITransformedStage[] = [

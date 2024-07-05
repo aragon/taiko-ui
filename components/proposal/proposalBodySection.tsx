@@ -12,7 +12,7 @@ export const BodySection: React.FC<IBodySectionProps> = (props) => {
 
   return (
     <CardCollapsible
-      buttonLabelClosed="Read full PIP"
+      buttonLabelClosed="Expend description"
       buttonLabelOpened="Read less"
       collapsedSize="md"
       className="w-full shadow-neutral"
