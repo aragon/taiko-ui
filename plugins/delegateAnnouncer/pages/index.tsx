@@ -10,6 +10,8 @@ import { DelegateMemberList } from "../components/DelegateMemberList";
 // import { councilMemberList, delegatesList } from "../services/members/query-options";
 import { useMetadata } from "@/hooks/useMetadata";
 import { type IAnnouncementMetadata } from "@/plugins/delegateAnnouncer/utils/types";
+import { AddressText } from "@/components/text/address";
+import { PUB_TOKEN_ADDRESS } from "@/constants";
 
 const DEFAULT_PAGE_SIZE = 12;
 const DELEGATION_DESCRIPTION =
@@ -21,6 +23,11 @@ export default function MembersList() {
   const [showProfileCreationDialog, setShowProfileCreationDialog] = useState(false);
 
   const { address, isConnected } = useAccount();
+
+  const [toggleValue, setToggleValue] = useState<string>("all");
+  const onToggleChange = (value: string | undefined) => {
+    if (value) setToggleValue(value);
+  };
 
   // const { data: announcementData } = useAnnouncement(address);
   const { data: announcement } = useMetadata<IAnnouncementMetadata>(""); // announcementData?.[0]);
@@ -51,6 +58,11 @@ export default function MembersList() {
         <div className="flex flex-1 flex-col gap-y-6">
           <div className="flex items-center justify-between">
             <Heading size="h1">Members</Heading>
+
+            <ToggleGroup isMultiSelect={false} onChange={onToggleChange} value={toggleValue}>
+              <Toggle value="all" label="All delegates" />
+              <Toggle value="verified" label="Verified delegates" />
+            </ToggleGroup>
           </div>
           <DelegateMemberList onAnnounceDelegation={() => setShowProfileCreationDialog(true)} />
         </div>
@@ -60,17 +72,19 @@ export default function MembersList() {
             <p className="text-neutral-500">{DELEGATION_DESCRIPTION}</p>
           </div>
           <dl className="divide-y divide-neutral-100">
-            {/* <div className="flex flex-col items-baseline gap-y-2 py-3 md:gap-x-6 md:py-4">
-              <dt className="line-clamp-1 shrink-0 text-lg leading-tight text-neutral-800 md:line-clamp-6 md:w-40">
-                Security council
-              </dt>
-              <dd className="size-full text-base leading-tight text-neutral-500">{`${councilMemberListData?.length} Multisig members`}</dd>
-            </div> */}
             <div className="flex flex-col items-baseline gap-y-2 py-3 md:gap-x-6 md:py-4">
               <dt className="line-clamp-1 shrink-0 text-lg leading-tight text-neutral-800 md:line-clamp-6 md:w-40">
                 Delegates
               </dt>
               <dd className="size-full text-base leading-tight text-neutral-500">{TEMP_DELEGATE_COUNT} delegates</dd>
+            </div>
+            <div className="flex flex-col items-baseline gap-y-2 py-3 md:gap-x-6 md:py-4">
+              <dt className="line-clamp-1 shrink-0 text-lg leading-tight text-neutral-800 md:line-clamp-6 md:w-40">
+                Token contract
+              </dt>
+              <dd className="size-full text-base leading-tight text-neutral-500">
+                <AddressText>{PUB_TOKEN_ADDRESS}</AddressText>
+              </dd>
             </div>
           </dl>
           <Button onClick={() => setShowProfileCreationDialog(true)} disabled={!isConnected}>

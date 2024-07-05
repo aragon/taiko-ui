@@ -17,7 +17,7 @@ export const DelegateAnnouncerAbi = [
       {
         indexed: false,
         internalType: "bytes",
-        name: "message",
+        name: "contentUri",
         type: "bytes",
       },
     ],
@@ -33,7 +33,7 @@ export const DelegateAnnouncerAbi = [
       },
       {
         internalType: "bytes",
-        name: "message",
+        name: "contentUri",
         type: "bytes",
       },
     ],

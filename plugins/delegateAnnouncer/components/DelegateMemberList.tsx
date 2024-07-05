@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 // import { useDelegate } from "@/plugins/erc20Votes/hooks/useDelegate";
 // import { isAddressEqual } from "@/utils/evm";
 import { generateDataListState } from "@/utils/query";
-import { DataList, IconType, MemberDataListItem, type DataListState } from "@aragon/ods";
+import { Button, DataList, IconType, IllustrationHuman, MemberDataListItem, type DataListState } from "@aragon/ods";
 // import { useInfiniteQuery } from "@tanstack/react-query";
 // import { useAccount } from "wagmi";
 // import { delegatesList } from "../../../services/members/query-options";
 import { MemberListItem } from "./MemberListItem";
 import { equalAddresses } from "@/utils/evm";
 import { useRouter } from "next/router";
+import Link from "next/link";
 // import { generateSortOptions, sortItems } from "./utils";
 
 const DEFAULT_PAGE_SIZE = 12;
@@ -21,8 +22,8 @@ interface IDelegateMemberListProps {
 }
 
 const TEMP_LIST = [
-  { votingPower: 1.55, isDelegate: false, address: "0x1234123412341234123412341234412341234333" },
-  { votingPower: 2.45, isDelegate: true, address: "0x1234123412341234123412341234412341234333" },
+  { votingPower: 1.55, isDelegate: false, address: "0x2234123412341234123412341234412341234333" },
+  { votingPower: 2.45, isDelegate: true, address: "0x3134123412341234123412341234412341234333" },
   { votingPower: 7.55, isDelegate: false, address: "0x1234123412341234123412341234412341234333" },
   { votingPower: 3.55, isDelegate: false, address: "0x2341234123412341234123412344123412343331" },
   { votingPower: 1.55, isDelegate: false, address: "0x3412341234123412341234123441234123433311" },
@@ -75,25 +76,24 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ onAnnou
   //       setDataListState("loading");
   //     }
   //   }, [debouncedQuery, activeSort]);
-  //   const resetFilters = () => {
-  //     setSearchValue("");
-  //     setDebouncedQuery("");
-  //     setActiveSort("");
-  //   };
+  const resetFilters = () => {
+    setSearchValue("");
+    // setDebouncedQuery("");
+    // setActiveSort("");
+  };
   // const totalMembers = delegatesQueryData?.pagination?.total;
   const totalMembers = 27; // REMOVE
-  // const entityLabel = totalMembers === 1 ? "Delegate" : "Delegates";
   const entityLabel = "Delegates";
   const showPagination = (totalMembers ?? 0) > DEFAULT_PAGE_SIZE;
-  //   const emptyFilteredState = {
-  //     heading: "No delegates found",
-  //     description: "Your applied filters are not matching with any results. Reset and search with other filters!",
-  //     secondaryButton: {
-  //       label: "Reset all filters",
-  //       iconLeft: IconType.RELOAD,
-  //       onclick: () => resetFilters(),
-  //     },
-  //   };
+  const emptyFilteredState = {
+    heading: "No delegates found",
+    description: "Your applied filters are not matching with any results. Reset and search with other filters!",
+    secondaryButton: {
+      label: "Reset all filters",
+      iconLeft: IconType.RELOAD,
+      onclick: () => resetFilters(),
+    },
+  };
   //   const emptyState = {
   //     heading: "No delegates found",
   //     description: "Create your delegate profile",
@@ -111,6 +111,13 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ onAnnou
   //       onClick: () => refetch(),
   //     },
   //   };
+
+  const items = TEMP_LIST;
+
+  if (!items?.length) {
+    return <NoDelegatesView />;
+  }
+
   return (
     <DataList.Root
       entityLabel={entityLabel}
@@ -131,7 +138,7 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ onAnnou
         // SkeletonElement={MemberDataListItem.Skeleton}
         // errorState={errorState}
         // emptyState={emptyState}
-        // emptyFilteredState={emptyFilteredState}
+        emptyFilteredState={emptyFilteredState}
         className="grid grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))] gap-3"
       >
         {TEMP_LIST.map((delegate) => (
@@ -148,3 +155,15 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ onAnnou
     </DataList.Root>
   );
 };
+
+function NoDelegatesView() {
+  return (
+    <div className="w-full">
+      <p className="text-md text-neutral-400">
+        No delegates have posted an announcement yet. Here you will see the addresses of members who have posted their
+        candidacy. Be the first to post an announcement.
+      </p>
+      <IllustrationHuman className="mx-auto mb-10 max-w-72" body="VOTING" expression="CASUAL" hairs="CURLY" />
+    </div>
+  );
+}

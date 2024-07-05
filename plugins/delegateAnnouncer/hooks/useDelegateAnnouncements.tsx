@@ -26,7 +26,7 @@ export function useDelegateAnnouncements(publicClient: PublicClient, delegationC
           logIndex: log.logIndex,
           dao: log.args.dao ?? "0x",
           delegate: log.args.delegate ?? "0x",
-          message: fromHex(log.args.message ?? "0x", "string"),
+          contentUri: fromHex(log.args.contentUri ?? "0x", "string"),
         }));
         setDelegateAnnouncements(announcements);
       })

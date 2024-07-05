@@ -45,7 +45,7 @@ export const plugins: PluginItem[] = [
   {
     id: "members",
     folderName: "delegateAnnouncer",
-    title: "Taiko Delegates",
+    title: "Delegates",
     icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_DELEGATION_WALL_CONTRACT_ADDRESS,
   },
