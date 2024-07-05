@@ -4,6 +4,12 @@ export const isAddress = (maybeAddress: any) => {
   return true;
 };
 
+export function equalAddresses(value1?: string, value2?: string): boolean {
+  if (!value1 || !value2) return false;
+  else if (!isAddress(value1) || !isAddress(value2)) return false;
+  return value1.toLowerCase().trim() === value2.toLocaleLowerCase().trim();
+}
+
 export function formatHexString(address: string): string {
   if (!address || address.length < 12) {
     return address || "";

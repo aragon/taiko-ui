@@ -77,6 +77,11 @@ export interface IVote {
   variant: IVotesDataListVariant;
 }
 
+export interface IResource {
+  name: string;
+  link: string;
+}
+
 export interface ITransformedStage<TType extends ProposalType = ProposalType> {
   id: string;
   type: ProposalStages;

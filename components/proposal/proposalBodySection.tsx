@@ -19,7 +19,7 @@ export const BodySection: React.FC<IBodySectionProps> = (props) => {
     >
       <div className="flex flex-col gap-y-4">
         <Heading size="h2">Proposal description</Heading>
-        <hr className="rounded-full border-neutral-100" />
+        <hr className="border-neutral-100" />
         <DocumentParser document={body} className={proseClasses} />
       </div>
     </CardCollapsible>
