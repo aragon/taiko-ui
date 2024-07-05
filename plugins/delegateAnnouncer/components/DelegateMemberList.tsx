@@ -11,7 +11,6 @@ import { Button, DataList, IconType, IllustrationHuman, MemberDataListItem, type
 import { MemberListItem } from "./MemberListItem";
 import { equalAddresses } from "@/utils/evm";
 import { useRouter } from "next/router";
-import Link from "next/link";
 // import { generateSortOptions, sortItems } from "./utils";
 
 const DEFAULT_PAGE_SIZE = 12;
@@ -94,23 +93,6 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ onAnnou
       onclick: () => resetFilters(),
     },
   };
-  //   const emptyState = {
-  //     heading: "No delegates found",
-  //     description: "Create your delegate profile",
-  //     primaryButton: {
-  //       label: "Announce delegation",
-  //       onClick: onAnnounceDelegation,
-  //     },
-  //   };
-  //   const errorState = {
-  //     heading: "Error loading delegates",
-  //     description: "There was an error loading the delegates. Please try again!",
-  //     secondaryButton: {
-  //       label: "Reload delegates",
-  //       iconLeft: IconType.RELOAD,
-  //       onClick: () => refetch(),
-  //     },
-  //   };
 
   const items = TEMP_LIST;
 
