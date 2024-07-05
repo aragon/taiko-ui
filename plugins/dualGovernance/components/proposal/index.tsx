@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { useProposalVeto } from "@/plugins/dualGovernance/hooks/useProposalVeto";
-import { Card, ProposalStatus, Tag, TagVariant } from "@aragon/ods";
+import { Card } from "@aragon/ods";
 import { ProposalDataListItem } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
 import { useAccount } from "wagmi";
-import { useReadContract } from "wagmi";
-import { parseAbi } from "viem";
-import { PUB_TOKEN_ADDRESS } from "@/constants";
+import { formatEther } from "viem";
+import { usePastSupply } from "../../hooks/usePastSupply";
+import { useVotingToken } from "../../hooks/useVotingToken";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_METADATA_SUMMARY = "(The metadata of the proposal is not available)";
@@ -16,20 +16,13 @@ type ProposalInputs = {
   proposalIndex: number;
 };
 
-const erc20Votes = parseAbi(["function getPastTotalSupply(uint256 blockNumber) view returns (uint256)"]);
-
 export default function ProposalCard(props: ProposalInputs) {
   const { address } = useAccount();
   const { proposal, proposalFetchStatus, vetoes } = useProposalVeto(props.proposalIndex);
-  const { data: pastSupply } = useReadContract({
-    address: PUB_TOKEN_ADDRESS,
-    abi: erc20Votes,
-    functionName: "getPastTotalSupply",
-    args: [proposal?.parameters.snapshotTimestamp || BigInt(0)],
-  });
+  const pastSupply = usePastSupply(proposal);
+  const { symbol: tokenSymbol } = useVotingToken();
 
   const proposalVariant = useProposalStatus(proposal!);
-
   const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
 
   const hasVetoed = vetoes?.some((veto) => veto.voter === address);
@@ -70,16 +63,23 @@ export default function ProposalCard(props: ProposalInputs) {
     );
   }
 
+  const vetoPercentage = proposal?.vetoTally
+    ? Number(
+        (BigInt(100) * proposal.vetoTally) / ((pastSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(1000000))
+      )
+    : 0;
+
   return (
     <Link href={`#/proposals/${props.proposalIndex}`} className="mb-4 w-full cursor-pointer">
       <ProposalDataListItem.Structure
-        {...proposal}
         id=""
+        title={proposal.title}
+        summary={proposal.summary}
         voted={hasVetoed}
         result={{
           option: "Veto",
-          voteAmount: proposal.vetoTally.toString(),
-          votePercentage: pastSupply ? Number((proposal?.vetoTally * BigInt(100)) / pastSupply) : 0,
+          voteAmount: formatEther(proposal.vetoTally) + " " + (tokenSymbol || "TKO"),
+          votePercentage: vetoPercentage,
         }}
         publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
         status={proposalVariant!}

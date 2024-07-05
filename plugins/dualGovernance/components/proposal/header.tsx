@@ -3,11 +3,7 @@ import { Publisher } from "@/components/publisher";
 import classNames from "classnames";
 import { ReactNode } from "react";
 import { OptimisticProposal } from "@/plugins/dualGovernance/utils/types";
-import { AlertVariant } from "@aragon/ods";
-import { ElseIf, If, Then, Else } from "@/components/if";
-import { AddressText } from "@/components/text/address";
-import { useProposalStatus, useProposalVariantStatus } from "@/plugins/dualGovernance/hooks/useProposalVariantStatus";
-import { PleaseWaitSpinner } from "@/components/please-wait";
+import { useProposalStatus } from "@/plugins/dualGovernance/hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
 
 import { getSimpleRelativeTimeFromDate } from "@/utils/dates";

@@ -63,9 +63,11 @@ export interface IBreakdownMajorityVotingResult {
 }
 
 export interface IVotingStageDetails {
-  censusBlock: number;
+  censusBlock?: number;
+  censusTimestamp?: number;
   startDate: string;
   endDate: string;
+  tokenAddress?: Address;
   strategy: string;
   options: string;
 }

@@ -38,15 +38,24 @@ export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
             </Button>
           )}
         </div>
-        <p className="text-base leading-normal text-neutral-500 md:text-lg">
-          When the proposal passes the community vote, the following actions will be executable on the DAO.
-        </p>
+        <If condition={actions?.length}>
+          <Then>
+            <p className="text-base leading-normal text-neutral-500 md:text-lg">
+              When the proposal passes the community vote, the following actions will be executable on the DAO.
+            </p>
+          </Then>
+          <Else>
+            <p className="text-base leading-normal text-neutral-500 md:text-lg">This is a signaling proposal.</p>
+          </Else>
+        </If>
       </div>
 
       {/* Content */}
-      <AccordionContainer isMulti={true} className="border-t border-t-neutral-100">
-        {actions?.map((action, index) => <ActionItem key={index} index={index} rawAction={action} />)}
-      </AccordionContainer>
+      <If condition={actions?.length}>
+        <AccordionContainer isMulti={true} className="border-t border-t-neutral-100">
+          {actions?.map((action, index) => <ActionItem key={index} index={index} rawAction={action} />)}
+        </AccordionContainer>
+      </If>
     </div>
   );
 };

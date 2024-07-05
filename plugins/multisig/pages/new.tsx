@@ -71,9 +71,7 @@ export default function Create() {
       type: "success",
       txHash: createTxHash,
     });
-    setTimeout(() => {
-      push("#/");
-    }, 1000 * 2);
+    setTimeout(() => push("#/"), 1000 * 2);
   }, [status, createTxHash, isConfirming, isConfirmed]);
 
   const submitProposal = async () => {

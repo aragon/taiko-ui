@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { MultisigPluginAbi } from "../artifacts/MultisigPlugin";
 
-export function useUserCanApprove(proposalId: bigint) {
+export function useUserCanApprove(proposalId: string | bigint | number) {
   const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber({ watch: true });
 
@@ -12,7 +12,7 @@ export function useUserCanApprove(proposalId: bigint) {
     address: PUB_MULTISIG_PLUGIN_ADDRESS,
     abi: MultisigPluginAbi,
     functionName: "canApprove",
-    args: [proposalId, address!],
+    args: [BigInt(proposalId), address!],
     query: {
       enabled: !!address,
     },

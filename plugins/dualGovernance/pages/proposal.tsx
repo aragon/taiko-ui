@@ -12,24 +12,33 @@ import { useProposalStatus } from "../hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
 import { ProposalAction } from "@/components/proposalAction/proposalAction";
 import { CardResources } from "@/components/proposal/cardResources";
+import { formatEther } from "viem";
+import { useVotingToken } from "../hooks/useVotingToken";
+import { usePastSupply } from "../hooks/usePastSupply";
 
 export default function ProposalDetail({ index: proposalId }: { index: number }) {
   const router = useRouter();
-
   const {
     proposal,
     proposalFetchStatus,
     canVeto,
     vetoes,
-    isConfirming: isConfirmingApproval,
+    isConfirming: isConfirmingVeto,
     vetoProposal,
   } = useProposalVeto(proposalId);
+  const pastSupply = usePastSupply(proposal);
+  const { symbol: tokenSymbol } = useVotingToken();
 
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(BigInt(proposalId));
-  const breadcrumbs = generateBreadcrumbs(router.asPath);
+  const breadcrumbs = generateBreadcrumbs(router.asPath, "Proposal");
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalVariant = useProposalStatus(proposal!);
+  const vetoPercentage = proposal?.vetoTally
+    ? Number(
+        (BigInt(100) * proposal.vetoTally) / ((pastSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(1000000))
+      )
+    : 0;
 
   // TODO: This is not revelant anymore
   const proposalStage: ITransformedStage[] = [
@@ -56,26 +65,26 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
               }
             : {
                 disabled: !canVeto,
-                isLoading: isConfirmingApproval,
+                isLoading: isConfirmingVeto,
                 label: "Veto",
                 onClick: vetoProposal,
               },
         votingScores: [
           {
             option: "Veto",
-            voteAmount: proposal?.vetoTally.toString() || "0",
-            votePercentage: 0,
-            tokenSymbol: "TKO",
+            voteAmount: formatEther(proposal?.vetoTally || BigInt(0)),
+            votePercentage: vetoPercentage,
+            tokenSymbol: tokenSymbol || "TKO",
           },
         ],
         proposalId: proposalId.toString(),
       },
       details: {
-        censusBlock: 0,
+        censusTimestamp: Number(proposal?.parameters.snapshotTimestamp || 0) || 0,
         startDate: dayjs(Number(proposal?.parameters.vetoStartDate) * 1000).toString(),
         endDate: dayjs(Number(proposal?.parameters.vetoEndDate) * 1000).toString(),
         strategy: "Optimistic voting",
-        options: "approve",
+        options: "Veto",
       },
       votes: vetoes.map(({ voter }) => ({ address: voter, variant: "no" }) as IVote),
     },
@@ -94,7 +103,7 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
       <ProposalHeader
         proposal={proposal}
         breadcrumbs={breadcrumbs}
-        transactionConfirming={isConfirmingApproval || isConfirmingExecution}
+        transactionConfirming={isConfirmingVeto || isConfirmingExecution}
         canExecute={canExecute}
         onExecutePressed={() => executeProposal()}
       />

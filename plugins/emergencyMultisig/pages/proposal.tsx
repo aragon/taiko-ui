@@ -32,7 +32,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   } = useProposalApprove(proposalId);
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
   const { publicKey, requestSignature } = useDerivedWallet();
-  const breadcrumbs = generateBreadcrumbs(router.asPath);
+  const breadcrumbs = generateBreadcrumbs(router.asPath, "Proposal");
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalVariant = useProposalStatus(proposal!);
@@ -72,8 +72,8 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         censusBlock: Number(proposal?.parameters.snapshotBlock),
         startDate: "",
         endDate: dayjs(Number(proposal?.parameters.expirationDate) * 1000).toString(),
-        strategy: "approvalThreshold",
-        options: "approve",
+        strategy: "Approval threshold",
+        options: "Approve",
       },
       votes: approvals.map(({ approver }) => ({ address: approver, variant: "approve" }) as IVote),
     },
