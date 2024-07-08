@@ -22,6 +22,13 @@ export const DelegateProfile = ({ address }: { address: Address }) => {
   // const { data: announcementData } = useAnnouncement(profileAddress);
   // const { data: announcement } = useMetadata<IAnnouncementMetadata>(announcementData?.[0]);
 
+  const announcement = {
+    name: "NAME",
+    bio: "Hi, I want to be a delegate",
+    message: "Delegate everything to me. It's going to be the best choice, ever",
+    resources: [],
+  };
+
   return (
     <div className="flex flex-col items-center">
       <HeaderMember address={address} name={announcement?.name || address} bio={announcement?.bio} />

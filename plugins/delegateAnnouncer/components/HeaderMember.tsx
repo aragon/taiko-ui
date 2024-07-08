@@ -40,8 +40,8 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
   const { address: address, bio, name } = props;
   const breadcrumbs: IBreadcrumbsLink[] = [
     {
-      label: "Delegate",
-      href: "#/delegates",
+      label: "Delegates",
+      href: "#/",
     },
     {
       label: props.address,
@@ -135,18 +135,6 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
   //   });
   // }
 
-  // const getTagLabel = () => {
-  //   if (!isTokenVoting) {
-  //     return "Council member";
-  //   } else if (memberIsConnectedAccount) {
-  //     return "You";
-  //   } else if (memberIsconnectedAccountDelegate) {
-  //     return "Your delegate";
-  //   } else {
-  //     return "Delegate";
-  //   }
-  // };
-
   // const getCtaLabel = () => {
   //   if (!isConnected) {
   //     return "Connect to delegate";
@@ -159,16 +147,22 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
   //   }
   // };
 
-  // const handleCtaClick = () => {
-  //   if (memberIsconnectedAccountDelegate || connectedMemberDelegationInactive) {
-  //     delegateVotingPower(connectedAccount);
-  //   } else {
-  //     delegateVotingPower(address);
-  //   }
-  // };
+  const handleCtaClick = () => {
+    //   if (memberIsconnectedAccountDelegate || connectedMemberDelegationInactive) {
+    //     delegateVotingPower(connectedAccount);
+    //   } else {
+    //     delegateVotingPower(address);
+    //   }
+  };
 
   // const isNeitherCouncilNorDelegate = isTokenVoting && !hasDelegationProfile;
   // const showTag = !isNeitherCouncilNorDelegate;
+
+  const hasDelegationProfile = false;
+  const isConfirming = false;
+  const connectedMemberIsSelfDelegated = false;
+  const votingPower = "22341234.1234";
+  const tokenBalance = "12341234.1234";
 
   return (
     <div className="flex w-full justify-center bg-gradient-to-b from-neutral-0 to-transparent">
@@ -226,7 +220,8 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
                   onClick={handleCtaClick}
                   disabled={connectedMemberIsSelfDelegated || !isConnected}
                 >
-                  {getCtaLabel()}
+                  {/* {getCtaLabel()} */}
+                  TODO: CTA LABEL
                 </Button>
               )}
               <Dropdown.Container

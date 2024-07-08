@@ -32,7 +32,7 @@ export const Navbar: React.FC = () => {
               <Link
                 href="/"
                 className={classNames(
-                  "ml-10 flex items-center gap-x-5 rounded-full py-3 pb-5 md:rounded-lg",
+                  "flex items-center gap-x-5 rounded-full py-3 pb-5 md:rounded-lg lg:ml-10",
                   "outline-none focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset" // focus styles
                 )}
               >
@@ -63,7 +63,7 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Tab wrapper */}
-          <ul className="hidden gap-x-10 md:flex lg:pl-14">
+          <ul className="hidden gap-x-10 md:flex lg:pl-10">
             {navLinks.map(({ id, name, path }) => (
               <NavLink name={name} path={path} id={id} key={id} />
             ))}

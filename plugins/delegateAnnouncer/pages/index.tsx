@@ -12,6 +12,8 @@ import { useMetadata } from "@/hooks/useMetadata";
 import { type IAnnouncementMetadata } from "@/plugins/delegateAnnouncer/utils/types";
 import { AddressText } from "@/components/text/address";
 import { PUB_TOKEN_ADDRESS } from "@/constants";
+import { Else, ElseIf, If, Then } from "@/components/if";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 const DEFAULT_PAGE_SIZE = 12;
 const DELEGATION_DESCRIPTION =
@@ -20,9 +22,10 @@ const DELEGATION_DESCRIPTION =
 const TEMP_DELEGATE_COUNT = 15;
 
 export default function MembersList() {
+  const { open } = useWeb3Modal();
   const [showProfileCreationDialog, setShowProfileCreationDialog] = useState(false);
 
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
 
   const [toggleValue, setToggleValue] = useState<string>("all");
   const onToggleChange = (value: string | undefined) => {
@@ -41,16 +44,6 @@ export default function MembersList() {
   //     limit: DEFAULT_PAGE_SIZE,
   //   }),
   // });
-
-  const getButtonLabel = () => {
-    if (!isConnected) {
-      return "Connect to create delegation profile";
-    } else if (announcement) {
-      return "Update delegation profile";
-    } else {
-      return "Create delegation profile";
-    }
-  };
 
   return (
     <MainSection className="md:px-16 md:pb-20 xl:pt-12">
@@ -87,9 +80,17 @@ export default function MembersList() {
               </dd>
             </div>
           </dl>
-          <Button onClick={() => setShowProfileCreationDialog(true)} disabled={!isConnected}>
-            {getButtonLabel()}
-          </Button>
+          <If condition={!isConnected}>
+            <Then>
+              <Button onClick={() => open()}>Connect to create your profile</Button>
+            </Then>
+            <ElseIf condition={announcement}>
+              <Button onClick={() => setShowProfileCreationDialog(true)}>Update delegation profile</Button>
+            </ElseIf>
+            <Else>
+              <Button onClick={() => setShowProfileCreationDialog(true)}>Create delegation profile</Button>
+            </Else>
+          </If>
           <DelegateAnnouncementDialog
             onClose={() => setShowProfileCreationDialog(false)}
             open={showProfileCreationDialog}

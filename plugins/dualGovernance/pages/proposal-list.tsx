@@ -12,6 +12,7 @@ import {
 import { Else, If, Then } from "@/components/if";
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisticTokenVotingPlugin.sol";
+import { MainSection } from "@/components/layout/main-section";
 
 const DEFAULT_PAGE_SIZE = 6;
 
@@ -77,10 +78,8 @@ export default function Proposals() {
   };
 
   return (
-    <MainSection>
-      <SectionView>
-        <h1 className="justify-self-start align-middle text-3xl font-semibold">Proposals</h1>
-      </SectionView>
+    <MainSection className="flex flex-col gap-y-6 md:px-16 md:py-10">
+      <h1 className="justify-self-start align-middle text-3xl font-semibold">Proposals</h1>
       <If condition={proposalCount}>
         <Then>
           <DataList.Root
@@ -118,16 +117,4 @@ export default function Proposals() {
       </If>
     </MainSection>
   );
-}
-
-function MainSection({ children }: { children: ReactNode }) {
-  return (
-    <main className="flex w-full flex-col items-center px-4 py-6 md:w-4/5 md:p-6 lg:w-2/3 xl:py-10 2xl:w-3/5">
-      {children}
-    </main>
-  );
-}
-
-function SectionView({ children }: { children: ReactNode }) {
-  return <div className="mb-6 flex w-full flex-row content-center justify-between">{children}</div>;
 }
