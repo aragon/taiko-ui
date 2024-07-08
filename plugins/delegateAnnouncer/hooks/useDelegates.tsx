@@ -1,6 +1,6 @@
 import { useReadContract } from "wagmi";
 import { DelegateAnnouncerAbi } from "@/plugins/delegateAnnouncer/artifacts/DelegateAnnouncer.sol";
-import { PUB_CHAIN, PUB_DAO_ADDRESS } from "@/constants";
+import { PUB_CHAIN, PUB_DELEGATION_WALL_CONTRACT_ADDRESS } from "@/constants";
 
 /** Returns the list of delegates who posted a candidacy */
 export function useDelegates() {
@@ -10,7 +10,7 @@ export function useDelegates() {
     refetch,
   } = useReadContract({
     chainId: PUB_CHAIN.id,
-    address: PUB_DAO_ADDRESS,
+    address: PUB_DELEGATION_WALL_CONTRACT_ADDRESS,
     abi: DelegateAnnouncerAbi,
     functionName: "getCandidateAddresses",
   });

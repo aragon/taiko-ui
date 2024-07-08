@@ -4,7 +4,7 @@ import { type Address } from "viem";
 import { useReadContract } from "wagmi";
 
 /** Returns the delegate (if any) for the given address */
-export const useDelegate = (address?: Address, options = {}) => {
+export const useDelegate = (address?: Address) => {
   const {
     data: delegate,
     isLoading,
@@ -14,7 +14,7 @@ export const useDelegate = (address?: Address, options = {}) => {
     abi: iVotesAbi,
     functionName: "delegates",
     args: [address!],
-    query: { enabled: !!address, ...options },
+    query: { enabled: !!address },
   });
 
   return {

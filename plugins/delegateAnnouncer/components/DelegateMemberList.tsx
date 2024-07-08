@@ -11,14 +11,6 @@ import { useAccount } from "wagmi";
 
 const DEFAULT_PAGE_SIZE = 12;
 
-const TEST_LIST = [
-  "0x2234123412341234123412341234412341234333",
-  "0x3134123412341234123412341234412341234333",
-  "0x1234123412341234123412341234412341234333",
-  "0x2341234123412341234123412344123412343331",
-  "0x3412341234123412341234123441234123433311",
-];
-
 interface IDelegateMemberListProps {
   onAnnounceDelegation: () => void;
 }
@@ -53,7 +45,7 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ onAnnou
 
   return (
     <DataList.Root
-      entityLabel="Delegates"
+      entityLabel={totalMembers === 1 ? "delegate" : "delegates"}
       itemsCount={totalMembers}
       // pageSize={DEFAULT_PAGE_SIZE}
       // state={dataListState}
@@ -74,7 +66,7 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ onAnnou
         emptyFilteredState={emptyFilteredState}
         className="grid grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))] gap-3"
       >
-        {((delegates && delegates) || TEST_LIST).map((delegate) => (
+        {(delegates || []).map((delegate) => (
           <MemberListItem
             isMyDelegate={equalAddresses(myDelegate, delegate)}
             key={delegate}

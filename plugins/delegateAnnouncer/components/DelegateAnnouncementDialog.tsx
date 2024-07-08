@@ -16,9 +16,9 @@ import {
   TextAreaRichText,
   type IDialogRootProps,
 } from "@aragon/ods";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/router";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { useAccount } from "wagmi";
 import { z } from "zod";
 
@@ -60,33 +60,28 @@ interface IDelegateAnnouncementDialogProps extends IDialogRootProps {
 
 export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogProps> = (props) => {
   const { onClose, ...otherProps } = props;
-
   const router = useRouter();
   const { address } = useAccount();
+  const {
+    control,
+    getValues,
+    setValue,
+    formState: { errors },
+    handleSubmit,
+    register,
+  } = useForm<z.infer<typeof MetadataSchema>>({
+    resolver: zodResolver(MetadataSchema),
+    mode: "onTouched",
+    defaultValues: { bio: "", message: "<p></p>", resources: [{ name: "", link: "" }] },
+  });
+  const { fields, append, remove } = useFieldArray({ name: DELEGATE_RESOURCES, control });
 
-  // const {
-  //   control,
-  //   getValues,
-  //   setValue,
-  //   formState: { errors },
-  //   handleSubmit,
-  //   register,
-  // } = useForm<z.infer<typeof MetadataSchema>>({
-  //   resolver: zodResolver(MetadataSchema),
-  //   mode: "onTouched",
-  //   defaultValues: { bio: "", message: "<p></p>", resources: [{ name: "", link: "" }] },
-  // });
-
-  // const { fields, append, remove } = useFieldArray({ name: DELEGATE_RESOURCES, control });
-
-  // const addProtocolToLink = (index: number) => {
-  //   const linkName = `${DELEGATE_RESOURCES}.${index}.link` as const;
-  //   const value = getValues(linkName) ?? "";
-
-  //   if (UrlRegex.test(value) && !EmailRegex.test(value) && !UrlWithProtocolRegex.test(value)) {
-  //     setValue(linkName, `http://${value}`);
-  //   }
-  // };
+  const onSuccessfulAnnouncement = () => {
+    setTimeout(() => {
+      router.push("#/delegates/" + address!);
+    }, 2000);
+  };
+  const { isConfirming, status, announceDelegation } = useAnnounceDelegation(onSuccessfulAnnouncement);
 
   const handleAnnouncement = async (values: z.infer<typeof MetadataSchema>) => {
     announceDelegation({
@@ -95,13 +90,14 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
     });
   };
 
-  const onSuccessfulAnnouncement = () => {
-    // setTimeout(() => {
-    //   router.push(MemberProfile.getPath(address!));
-    // }, 2000);
-  };
+  const addProtocolToLink = (index: number) => {
+    const linkKey = `${DELEGATE_RESOURCES}.${index}.link` as const;
+    const value = getValues(linkKey) ?? "";
 
-  const { isConfirming, status, announceDelegation } = useAnnounceDelegation(onSuccessfulAnnouncement);
+    if (UrlRegex.test(value) && !EmailRegex.test(value) && !UrlWithProtocolRegex.test(value)) {
+      setValue(linkKey, `http://${value}`);
+    }
+  };
 
   const ctaLabel = isConfirming
     ? "Creating profile"
@@ -116,21 +112,22 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
         <InputText
           label="Identifier"
           readOnly={isConfirming}
-          placeholder="Name, ENS name, Privado ID, etc."
-          // {...register("identifier")}
-          // {...(errors.identifier?.message
-          //   ? { alert: { variant: "critical", message: errors.identifier.message } }
-          //   : {})}
+          placeholder="Your name or alias"
+          maxLength={50}
+          {...register("identifier")}
+          {...(errors.identifier?.message
+            ? { alert: { variant: "critical", message: errors.identifier.message } }
+            : {})}
         />
         <TextArea
-          placeholder="Brief description of who you are and your relevant experiences"
+          placeholder="Brief description about you and your relevant experiences"
           label="Bio"
-          // {...register("bio")}
+          {...register("bio")}
           maxLength={400}
           readOnly={isConfirming}
-          // alert={errors.bio?.message ? { variant: "critical", message: errors.bio.message } : undefined}
+          alert={errors.bio?.message ? { variant: "critical", message: errors.bio.message } : undefined}
         />
-        {/* <Controller
+        <Controller
           name="message"
           control={control}
           render={({ field }) => (
@@ -143,7 +140,7 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
               alert={errors.message?.message ? { variant: "critical", message: errors.message.message } : undefined}
             />
           )}
-        /> */}
+        />
 
         <div className="flex flex-col gap-y-2 md:gap-y-3">
           <div className="flex flex-col gap-0.5 md:gap-1">
@@ -155,7 +152,6 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
               Share external resources here
             </p>
           </div>
-          {/* 
           {fields.length > 0 && (
             <div className="flex flex-col gap-y-4 rounded-xl border border-neutral-100 bg-neutral-0 px-3 py-1 md:px-4 md:py-2">
               {fields.map((field, index) => {
@@ -165,7 +161,7 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
                   <div key={field.id} className="flex flex-col gap-y-3 py-3 md:py-4">
                     <div className="flex items-end gap-x-3">
                       <InputText
-                        label="Name / Description"
+                        label="Description"
                         readOnly={isConfirming}
                         placeholder="GitHub, Twitter, etc."
                         {...register(`${DELEGATE_RESOURCES}.${index}.name` as const)}
@@ -201,14 +197,14 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
                 );
               })}
             </div>
-          )} */}
+          )}
           <span className="mt-1">
             <Button
               variant="tertiary"
               size="lg"
               iconLeft={IconType.PLUS}
               onClick={() => {
-                // append({ link: "", name: "" });
+                append({ link: "", name: "" });
               }}
             >
               Add resource
@@ -220,7 +216,7 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
             variant="primary"
             size="lg"
             isLoading={isConfirming || status === "pending"}
-            // onClick={handleSubmit(handleAnnouncement)}
+            onClick={handleSubmit(handleAnnouncement)}
           >
             {ctaLabel}
           </Button>

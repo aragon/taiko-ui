@@ -1,49 +1,32 @@
 import { MainSection } from "@/components/layout/main-section";
-// import { useAnnouncement } from "@/plugins/delegateAnnouncer/hooks/useAnnouncement";
 import { Button, Heading, Toggle, ToggleGroup } from "@aragon/ods";
-// import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { DelegateAnnouncementDialog } from "../components/DelegateAnnouncementDialog";
-// import { CouncilMemberList } from "../components/memberDataList/councilMemberList/councilMemberList";
 import { DelegateMemberList } from "../components/DelegateMemberList";
-// import { councilMemberList, delegatesList } from "../services/members/query-options";
-import { useMetadata } from "@/hooks/useMetadata";
-import { type IAnnouncementMetadata } from "@/plugins/delegateAnnouncer/utils/types";
 import { AddressText } from "@/components/text/address";
 import { PUB_TOKEN_ADDRESS } from "@/constants";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useDelegates } from "../hooks/useDelegates";
+import { useDelegateAnnounce } from "../hooks/useDelegateAnnounce";
 
-const DEFAULT_PAGE_SIZE = 12;
 const DELEGATION_DESCRIPTION =
   "Proposals submitted to the community can be vetoed by token holders. Additionally, token holders can opt to delegate their voting power to delegates.";
-
-const TEMP_DELEGATE_COUNT = 15;
 
 export default function MembersList() {
   const { open } = useWeb3Modal();
   const [showProfileCreationDialog, setShowProfileCreationDialog] = useState(false);
-
-  const { isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
+  const { delegates } = useDelegates();
+  const delegateCount = delegates?.length || 0;
 
   const [toggleValue, setToggleValue] = useState<string>("all");
   const onToggleChange = (value: string | undefined) => {
     if (value) setToggleValue(value);
   };
 
-  // const { data: announcementData } = useAnnouncement(address);
-  const { data: announcement } = useMetadata<IAnnouncementMetadata>(""); // announcementData?.[0]);
-
-  // const { data: councilMemberListData } = useQuery({
-  //   ...councilMemberList(),
-  // });
-
-  // const { data: delegatesListData } = useInfiniteQuery({
-  //   ...delegatesList({
-  //     limit: DEFAULT_PAGE_SIZE,
-  //   }),
-  // });
+  const { announce } = useDelegateAnnounce(address);
 
   return (
     <MainSection className="md:px-16 md:pb-20 xl:pt-12">
@@ -69,7 +52,9 @@ export default function MembersList() {
               <dt className="line-clamp-1 shrink-0 text-lg leading-tight text-neutral-800 md:line-clamp-6 md:w-40">
                 Delegates
               </dt>
-              <dd className="size-full text-base leading-tight text-neutral-500">{TEMP_DELEGATE_COUNT} delegates</dd>
+              <dd className="size-full text-base leading-tight text-neutral-500">
+                {delegateCount === 1 ? "1 delegate" : `${delegateCount} delegates`} registered
+              </dd>
             </div>
             <div className="flex flex-col items-baseline gap-y-2 py-3 md:gap-x-6 md:py-4">
               <dt className="line-clamp-1 shrink-0 text-lg leading-tight text-neutral-800 md:line-clamp-6 md:w-40">
@@ -84,7 +69,7 @@ export default function MembersList() {
             <Then>
               <Button onClick={() => open()}>Connect to create your profile</Button>
             </Then>
-            <ElseIf condition={announcement}>
+            <ElseIf condition={announce}>
               <Button onClick={() => setShowProfileCreationDialog(true)}>Update delegation profile</Button>
             </ElseIf>
             <Else>
