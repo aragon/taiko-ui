@@ -5,30 +5,36 @@ import { equalAddresses } from "@/utils/evm";
 import { useRouter } from "next/router";
 import { useDelegates } from "../hooks/useDelegates";
 import { useGovernanceToken } from "../hooks/useGovernanceToken";
+import { Else, If, Then } from "@/components/if";
 import { useAccount } from "wagmi";
-// import { useDelegate } from "@/plugins/erc20Votes/hooks/useDelegate";
+import VerifiedDelegates from "../../../verified-delegates.json";
 // import { generateSortOptions, sortItems } from "./utils";
 
 const DEFAULT_PAGE_SIZE = 12;
 
 interface IDelegateMemberListProps {
+  verifiedOnly?: boolean;
   onAnnounceDelegation: () => void;
 }
 
-export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ onAnnounceDelegation }) => {
+export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifiedOnly, onAnnounceDelegation }) => {
   const { push } = useRouter();
   const { address } = useAccount();
   const [searchValue, setSearchValue] = useState<string>();
   //   const [activeSort, setActiveSort] = useState<string>();
-  const { delegates, status: loadingStatus } = useDelegates();
+  const { delegates: fetchedDelegates, status: loadingStatus } = useDelegates();
   const { delegatesTo, isLoading } = useGovernanceToken(address);
+  const delegates = (fetchedDelegates || []).filter((item) => {
+    if (!verifiedOnly) return true;
+    return VerifiedDelegates.findIndex((d) => equalAddresses(d.address, item)) >= 0;
+  });
 
+  const totalMembers = delegates?.length || 0;
+  const showPagination = (totalMembers ?? 0) > DEFAULT_PAGE_SIZE;
   const resetFilters = () => {
     setSearchValue("");
     // setActiveSort("");
   };
-  const totalMembers = delegates?.length || 0;
-  const showPagination = (totalMembers ?? 0) > DEFAULT_PAGE_SIZE;
   const emptyFilteredState = {
     heading: "No delegates found",
     description: "Your applied filters are not matching with any results. Reset and search with other filters!",
@@ -40,7 +46,7 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ onAnnou
   };
 
   if (!totalMembers) {
-    return <NoDelegatesView />;
+    return <NoDelegatesView verified={verifiedOnly} />;
   }
 
   return (
@@ -80,12 +86,20 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ onAnnou
   );
 };
 
-function NoDelegatesView() {
+function NoDelegatesView({ verified }: { verified?: boolean }) {
   return (
     <div className="w-full">
       <p className="text-md text-neutral-400">
-        No delegates have posted an announcement yet. Here you will see the addresses of members who have posted their
-        candidacy. Be the first to post an announcement.
+        <If condition={verified}>
+          <Then>
+            There are no verified candidates with a public an announcement yet. Here you will see the addresses of
+            members who have posted their candidacy. Be the first to post an announcement.
+          </Then>
+          <Else>
+            No candidates posted an announcement yet. Here you will see the addresses of members who have posted their
+            candidacy. Be the first to post an announcement.
+          </Else>
+        </If>
       </p>
       <IllustrationHuman className="mx-auto mb-10 max-w-72" body="VOTING" expression="CASUAL" hairs="CURLY" />
     </div>

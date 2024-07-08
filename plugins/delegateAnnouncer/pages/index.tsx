@@ -21,9 +21,9 @@ export default function MembersList() {
   const { delegates } = useDelegates();
   const delegateCount = delegates?.length || 0;
 
-  const [toggleValue, setToggleValue] = useState<string>("all");
+  const [toggleValue, setToggleValue] = useState<"all" | "verified">("all");
   const onToggleChange = (value: string | undefined) => {
-    if (value) setToggleValue(value);
+    if (value) setToggleValue(value as "all" | "verified");
   };
 
   const { announce } = useDelegateAnnounce(address);
@@ -40,7 +40,10 @@ export default function MembersList() {
               <Toggle value="verified" label="Verified delegates" />
             </ToggleGroup>
           </div>
-          <DelegateMemberList onAnnounceDelegation={() => setShowProfileCreationDialog(true)} />
+          <DelegateMemberList
+            verifiedOnly={toggleValue === "verified"}
+            onAnnounceDelegation={() => setShowProfileCreationDialog(true)}
+          />
         </div>
         <aside className="flex w-full flex-col gap-y-4 md:max-w-[320px] md:gap-y-6">
           <div className="flex flex-col gap-y-3">

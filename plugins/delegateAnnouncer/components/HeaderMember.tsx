@@ -17,6 +17,7 @@ import { useGovernanceToken } from "../hooks/useGovernanceToken";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useDelegateVotingPower } from "../hooks/useDelegateVotingPower";
+import VerifiedDelegates from "../../../verified-delegates.json";
 
 interface IHeaderMemberProps {
   name?: string;
@@ -34,11 +35,15 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
   const { delegatesTo } = useGovernanceToken(connectedAccount);
   const { delegateVotingPower, isLoading: isConfirming } = useDelegateVotingPower(memberAddress, refetch);
   const formattedAddress = formatHexString(memberAddress);
+  const isVerified = VerifiedDelegates.findIndex((d) => equalAddresses(d.address, memberAddress)) >= 0;
 
   return (
     <div className="flex w-full justify-center bg-gradient-to-b from-neutral-0 to-transparent">
       <div className="flex w-full max-w-screen-xl flex-col gap-y-6 px-4 py-6 md:px-16 md:py-10">
-        <Breadcrumbs links={breadcrumbs.map((v) => ({ ...v, label: formatHexString(v.label) }))} />
+        <Breadcrumbs
+          links={breadcrumbs.map((v) => ({ ...v, label: formatHexString(v.label) }))}
+          tag={isVerified ? { label: "Verified", variant: "success" } : { label: "Unverified" }}
+        />
 
         {/* Content Wrapper */}
         <div className="flex flex-col gap-y-4">
