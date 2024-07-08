@@ -157,7 +157,7 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
   // const isNeitherCouncilNorDelegate = isTokenVoting && !hasDelegationProfile;
   // const showTag = !isNeitherCouncilNorDelegate;
 
-  const hasDelegationProfile = false;
+  const hasDelegationProfile = true;
   const isConfirming = false;
   const connectedMemberIsSelfDelegated = false;
   const votingPower = "22341234.1234";
