@@ -3,13 +3,14 @@ import { ProfileAside } from "../components/ProfileAside";
 import { DelegationStatement } from "../components/DelegationStatement";
 import { HeaderMember } from "../components/HeaderMember";
 import { useDelegateAnnounce } from "../hooks/useDelegateAnnounce";
+import { formatHexString } from "@/utils/evm";
 
 export const DelegateProfile = ({ address }: { address: Address }) => {
   const { announce, isLoading } = useDelegateAnnounce(address);
 
   return (
     <div className="flex flex-col items-center">
-      <HeaderMember address={address} name={announce?.identifier || address} bio={announce?.bio} />
+      <HeaderMember address={address} name={announce?.identifier || formatHexString(address)} bio={announce?.bio} />
       <div className="flex w-full max-w-screen-xl flex-col gap-x-16 gap-y-12 px-4 py-6 md:flex-row md:px-16 md:pb-20">
         {/* Main section */}
         <div className="flex flex-col gap-y-12 md:w-[720px] md:gap-y-20">

@@ -2,14 +2,14 @@ import { iVotesAbi } from "../artifacts/iVotes.sol";
 import { PUB_TOKEN_ADDRESS } from "@/constants";
 import { useAlerts } from "@/context/Alerts";
 import { logger } from "@/services/logger";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { type Address } from "viem";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
-export const useDelegateVotingPower = (mode: "delegate" | "claim" = "delegate", onSuccess?: () => void) => {
+export const useDelegateVotingPower = (targetAddress: Address, onSuccess?: () => void) => {
   const { addAlert } = useAlerts();
   const { writeContract, data: hash, error, status } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
+  const { isLoading, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
 
   useEffect(() => {
     if (status === "idle" || status === "pending") return;
@@ -19,15 +19,15 @@ export const useDelegateVotingPower = (mode: "delegate" | "claim" = "delegate", 
           timeout: 4 * 1000,
         });
       } else {
-        logger.error(`Could not ${mode} voting power`, error);
-        addAlert(`Could not ${mode} voting power`, { type: "error" });
+        logger.error(`Could not delegate`, error);
+        addAlert(`Could not delegate`, { type: "error" });
       }
       return;
     }
 
     // success
     if (!hash) return;
-    else if (isConfirming) {
+    else if (isLoading) {
       addAlert("Delegation submitted", {
         description: "Waiting for the transaction to be validated",
         txHash: hash,
@@ -41,27 +41,22 @@ export const useDelegateVotingPower = (mode: "delegate" | "claim" = "delegate", 
       txHash: hash,
     });
 
-    onSuccess?.();
-  }, [status, hash, isConfirming, isConfirmed]);
+    if (typeof onSuccess === "function") onSuccess();
+  }, [status, hash, isLoading, isConfirmed]);
 
-  const delegateVotingPower = useCallback(
-    async (address: Address | undefined) => {
-      if (address) {
-        writeContract({
-          abi: iVotesAbi,
-          address: PUB_TOKEN_ADDRESS,
-          functionName: "delegate",
-          args: [address],
-        });
-      }
-    },
-    [writeContract]
-  );
+  const delegateVotingPower = () => {
+    writeContract({
+      abi: iVotesAbi,
+      address: PUB_TOKEN_ADDRESS,
+      functionName: "delegate",
+      args: [targetAddress],
+    });
+  };
 
   return {
     delegateVotingPower,
     isConfirmed,
-    isConfirming,
+    isLoading,
     status,
   };
 };

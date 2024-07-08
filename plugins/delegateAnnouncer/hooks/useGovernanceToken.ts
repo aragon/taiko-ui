@@ -5,7 +5,7 @@ import { useReadContracts } from "wagmi";
 
 /** Returns the delegate (if any) for the given address */
 export const useGovernanceToken = (address?: Address) => {
-  const { data, isLoading, isError } = useReadContracts({
+  const { data, isLoading, isError, refetch } = useReadContracts({
     contracts: [
       {
         chainId: PUB_CHAIN.id,
@@ -38,5 +38,6 @@ export const useGovernanceToken = (address?: Address) => {
     balance: data?.[2].result,
     isLoading,
     isError,
+    refetch,
   };
 };
