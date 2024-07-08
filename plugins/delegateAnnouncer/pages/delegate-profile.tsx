@@ -1,13 +1,8 @@
-import { Heading } from "@aragon/ods";
 import { type Address } from "viem";
 import { ProfileAside } from "../components/ProfileAside";
 import { DelegationStatement } from "../components/DelegationStatement";
 import { HeaderMember } from "../components/HeaderMember";
 import { useDelegateAnnounce } from "../hooks/useDelegateAnnounce";
-// import { DelegationsReceivedDataList } from "../components/memberDataList/delegationsReceivedDataList/delegationsReceivedDataList";
-// import { MemberVotesDataList } from "../components/memberVotesDataList/memberVotesDataList";
-// import { councilMemberList } from "../services/members/query-options";
-// import { ProposalStages } from "@/features/proposals";
 
 export const DelegateProfile = ({ address }: { address: Address }) => {
   const { announce, isLoading } = useDelegateAnnounce(address);
@@ -21,20 +16,7 @@ export const DelegateProfile = ({ address }: { address: Address }) => {
           {/* Delegation Statement */}
           <div className="flex w-full flex-col gap-y-6 overflow-auto">
             <DelegationStatement message={announce?.message} />
-            {/* Delegations Received */}
-            {/* <div className="flex flex-col gap-y-3">
-              <Heading size="h3">Delegations received</Heading>
-              <DelegationsReceivedDataList address={profileAddress} />
-            </div> */}
           </div>
-
-          {/* <div className="flex w-full flex-col gap-y-6">
-            <Heading size="h2">Voting activity</Heading>
-            <MemberVotesDataList
-              address={profileAddress}
-              stage={isCouncilMember ? ProposalStages.COUNCIL_APPROVAL : ProposalStages.COMMUNITY_VOTING}
-            />
-          </div> */}
         </div>
         {/* Aside */}
         <aside className="flex w-full flex-1 flex-col gap-y-12 md:max-w-[320px] md:gap-y-20">

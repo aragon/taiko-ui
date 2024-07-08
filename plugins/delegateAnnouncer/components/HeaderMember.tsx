@@ -13,12 +13,11 @@ import {
   MemberAvatar,
   NumberFormat,
   clipboardUtils,
-  formatterUtils,
   type IBreadcrumbsLink,
 } from "@aragon/ods";
 // import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 // import React from "react";
-import { formatUnits, zeroAddress, type Address } from "viem";
+import { formatEther, formatUnits, zeroAddress, type Address } from "viem";
 import { mainnet } from "viem/chains";
 import { useAccount, useEnsName } from "wagmi";
 // import {
@@ -27,6 +26,7 @@ import { useAccount, useEnsName } from "wagmi";
 //   votingPower as votingPowerQueryOptions,
 // } from "../../services/members/query-options";
 import classNames from "classnames";
+import { useGovernanceToken } from "../hooks/useGovernanceToken";
 // import { useAnnouncement } from "@/plugins/delegateAnnouncer/hooks/useAnnouncement";
 
 interface IHeaderMemberProps {
@@ -49,6 +49,7 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
 
   const { address: connectedAccount, isConnected } = useAccount();
   const { data: ensName } = useEnsName({ chainId: mainnet.id, address: address });
+  const { delegatesTo, votingPower, balance, isLoading } = useGovernanceToken(address);
 
   // // delegate hooks
   // const isTokenVoting = type === "majorityVoting";
@@ -61,7 +62,7 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
   //   enabled: hasDelegationProfile,
   // });
 
-  // const { data: connectedAccountDelegate, queryKey: delegateQueryKey } = useDelegate(connectedAccount, {
+  // const { data: connectedAccountDelegate, queryKey: delegateQueryKey } = useGovernanceToken(connectedAccount, {
   //   enabled: !!connectedAccount && isTokenVoting,
   // });
 
@@ -160,8 +161,6 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
   const hasDelegationProfile = true;
   const isConfirming = false;
   const connectedMemberIsSelfDelegated = false;
-  const votingPower = "22341234.1234";
-  const tokenBalance = "12341234.1234";
 
   return (
     <div className="flex w-full justify-center bg-gradient-to-b from-neutral-0 to-transparent">
@@ -183,9 +182,7 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
                 {/* Voting power */}
                 <div className="flex flex-col gap-y-1 leading-tight">
                   <div className="flex items-baseline gap-x-1">
-                    <span className="text-2xl text-neutral-800">
-                      {formatterUtils.formatNumber(votingPower, { format: NumberFormat.TOKEN_AMOUNT_SHORT })}
-                    </span>
+                    <span className="text-2xl text-neutral-800">{formatEther(votingPower ?? BigInt(0))}</span>
                     <span className="text-base text-neutral-500">{PUB_TOKEN_SYMBOL}</span>
                   </div>
                   <span className="text-sm text-neutral-500">Voting power</span>
@@ -194,11 +191,7 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
                 {/* Token Balance */}
                 <div className="flex flex-col gap-y-1 leading-tight">
                   <div className="flex items-baseline gap-x-1">
-                    <span className="text-2xl text-neutral-800">
-                      {formatterUtils.formatNumber(tokenBalance, {
-                        format: NumberFormat.TOKEN_AMOUNT_SHORT,
-                      })}
-                    </span>
+                    <span className="text-2xl text-neutral-800">{formatEther(balance ?? BigInt(0))}</span>
                     <span className="text-base text-neutral-500">{PUB_TOKEN_SYMBOL}</span>
                   </div>
                   <span className="text-sm text-neutral-500">Token balance</span>

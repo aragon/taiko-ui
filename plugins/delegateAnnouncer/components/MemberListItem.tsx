@@ -1,15 +1,16 @@
 import { If } from "@/components/if";
 import { formatHexString, equalAddresses } from "@/utils/evm";
 import { type IDataListItemProps, DataList, MemberAvatar, Tag, formatterUtils, NumberFormat } from "@aragon/ods";
-// import { useDelegate } from "@/plugins/erc20Votes/hooks/useDelegate";
 // import { useDelegateVotingPower } from "@/plugins/erc20Votes/hooks/useDelegateVotingPower";
 import { useAccount } from "wagmi";
+// import { useDelegateAnnounce } from "../hooks/useDelegateAnnounce";
+import { Address } from "viem";
 
 export interface IMemberDataListItemProps extends IDataListItemProps {
   /** Whether the member is a delegate of current user or not */
   isMyDelegate?: boolean;
   /** 0x address of the user */
-  address: string;
+  address: Address;
   /** Direct URL src of the user avatar image to be rendered */
   avatarSrc?: string;
 }
@@ -19,7 +20,7 @@ export const MemberListItem: React.FC<IMemberDataListItemProps> = (props) => {
   const { address: currentUserAddress, isConnected } = useAccount();
   const isCurrentUser = isConnected && address && equalAddresses(currentUserAddress, address);
 
-  const votingPower = 0;
+  const votingPower = 0; // useVotingPower(address);
 
   return (
     <DataList.Item className="min-w-fit !py-0 px-4 md:px-6" {...otherProps}>

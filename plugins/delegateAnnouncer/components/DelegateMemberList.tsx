@@ -4,7 +4,7 @@ import { MemberListItem } from "./MemberListItem";
 import { equalAddresses } from "@/utils/evm";
 import { useRouter } from "next/router";
 import { useDelegates } from "../hooks/useDelegates";
-import { useDelegate } from "../hooks/useDelegate";
+import { useGovernanceToken } from "../hooks/useGovernanceToken";
 import { useAccount } from "wagmi";
 // import { useDelegate } from "@/plugins/erc20Votes/hooks/useDelegate";
 // import { generateSortOptions, sortItems } from "./utils";
@@ -21,7 +21,7 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ onAnnou
   const [searchValue, setSearchValue] = useState<string>();
   //   const [activeSort, setActiveSort] = useState<string>();
   const { delegates, status: loadingStatus } = useDelegates();
-  const { delegate: myDelegate } = useDelegate(address);
+  const { delegatesTo, isLoading } = useGovernanceToken(address);
 
   const resetFilters = () => {
     setSearchValue("");
@@ -68,7 +68,7 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ onAnnou
       >
         {(delegates || []).map((delegate) => (
           <MemberListItem
-            isMyDelegate={equalAddresses(myDelegate, delegate)}
+            isMyDelegate={equalAddresses(delegatesTo, delegate)}
             key={delegate}
             onClick={() => push("#/delegates/" + delegate)}
             address={delegate}
