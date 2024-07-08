@@ -1,13 +1,13 @@
 import { If } from "@/components/if";
 import { formatHexString, equalAddresses } from "@/utils/evm";
 import { type IDataListItemProps, DataList, MemberAvatar, Tag, formatterUtils, NumberFormat } from "@aragon/ods";
+// import { useDelegate } from "@/plugins/erc20Votes/hooks/useDelegate";
+// import { useDelegateVotingPower } from "@/plugins/erc20Votes/hooks/useDelegateVotingPower";
 import { useAccount } from "wagmi";
 
 export interface IMemberDataListItemProps extends IDataListItemProps {
   /** Whether the member is a delegate of current user or not */
-  isDelegate?: boolean;
-  /** The total voting power of the member */
-  votingPower?: number;
+  isMyDelegate?: boolean;
   /** 0x address of the user */
   address: string;
   /** Direct URL src of the user avatar image to be rendered */
@@ -15,16 +15,18 @@ export interface IMemberDataListItemProps extends IDataListItemProps {
 }
 
 export const MemberListItem: React.FC<IMemberDataListItemProps> = (props) => {
-  const { isDelegate, votingPower, avatarSrc, address, ...otherProps } = props;
+  const { isMyDelegate, avatarSrc, address, ...otherProps } = props;
   const { address: currentUserAddress, isConnected } = useAccount();
   const isCurrentUser = isConnected && address && equalAddresses(currentUserAddress, address);
+
+  const votingPower = 0;
 
   return (
     <DataList.Item className="min-w-fit !py-0 px-4 md:px-6" {...otherProps}>
       <div className="flex flex-col items-start justify-center gap-y-3 py-4 md:min-w-44 md:py-6">
         <div className="flex w-full items-center justify-between">
           <MemberAvatar address={address} avatarSrc={avatarSrc} responsiveSize={{ md: "md" }} />
-          {isDelegate && !isCurrentUser && <Tag variant="info" label="Your Delegate" />}
+          {isMyDelegate && !isCurrentUser && <Tag variant="info" label="Your Delegate" />}
           {isCurrentUser && <Tag variant="neutral" label="You" />}
         </div>
 

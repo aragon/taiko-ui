@@ -1,88 +1,41 @@
-import { useEffect, useState } from "react";
-// import { MemberProfile } from "@/components/nav/routes";
-// import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-// import { useDelegate } from "@/plugins/erc20Votes/hooks/useDelegate";
-// import { isAddressEqual } from "@/utils/evm";
-import { generateDataListState } from "@/utils/query";
-import { Button, DataList, IconType, IllustrationHuman, MemberDataListItem, type DataListState } from "@aragon/ods";
-// import { useInfiniteQuery } from "@tanstack/react-query";
-// import { useAccount } from "wagmi";
-// import { delegatesList } from "../../../services/members/query-options";
+import { useState } from "react";
+import { DataList, IconType, IllustrationHuman, MemberDataListItem, type DataListState } from "@aragon/ods";
 import { MemberListItem } from "./MemberListItem";
 import { equalAddresses } from "@/utils/evm";
 import { useRouter } from "next/router";
+import { useDelegates } from "../hooks/useDelegates";
+import { useDelegate } from "../hooks/useDelegate";
+import { useAccount } from "wagmi";
+// import { useDelegate } from "@/plugins/erc20Votes/hooks/useDelegate";
 // import { generateSortOptions, sortItems } from "./utils";
 
 const DEFAULT_PAGE_SIZE = 12;
-const SEARCH_DEBOUNCE_MILLS = 500;
+
+const TEST_LIST = [
+  "0x2234123412341234123412341234412341234333",
+  "0x3134123412341234123412341234412341234333",
+  "0x1234123412341234123412341234412341234333",
+  "0x2341234123412341234123412344123412343331",
+  "0x3412341234123412341234123441234123433311",
+];
 
 interface IDelegateMemberListProps {
   onAnnounceDelegation: () => void;
 }
 
-const TEMP_LIST = [
-  { votingPower: 1.55, isDelegate: false, address: "0x2234123412341234123412341234412341234333" },
-  { votingPower: 2.45, isDelegate: true, address: "0x3134123412341234123412341234412341234333" },
-  { votingPower: 7.55, isDelegate: false, address: "0x1234123412341234123412341234412341234333" },
-  { votingPower: 3.55, isDelegate: false, address: "0x2341234123412341234123412344123412343331" },
-  { votingPower: 1.55, isDelegate: false, address: "0x3412341234123412341234123441234123433311" },
-];
-const TEMP_YOUR_DELEGATE = "0x3412341234123412341234123441234123433311";
-
 export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ onAnnounceDelegation }) => {
   const { push } = useRouter();
-  //   const [activeSort, setActiveSort] = useState<string>();
+  const { address } = useAccount();
   const [searchValue, setSearchValue] = useState<string>();
-  //   const [debouncedQuery, setDebouncedQuery] = useDebouncedValue<string | undefined>(
-  //     searchValue?.trim()?.toLowerCase(),
-  //     {
-  //       delay: SEARCH_DEBOUNCE_MILLS,
-  //     }
-  //   );
-  //   const { address } = useAccount();
-  //   const { data: yourDelegate } = useDelegate(address);
-  //   const {
-  //     data: delegatesQueryData,
-  //     isError,
-  //     isLoading,
-  //     isFetching,
-  //     isRefetching,
-  //     isRefetchError,
-  //     isFetchingNextPage,
-  //     isFetchNextPageError,
-  //     refetch,
-  //     fetchNextPage,
-  //   } = useInfiniteQuery({
-  //     ...delegatesList({
-  //       limit: DEFAULT_PAGE_SIZE,
-  //       ...(activeSort ? generateSortOptions(activeSort) : {}),
-  //       ...(debouncedQuery ? { search: debouncedQuery } : {}),
-  //     }),
-  //   });
-  // const isFiltered = !!searchValue?.trim();
-  // const loading = isLoading || (isError && isRefetching);
-  // const error = isError && !isRefetchError && !isFetchNextPageError;
-  // const [dataListState, setDataListState] = useState<DataListState>(() =>
-  //   generateDataListState(loading, error, isFetchingNextPage, isFetching && !isRefetching, isFiltered)
-  // );
-  // useEffect(() => {
-  //   setDataListState(
-  //     generateDataListState(loading, isError, isFetchingNextPage, isFetching && !isRefetching, isFiltered)
-  //   );
-  // }, [isError, isFetching, isFetchingNextPage, loading, isRefetching, isFiltered]);
-  //   useEffect(() => {
-  //     if (!!debouncedQuery || !!activeSort) {
-  //       setDataListState("loading");
-  //     }
-  //   }, [debouncedQuery, activeSort]);
+  //   const [activeSort, setActiveSort] = useState<string>();
+  const { delegates, status: loadingStatus } = useDelegates();
+  const { delegate: myDelegate } = useDelegate(address);
+
   const resetFilters = () => {
     setSearchValue("");
-    // setDebouncedQuery("");
     // setActiveSort("");
   };
-  // const totalMembers = delegatesQueryData?.pagination?.total;
-  const totalMembers = 27; // REMOVE
-  const entityLabel = "Delegates";
+  const totalMembers = delegates?.length || 0;
   const showPagination = (totalMembers ?? 0) > DEFAULT_PAGE_SIZE;
   const emptyFilteredState = {
     heading: "No delegates found",
@@ -94,16 +47,14 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ onAnnou
     },
   };
 
-  const items = TEMP_LIST;
-
-  if (!items?.length) {
+  if (!totalMembers) {
     return <NoDelegatesView />;
   }
 
   return (
     <DataList.Root
-      entityLabel={entityLabel}
-      // itemsCount={totalMembers}
+      entityLabel="Delegates"
+      itemsCount={totalMembers}
       // pageSize={DEFAULT_PAGE_SIZE}
       // state={dataListState}
       // onLoadMore={fetchNextPage}
@@ -123,13 +74,12 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ onAnnou
         emptyFilteredState={emptyFilteredState}
         className="grid grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))] gap-3"
       >
-        {TEMP_LIST.map((delegate) => (
+        {((delegates && delegates) || TEST_LIST).map((delegate) => (
           <MemberListItem
-            votingPower={delegate.votingPower}
-            isDelegate={equalAddresses(TEMP_YOUR_DELEGATE, delegate.address)}
-            key={delegate.address}
-            onClick={() => push("#/delegates/" + delegate.address)}
-            address={delegate.address}
+            isMyDelegate={equalAddresses(myDelegate, delegate)}
+            key={delegate}
+            onClick={() => push("#/delegates/" + delegate)}
+            address={delegate}
           />
         ))}
       </DataList.Container>

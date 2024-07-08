@@ -1,6 +1,5 @@
 import { PUB_TOKEN_ADDRESS, PUB_TOKEN_SYMBOL } from "@/constants";
 // import { ProposalStages } from "@/features/proposals";
-// import { useDelegate } from "@/plugins/erc20Votes/hooks/useDelegate";
 // import { useDelegateVotingPower } from "@/plugins/erc20Votes/hooks/useDelegateVotingPower";
 // import { useTokenInfo } from "@/plugins/erc20Votes/hooks/useTokenBalance";
 import { formatHexString, equalAddresses } from "@/utils/evm";
