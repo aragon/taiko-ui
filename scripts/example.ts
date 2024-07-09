@@ -11,7 +11,7 @@ async function main() {
   const { request } = await publicClient.simulateContract({
     address: "0xa119833aba78d4639c6ce6c2fe3ca4c7de02d710",
     abi: DelegateAnnouncerAbi,
-    functionName: "announceDelegation",
+    functionName: "register",
     args: [DAO, toHex(message)],
     account,
   });
