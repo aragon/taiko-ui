@@ -4,10 +4,12 @@ import { OptimisticTokenVotingPluginAbi } from "../artifacts/OptimisticTokenVoti
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
+import { useProposalId } from "./useProposalId";
 
-export function useProposalExecute(proposalId?: bigint) {
+export function useProposalExecute(index: number) {
   const { reload } = useRouter();
   const { addAlert } = useAlerts() as AlertContextProps;
+  const { proposalId } = useProposalId(index);
 
   const {
     data: canExecute,

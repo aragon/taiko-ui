@@ -27,7 +27,7 @@ interface IHeaderMemberProps {
 
 export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
   const { address: memberAddress, bio, name } = props;
-  const breadcrumbs: IBreadcrumbsLink[] = [{ label: "Delegates" }, { label: props.address }];
+  const breadcrumbs: IBreadcrumbsLink[] = [{ label: "Delegates", href: "#/" }, { label: props.address }];
   const { open } = useWeb3Modal();
   const { address: connectedAccount, isConnected } = useAccount();
   const { data: ensName } = useEnsName({ chainId: mainnet.id, address: memberAddress });

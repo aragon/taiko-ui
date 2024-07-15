@@ -3,7 +3,6 @@ import ProposalHeader from "@/plugins/multisig/components/proposal/header";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalApprove } from "@/plugins/multisig/hooks/useProposalApprove";
 import { useProposalExecute } from "@/plugins/multisig/hooks/useProposalExecute";
-import { generateBreadcrumbs } from "@/utils/nav";
 import { useRouter } from "next/router";
 import { BodySection } from "@/components/proposal/proposalBodySection";
 import { ProposalVoting } from "@/components/proposalVoting";
@@ -12,6 +11,7 @@ import { useProposalStatus } from "../hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
 import { ProposalAction } from "@/components/proposalAction/proposalAction";
 import { CardResources } from "@/components/proposal/cardResources";
+import { IBreadcrumbsLink } from "@aragon/ods";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const router = useRouter();
@@ -26,7 +26,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   } = useProposalApprove(proposalId);
 
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
-  const breadcrumbs = generateBreadcrumbs(router.asPath, "Proposal");
+  const breadcrumbs: IBreadcrumbsLink[] = [{ label: "Proposals", href: "#/" }, { label: proposalId.toString() }];
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalVariant = useProposalStatus(proposal!);
