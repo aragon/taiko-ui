@@ -5,12 +5,12 @@ import { equalAddresses } from "@/utils/evm";
 import { useRouter } from "next/router";
 import { useDelegates } from "../hooks/useDelegates";
 import { useGovernanceToken } from "../hooks/useGovernanceToken";
-import { Else, If, Then } from "@/components/if";
 import { useAccount } from "wagmi";
 import VerifiedDelegates from "../../../verified-delegates.json";
+import { PleaseWaitSpinner } from "@/components/please-wait";
 // import { generateSortOptions, sortItems } from "./utils";
 
-const DEFAULT_PAGE_SIZE = 12;
+// const DEFAULT_PAGE_SIZE = 12;
 
 interface IDelegateMemberListProps {
   verifiedOnly?: boolean;
@@ -23,14 +23,26 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifie
   const [searchValue, setSearchValue] = useState<string>();
   //   const [activeSort, setActiveSort] = useState<string>();
   const { delegates: fetchedDelegates, status: loadingStatus } = useDelegates();
-  const { delegatesTo, isLoading } = useGovernanceToken(address);
+  const { delegatesTo } = useGovernanceToken(address);
   const delegates = (fetchedDelegates || []).filter((item) => {
     if (!verifiedOnly) return true;
     return VerifiedDelegates.findIndex((d) => equalAddresses(d.address, item)) >= 0;
   });
 
-  const totalMembers = delegates?.length || 0;
-  const showPagination = (totalMembers ?? 0) > DEFAULT_PAGE_SIZE;
+  if (loadingStatus === "pending" && !delegates?.length) {
+    return <PleaseWaitSpinner fullMessage="Please wait, loading candidates" />;
+  } else if (!delegates?.length) {
+    return <NoDelegatesView verified={verifiedOnly} />;
+  }
+
+  const filteredDelegates = (delegates || []).filter((item) => {
+    if (!searchValue?.trim()) return true;
+    return item.toLowerCase().includes(searchValue.toLowerCase());
+  });
+
+  const totalMembers = filteredDelegates.length || 0;
+  const showPagination = false;
+  // const showPagination = (totalMembers ?? 0) > DEFAULT_PAGE_SIZE;
   const resetFilters = () => {
     setSearchValue("");
     // setActiveSort("");
@@ -46,7 +58,19 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifie
   };
 
   if (!totalMembers) {
-    return <NoDelegatesView verified={verifiedOnly} />;
+    return (
+      <DataList.Root entityLabel="No members" itemsCount={totalMembers}>
+        <DataList.Filter
+          onSearchValueChange={setSearchValue}
+          searchValue={searchValue}
+          placeholder="Filter by name or address"
+          // onSortChange={setActiveSort}
+          // activeSort={activeSort}
+          // sortItems={sortItems}
+        />
+        <NoDelegatesView filtered={!!searchValue?.trim()} verified={verifiedOnly} />
+      </DataList.Root>
+    );
   }
 
   return (
@@ -60,7 +84,7 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifie
       <DataList.Filter
         onSearchValueChange={setSearchValue}
         searchValue={searchValue}
-        placeholder="Search by name or address"
+        placeholder="Filter by name or address"
         // onSortChange={setActiveSort}
         // activeSort={activeSort}
         // sortItems={sortItems}
@@ -72,7 +96,7 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifie
         emptyFilteredState={emptyFilteredState}
         className="grid grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))] gap-3"
       >
-        {(delegates || []).map((delegate) => (
+        {filteredDelegates.map((delegate) => (
           <MemberListItem
             isMyDelegate={equalAddresses(delegatesTo, delegate)}
             key={delegate}
@@ -86,21 +110,28 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifie
   );
 };
 
-function NoDelegatesView({ verified }: { verified?: boolean }) {
+function NoDelegatesView({ verified, filtered }: { verified?: boolean; filtered?: boolean }) {
+  let message: string;
+  if (filtered) {
+    if (verified) {
+      message =
+        "There are no verified candidates matching the current filter. Please, try entering a different search term.";
+    } else {
+      message = "There are no candidates matching the current filter. Please, try entering a different search term.";
+    }
+  } else {
+    if (verified) {
+      message =
+        "There are no verified candidates with a public an announcement yet. Here you will see the addresses of members who have posted their candidacy. Be the first to post an announcement.";
+    } else {
+      message =
+        "No candidates posted an announcement yet. Here you will see the addresses of members who have posted their candidacy. Be the first to post an announcement.";
+    }
+  }
+
   return (
     <div className="w-full">
-      <p className="text-md text-neutral-400">
-        <If condition={verified}>
-          <Then>
-            There are no verified candidates with a public an announcement yet. Here you will see the addresses of
-            members who have posted their candidacy. Be the first to post an announcement.
-          </Then>
-          <Else>
-            No candidates posted an announcement yet. Here you will see the addresses of members who have posted their
-            candidacy. Be the first to post an announcement.
-          </Else>
-        </If>
-      </p>
+      <p className="text-md text-neutral-400">{message}</p>
       <IllustrationHuman className="mx-auto mb-10 max-w-72" body="VOTING" expression="CASUAL" hairs="CURLY" />
     </div>
   );

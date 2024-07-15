@@ -33,7 +33,7 @@ export default function MembersList() {
       <div className="flex w-full max-w-[1280] flex-col gap-x-20 gap-y-8 md:flex-row">
         <div className="flex flex-1 flex-col gap-y-6">
           <div className="flex items-center justify-between">
-            <Heading size="h1">Members</Heading>
+            <Heading size="h1">Delegates</Heading>
 
             <ToggleGroup isMultiSelect={false} onChange={onToggleChange} value={toggleValue}>
               <Toggle value="all" label="All delegates" />
