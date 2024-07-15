@@ -10,7 +10,7 @@ export function useProposalExecute(index: number) {
   const { reload } = useRouter();
   const { addAlert } = useAlerts() as AlertContextProps;
   const { proposalId } = useProposalId(index);
-  const [executing, setExecuting] = useState(false);
+  const [isExecuting, setIsExecuting] = useState(false);
 
   const {
     data: canExecute,
@@ -35,7 +35,7 @@ export function useProposalExecute(index: number) {
     if (!canExecute) return;
     else if (typeof proposalId === "undefined") return;
 
-    setExecuting(true);
+    setIsExecuting(true);
 
     executeWrite({
       chainId: PUB_CHAIN.id,
@@ -60,7 +60,7 @@ export function useProposalExecute(index: number) {
           description: "The proposal may contain actions with invalid operations",
         });
       }
-      setExecuting(false);
+      setIsExecuting(false);
       return;
     }
 
@@ -87,7 +87,7 @@ export function useProposalExecute(index: number) {
   return {
     executeProposal,
     canExecute: !isCanVoteError && !isCanVoteLoading && !isConfirmed && !!canExecute,
-    isConfirming: executing || isConfirming,
+    isConfirming: isExecuting || isConfirming,
     isConfirmed,
   };
 }

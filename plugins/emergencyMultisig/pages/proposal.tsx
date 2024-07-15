@@ -11,7 +11,7 @@ import dayjs from "dayjs";
 import { ProposalAction } from "@/components/proposalAction/proposalAction";
 import { CardResources } from "@/components/proposal/cardResources";
 import { useDerivedWallet } from "../hooks/useDerivedWallet";
-import { MissingContentView } from "../components/MissingContentView";
+import { MissingContentView } from "@/components/MissingContentView";
 import { useAccount } from "wagmi";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { useWeb3Modal } from "@web3modal/wagmi/react";

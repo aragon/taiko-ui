@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
@@ -11,6 +11,7 @@ import { getContentCid, uploadToPinata } from "@/utils/ipfs";
 export function useProposalExecute(proposalId: string) {
   const { push } = useRouter();
   const { addAlert } = useAlerts() as AlertContextProps;
+  const [isExecuting, setIsExecuting] = useState(false);
   const {
     rawPrivateData: { privateRawMetadata },
     proposal,
@@ -41,6 +42,8 @@ export function useProposalExecute(proposalId: string) {
     if (!canExecute) return;
     else if (!privateRawMetadata || !proposal?.actions) return;
 
+    setIsExecuting(true);
+
     return uploadToPinata(privateRawMetadata)
       .then((uri) => {
         actualMetadataUri = uri;
@@ -62,6 +65,7 @@ export function useProposalExecute(proposalId: string) {
       })
       .catch((err) => {
         console.error(err);
+        setIsExecuting(false);
         addAlert("Could not recover the details to execute the transaction");
       });
   };
@@ -80,6 +84,7 @@ export function useProposalExecute(proposalId: string) {
           description: "The proposal may contain actions with invalid operations",
         });
       }
+      setIsExecuting(false);
       return;
     }
 
@@ -100,7 +105,10 @@ export function useProposalExecute(proposalId: string) {
       txHash: executeTxHash,
     });
 
-    setTimeout(() => push("#/"), 1000 * 2);
+    setTimeout(() => {
+      push("#/");
+      window.scroll(0, 0);
+    }, 1000 * 2);
   }, [executingStatus, executeTxHash, isConfirming, isConfirmed]);
 
   return {
@@ -112,7 +120,7 @@ export function useProposalExecute(proposalId: string) {
       !!canExecute &&
       !!privateRawMetadata &&
       !!proposal?.actions,
-    isConfirming,
+    isConfirming: isExecuting || isConfirming,
     isConfirmed,
   };
 }

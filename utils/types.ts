@@ -13,6 +13,12 @@ export type RawAction = {
   data: Hex;
 };
 
+export enum ActionType {
+  Signaling,
+  Withdrawal,
+  Custom,
+}
+
 /** Includes the raw action plus the decoded ABI and parameters of the function call */
 export type DecodedAction = RawAction & {
   functionName: string | null;
