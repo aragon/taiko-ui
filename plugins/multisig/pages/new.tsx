@@ -4,7 +4,6 @@ import WithdrawalInput from "@/components/input/withdrawal";
 import { FunctionCallForm } from "@/components/input/function-call-form";
 import { ActionType } from "@/utils/types";
 import { Else, ElseIf, If, Then } from "@/components/if";
-import { PleaseWaitSpinner } from "@/components/please-wait";
 import { ActionCard } from "@/components/actions/action";
 import { MainSection } from "@/components/layout/main-section";
 import { useCreateProposal } from "../hooks/useCreateProposal";

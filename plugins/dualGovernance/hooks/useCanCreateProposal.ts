@@ -1,4 +1,4 @@
-import { Address, keccak256, toHex } from "viem";
+import { type Address, keccak256, toHex } from "viem";
 import { useState, useEffect } from "react";
 import { useBalance, useAccount, useReadContracts, useReadContract } from "wagmi";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/dualGovernance/artifacts/OptimisticTokenVotingPlugin.sol";

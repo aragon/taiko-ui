@@ -1,11 +1,12 @@
-import { useProposal } from "@/plugins/dualGovernance/hooks/useProposal";
+import type { useProposal } from "@/plugins/dualGovernance/hooks/useProposal";
 import ProposalHeader from "@/plugins/dualGovernance/components/proposal/header";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalVeto } from "@/plugins/dualGovernance/hooks/useProposalVeto";
 import { useProposalExecute } from "@/plugins/dualGovernance/hooks/useProposalExecute";
 import { BodySection } from "@/components/proposal/proposalBodySection";
 import { ProposalVoting } from "@/components/proposalVoting";
-import { ITransformedStage, IVote, ProposalStages } from "@/utils/types";
+import type { ITransformedStage, IVote } from "@/utils/types";
+import { ProposalStages } from "@/utils/types";
 import { useProposalStatus } from "../hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
 import { ProposalAction } from "@/components/proposalAction/proposalAction";

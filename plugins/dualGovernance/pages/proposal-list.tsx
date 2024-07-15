@@ -1,14 +1,7 @@
-import { useAccount, useBlockNumber, useReadContract } from "wagmi";
-import { type ReactNode, useEffect } from "react";
+import { useBlockNumber, useReadContract } from "wagmi";
+import { useEffect } from "react";
 import ProposalCard from "@/plugins/dualGovernance/components/proposal";
-import {
-  Button,
-  DataList,
-  IconType,
-  IllustrationHuman,
-  ProposalDataListItemSkeleton,
-  type DataListState,
-} from "@aragon/ods";
+import { DataList, IllustrationHuman, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
 import { Else, If, Then } from "@/components/if";
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisticTokenVotingPlugin.sol";
@@ -48,35 +41,6 @@ export default function Proposals() {
     dataListState = "fetchingNextPage";
   }
 
-  const emptyFilteredState = {
-    heading: "No proposals found",
-    description: "Your applied filters are not matching with any results. Reset and search with other filters!",
-    secondaryButton: {
-      label: "Reset all filters",
-      iconLeft: IconType.RELOAD,
-    },
-  };
-
-  const emptyState = {
-    heading: "No proposals found",
-    description: "Start by creating a proposal",
-    primaryButton: {
-      label: "Create onChain PIP",
-      iconLeft: IconType.PLUS,
-      onClick: () => alert("create proposal"),
-    },
-  };
-
-  const errorState = {
-    heading: "Error loading proposals",
-    description: "There was an error loading the proposals. Try again!",
-    secondaryButton: {
-      label: "Reload proposals",
-      iconLeft: IconType.RELOAD,
-      onClick: () => refetch(),
-    },
-  };
-
   return (
     <MainSection className="flex flex-col gap-y-6 md:px-16 md:py-10">
       <h1 className="justify-self-start align-middle text-3xl font-semibold">Proposals</h1>
@@ -87,21 +51,14 @@ export default function Proposals() {
             itemsCount={proposalCount}
             pageSize={DEFAULT_PAGE_SIZE}
             state={dataListState}
-            //onLoadMore={fetchNextPage}
           >
-            <DataList.Container
-              SkeletonElement={ProposalDataListItemSkeleton}
-              errorState={errorState}
-              emptyState={emptyState}
-              emptyFilteredState={emptyFilteredState}
-            >
-              {proposalCount &&
-                Array.from(Array(proposalCount)?.keys())
-                  .reverse()
-                  ?.map((proposalIndex) => (
-                    // TODO: update with router agnostic ODS DataListItem
-                    <ProposalCard key={proposalIndex} proposalIndex={proposalIndex} />
-                  ))}
+            <DataList.Container SkeletonElement={ProposalDataListItemSkeleton}>
+              {Array.from(Array(proposalCount)?.keys())
+                .reverse()
+                ?.map((proposalIndex) => (
+                  // TODO: update with router agnostic ODS DataListItem
+                  <ProposalCard key={proposalIndex} proposalIndex={proposalIndex} />
+                ))}
             </DataList.Container>
             <DataList.Pagination />
           </DataList.Root>
