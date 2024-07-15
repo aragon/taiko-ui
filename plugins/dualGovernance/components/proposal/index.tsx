@@ -63,11 +63,13 @@ export default function ProposalCard(props: ProposalInputs) {
     );
   }
 
-  const vetoPercentage = proposal?.vetoTally
-    ? Number(
-        (BigInt(100) * proposal.vetoTally) / ((pastSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(1000000))
-      )
-    : 0;
+  const vetoPercentage =
+    proposal?.vetoTally && pastSupply && proposal.parameters.minVetoRatio
+      ? Number(
+          (BigInt(100) * proposal.vetoTally) /
+            ((pastSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(1000000))
+        )
+      : 0;
 
   return (
     <Link href={`#/proposals/${props.proposalIndex}`} className="mb-4 w-full cursor-pointer">

@@ -1,20 +1,19 @@
 import DelegationPage from "./pages/index";
-// import { useUrlHash } from "use-url-hash";
-// import { NotFound } from "@/components/not-found";
+import { DelegateProfile } from "./pages/delegate-profile";
+import { useUrl } from "@/hooks/useUrl";
+import { NotFound } from "@/components/not-found";
+import { Address } from "viem";
 
 export default function PluginPage() {
   // Select the inner pages to display depending on the URL hash
-  // const hash = useUrlHash();
+  const { hash } = useUrl();
 
-  // if (!hash || hash === "/") return <ProposalList />;
-  // else if (hash === "/new") return <ProposalCreate />;
-  // else if (hash.startsWith("/proposals/")) {
-  //   const id = hash.replace("/proposals/", "");
-  //   return <ProposalDetail id={id} />;
-  // }
+  if (!hash || hash === "#/") return <DelegationPage />;
+  else if (hash.startsWith("#/delegates/")) {
+    const address = hash.replace("#/delegates/", "") as Address;
+    return <DelegateProfile address={address} />;
+  }
 
   // Default not found page
-  // return <NotFound />;
-
-  return <DelegationPage />;
+  return <NotFound />;
 }

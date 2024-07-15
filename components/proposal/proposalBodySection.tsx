@@ -12,14 +12,14 @@ export const BodySection: React.FC<IBodySectionProps> = (props) => {
 
   return (
     <CardCollapsible
-      buttonLabelClosed="Read full PIP"
+      buttonLabelClosed="Expend description"
       buttonLabelOpened="Read less"
       collapsedSize="md"
       className="w-full shadow-neutral"
     >
       <div className="flex flex-col gap-y-4">
         <Heading size="h2">Proposal description</Heading>
-        <hr className="rounded-full border-neutral-100" />
+        <hr className="border-neutral-100" />
         <DocumentParser document={body} className={proseClasses} />
       </div>
     </CardCollapsible>
