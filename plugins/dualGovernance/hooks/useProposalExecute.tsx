@@ -1,13 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { OptimisticTokenVotingPluginAbi } from "../artifacts/OptimisticTokenVotingPlugin.sol";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
+import { useProposalId } from "./useProposalId";
 
-export function useProposalExecute(proposalId?: bigint) {
+export function useProposalExecute(index: number) {
   const { reload } = useRouter();
   const { addAlert } = useAlerts() as AlertContextProps;
+  const { proposalId } = useProposalId(index);
+  const [isExecuting, setIsExecuting] = useState(false);
 
   const {
     data: canExecute,
@@ -32,6 +35,8 @@ export function useProposalExecute(proposalId?: bigint) {
     if (!canExecute) return;
     else if (typeof proposalId === "undefined") return;
 
+    setIsExecuting(true);
+
     executeWrite({
       chainId: PUB_CHAIN.id,
       abi: OptimisticTokenVotingPluginAbi,
@@ -55,6 +60,7 @@ export function useProposalExecute(proposalId?: bigint) {
           description: "The proposal may contain actions with invalid operations",
         });
       }
+      setIsExecuting(false);
       return;
     }
 
@@ -81,7 +87,7 @@ export function useProposalExecute(proposalId?: bigint) {
   return {
     executeProposal,
     canExecute: !isCanVoteError && !isCanVoteLoading && !isConfirmed && !!canExecute,
-    isConfirming,
+    isConfirming: isExecuting || isConfirming,
     isConfirmed,
   };
 }

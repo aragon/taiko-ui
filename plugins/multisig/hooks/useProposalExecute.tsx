@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
 import { useRouter } from "next/router";
@@ -7,6 +7,7 @@ import { MultisigPluginAbi } from "../artifacts/MultisigPlugin";
 
 export function useProposalExecute(proposalId: string) {
   const { push } = useRouter();
+  const [isExecuting, setIsExecuting] = useState(false);
   const { addAlert } = useAlerts() as AlertContextProps;
 
   const {
@@ -31,6 +32,8 @@ export function useProposalExecute(proposalId: string) {
   const executeProposal = () => {
     if (!canExecute) return;
 
+    setIsExecuting(true);
+
     executeWrite({
       chainId: PUB_CHAIN.id,
       abi: MultisigPluginAbi,
@@ -54,6 +57,7 @@ export function useProposalExecute(proposalId: string) {
           description: "The proposal may contain actions with invalid operations",
         });
       }
+      setIsExecuting(false);
       return;
     }
 
@@ -74,13 +78,16 @@ export function useProposalExecute(proposalId: string) {
       txHash: executeTxHash,
     });
 
-    setTimeout(() => push("#/"), 1000 * 2);
+    setTimeout(() => {
+      push("#/");
+      window.scroll(0, 0);
+    }, 1000 * 2);
   }, [executingStatus, executeTxHash, isConfirming, isConfirmed]);
 
   return {
     executeProposal,
     canExecute: !isCanVoteError && !isCanVoteLoading && !isConfirmed && !!canExecute,
-    isConfirming,
+    isConfirming: isExecuting || isConfirming,
     isConfirmed,
   };
 }

@@ -6,21 +6,18 @@ import { ReactNode } from "react";
 import { Publisher } from "@/components/publisher";
 import { getSimpleRelativeTimeFromDate } from "@/utils/dates";
 import { EmergencyProposal } from "../../utils/types";
+import { Else, If, Then } from "@/components/if";
 
 interface ProposalHeaderProps {
-  proposalNumber: number;
-  breadcrumbs: IBreadcrumbsLink[];
+  proposalId: string;
   proposal: EmergencyProposal;
-  canApprove: boolean;
-  canExecute: boolean;
-  transactionConfirming: boolean;
-  onVetoPressed: () => void;
-  onExecutePressed: () => void;
 }
 
-const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposal, breadcrumbs }) => {
+const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalId, proposal }) => {
   const status = useProposalStatus(proposal);
   const tagVariant = getTagVariantFromStatus(status);
+  const breadcrumbs: IBreadcrumbsLink[] = [{ label: "Proposals", href: "#/" }, { label: proposalId }];
+  const expired = Number(proposal.parameters.expirationDate) * 1000 <= Date.now();
 
   return (
     <div className="flex w-full justify-center bg-neutral-0">
@@ -53,10 +50,17 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposal, breadcrumbs }
           <div className="flex items-center gap-x-2">
             <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
             <div className="flex gap-x-1 text-base leading-tight ">
-              <span className="text-neutral-800">
-                {getSimpleRelativeTimeFromDate(dayjs(Number(proposal.parameters.expirationDate) * 1000))}
-              </span>
-              <span className="text-neutral-500">left until expiration</span>
+              <If condition={expired}>
+                <Then>
+                  <span className="text-neutral-500">The proposal expired</span>
+                </Then>
+                <Else>
+                  <span className="text-neutral-800">
+                    {getSimpleRelativeTimeFromDate(dayjs(Number(proposal.parameters.expirationDate) * 1000))}
+                  </span>
+                  <span className="text-neutral-500">left until expiration</span>
+                </Else>
+              </If>
             </div>
           </div>
         </div>

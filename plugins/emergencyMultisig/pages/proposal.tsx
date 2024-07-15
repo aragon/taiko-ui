@@ -3,8 +3,6 @@ import ProposalHeader from "@/plugins/emergencyMultisig/components/proposal/head
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalApprove } from "@/plugins/emergencyMultisig/hooks/useProposalApprove";
 import { useProposalExecute } from "@/plugins/emergencyMultisig/hooks/useProposalExecute";
-import { generateBreadcrumbs } from "@/utils/nav";
-import { useRouter } from "next/router";
 import { BodySection } from "@/components/proposal/proposalBodySection";
 import { ProposalVoting } from "@/components/proposalVoting";
 import { ITransformedStage, IVote, ProposalStages } from "@/utils/types";
@@ -13,13 +11,12 @@ import dayjs from "dayjs";
 import { ProposalAction } from "@/components/proposalAction/proposalAction";
 import { CardResources } from "@/components/proposal/cardResources";
 import { useDerivedWallet } from "../hooks/useDerivedWallet";
-import { MissingContentView } from "../components/MissingContentView";
+import { MissingContentView } from "@/components/MissingContentView";
 import { useAccount } from "wagmi";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
-  const router = useRouter();
   const { isConnected } = useAccount();
   const { open } = useWeb3Modal();
   const {
@@ -32,7 +29,6 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   } = useProposalApprove(proposalId);
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
   const { publicKey, requestSignature } = useDerivedWallet();
-  const breadcrumbs = generateBreadcrumbs(router.asPath, "Proposal");
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalVariant = useProposalStatus(proposal!);
@@ -89,16 +85,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
 
   return (
     <section className="flex w-screen min-w-full max-w-full flex-col items-center">
-      <ProposalHeader
-        proposalNumber={Number(proposalId) + 1}
-        proposal={proposal}
-        breadcrumbs={breadcrumbs}
-        transactionConfirming={isConfirmingApproval || isConfirmingExecution}
-        canApprove={canApprove}
-        canExecute={canExecute}
-        onVetoPressed={() => approveProposal()}
-        onExecutePressed={() => executeProposal()}
-      />
+      <ProposalHeader proposalId={proposalId} proposal={proposal} />
 
       <If condition={!isConnected}>
         <Then>

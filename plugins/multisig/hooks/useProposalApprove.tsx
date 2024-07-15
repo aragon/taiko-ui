@@ -54,7 +54,11 @@ export function useProposalApprove(proposalId: string) {
       type: "success",
       txHash: approveTxHash,
     });
-    setTimeout(() => push("#/"), 1000 * 2);
+
+    setTimeout(() => {
+      push("#/");
+      window.scroll(0, 0);
+    }, 1000 * 2);
     refetchCanApprove();
     refetchProposal();
   }, [approveStatus, approveTxHash, isConfirming, isConfirmed]);

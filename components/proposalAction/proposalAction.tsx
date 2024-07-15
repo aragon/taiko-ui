@@ -32,11 +32,11 @@ export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
       <div className="flex flex-col gap-y-2 px-4 py-4 md:gap-y-3 md:px-6 md:py-6">
         <div className="flex justify-between gap-x-2 gap-y-2">
           <p className="text-xl leading-tight text-neutral-800 md:text-2xl">Actions</p>
-          {canExecute && (
+          <If condition={canExecute && actions?.length}>
             <Button size="md" disabled={isConfirmingExecution} onClick={() => onExecute()} className="">
               Execute
             </Button>
-          )}
+          </If>
         </div>
         <If condition={actions?.length}>
           <Then>
@@ -45,7 +45,9 @@ export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
             </p>
           </Then>
           <Else>
-            <p className="text-base leading-normal text-neutral-500 md:text-lg">This is a signaling proposal.</p>
+            <p className="text-base leading-normal text-neutral-500 md:text-lg">
+              This is a signaling proposal, no actions are defined.
+            </p>
           </Else>
         </If>
       </div>

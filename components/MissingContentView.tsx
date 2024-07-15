@@ -4,10 +4,12 @@ export const MissingContentView = ({
   message,
   callToAction,
   onClick,
+  isLoading,
 }: {
   message: string;
   callToAction?: string;
   onClick?: () => any;
+  isLoading?: boolean;
 }) => {
   if (!callToAction) {
     return (
@@ -23,7 +25,7 @@ export const MissingContentView = ({
       <p className="text-md text-neutral-400">{message}</p>
       <Illustration />
       <div className="flex justify-center">
-        <Button size="md" variant="primary" onClick={onClick ? onClick : () => {}}>
+        <Button size="md" variant="primary" isLoading={!!isLoading} onClick={onClick ? onClick : () => {}}>
           <span>{callToAction}</span>
         </Button>
       </div>

@@ -1,19 +1,23 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Hex } from "viem";
 import { PublicKeyRegistryAbi } from "../artifacts/PublicKeyRegistry";
-import { useConfig, useWriteContract } from "wagmi";
+import { useConfig, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { readContract } from "@wagmi/core";
 import { PUB_PUBLIC_KEY_REGISTRY_CONTRACT_ADDRESS } from "@/constants";
 import { useQuery } from "@tanstack/react-query";
 import { uint8ArrayToHex } from "@/utils/hex";
 import { useDerivedWallet } from "./useDerivedWallet";
+import { useAlerts } from "@/context/Alerts";
 
 export function usePublicKeyRegistry() {
   const config = useConfig();
-  const { writeContract, status: registrationStatus } = useWriteContract();
+  const { addAlert } = useAlerts();
+  const [isRegistering, setIsRegistering] = useState(false);
+  const { writeContract, status: registrationStatus, data: createTxHash } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: createTxHash });
   const { publicKey, requestSignature } = useDerivedWallet();
 
-  const { data, isLoading, isSuccess, error, refetch } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["public-key-registry-values"],
     queryFn: () => {
       return readContract(config, {
@@ -47,29 +51,64 @@ export function usePublicKeyRegistry() {
   });
 
   const registerPublicKey = async () => {
-    let pubK: Uint8Array | undefined = publicKey;
-    if (!pubK) {
-      const keys = await requestSignature();
-      pubK = keys.publicKey;
-    }
+    setIsRegistering(true);
 
-    writeContract({
-      abi: PublicKeyRegistryAbi,
-      address: PUB_PUBLIC_KEY_REGISTRY_CONTRACT_ADDRESS,
-      functionName: "setPublicKey",
-      args: [uint8ArrayToHex(pubK)],
-    });
+    try {
+      let pubK: Uint8Array | undefined = publicKey;
+      if (!pubK) {
+        const keys = await requestSignature();
+        pubK = keys.publicKey;
+      }
+
+      writeContract({
+        abi: PublicKeyRegistryAbi,
+        address: PUB_PUBLIC_KEY_REGISTRY_CONTRACT_ADDRESS,
+        functionName: "setPublicKey",
+        args: [uint8ArrayToHex(pubK)],
+      });
+    } catch (err) {
+      setIsRegistering(false);
+    }
   };
 
   useEffect(() => {
-    refetch();
-  }, [registrationStatus]);
+    if (registrationStatus === "idle" || registrationStatus === "pending") return;
+    else if (registrationStatus === "error") {
+      if (error?.message?.startsWith("User rejected the request")) {
+        addAlert("Transaction rejected by the user", {
+          timeout: 4 * 1000,
+        });
+      } else {
+        console.error(error);
+        addAlert("Could not register the public key", { type: "error" });
+      }
+      setIsRegistering(false);
+      return;
+    }
+
+    // success
+    if (!createTxHash) return;
+    else if (isConfirming) {
+      addAlert("Transaction submitted", {
+        description: "Waiting for the transaction to be validated",
+        txHash: createTxHash,
+      });
+      return;
+    } else if (!isConfirmed) return;
+
+    addAlert("Public key registered", {
+      description: "The transaction has been validated",
+      type: "success",
+      txHash: createTxHash,
+    });
+    setTimeout(() => refetch(), 1000 * 2);
+  }, [registrationStatus, createTxHash, isConfirming, isConfirmed]);
 
   return {
     data,
     registerPublicKey,
     isLoading,
-    isSuccess,
+    isConfirming: isRegistering || isConfirming,
     error,
   };
 }

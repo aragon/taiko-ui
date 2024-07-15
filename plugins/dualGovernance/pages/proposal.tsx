@@ -3,8 +3,6 @@ import ProposalHeader from "@/plugins/dualGovernance/components/proposal/header"
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalVeto } from "@/plugins/dualGovernance/hooks/useProposalVeto";
 import { useProposalExecute } from "@/plugins/dualGovernance/hooks/useProposalExecute";
-import { generateBreadcrumbs } from "@/utils/nav";
-import { useRouter } from "next/router";
 import { BodySection } from "@/components/proposal/proposalBodySection";
 import { ProposalVoting } from "@/components/proposalVoting";
 import { ITransformedStage, IVote, ProposalStages } from "@/utils/types";
@@ -16,8 +14,7 @@ import { formatEther } from "viem";
 import { useVotingToken } from "../hooks/useVotingToken";
 import { usePastSupply } from "../hooks/usePastSupply";
 
-export default function ProposalDetail({ index: proposalId }: { index: number }) {
-  const router = useRouter();
+export default function ProposalDetail({ index: proposalIdx }: { index: number }) {
   const {
     proposal,
     proposalFetchStatus,
@@ -25,12 +22,11 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
     vetoes,
     isConfirming: isConfirmingVeto,
     vetoProposal,
-  } = useProposalVeto(proposalId);
+  } = useProposalVeto(proposalIdx);
   const pastSupply = usePastSupply(proposal);
   const { symbol: tokenSymbol } = useVotingToken();
 
-  const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(BigInt(proposalId));
-  const breadcrumbs = generateBreadcrumbs(router.asPath, "Proposal");
+  const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalIdx);
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalVariant = useProposalStatus(proposal!);
@@ -51,7 +47,7 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
       title: "Optimistic voting",
       status: proposalVariant!,
       disabled: false,
-      proposalId: proposalId.toString(),
+      proposalId: proposalIdx.toString(),
       providerId: "1",
       result: {
         cta: proposal?.executed
@@ -79,7 +75,7 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
             tokenSymbol: tokenSymbol || "TKO",
           },
         ],
-        proposalId: proposalId.toString(),
+        proposalId: proposalIdx.toString(),
       },
       details: {
         censusTimestamp: Number(proposal?.parameters.snapshotTimestamp || 0) || 0,
@@ -102,13 +98,7 @@ export default function ProposalDetail({ index: proposalId }: { index: number })
 
   return (
     <section className="flex w-screen min-w-full max-w-full flex-col items-center">
-      <ProposalHeader
-        proposal={proposal}
-        breadcrumbs={breadcrumbs}
-        transactionConfirming={isConfirmingVeto || isConfirmingExecution}
-        canExecute={canExecute}
-        onExecutePressed={() => executeProposal()}
-      />
+      <ProposalHeader proposalIdx={proposalIdx} proposal={proposal} />
 
       <div className="mx-auto w-full max-w-screen-xl px-4 py-6 md:px-16 md:pb-20 md:pt-10">
         <div className="flex w-full flex-col gap-x-12 gap-y-6 md:flex-row">
