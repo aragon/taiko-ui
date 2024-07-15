@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { OptimisticTokenVotingPluginAbi } from "../artifacts/OptimisticTokenVotingPlugin.sol";
 import { AlertContextProps, useAlerts } from "@/context/Alerts";
@@ -10,6 +10,7 @@ export function useProposalExecute(index: number) {
   const { reload } = useRouter();
   const { addAlert } = useAlerts() as AlertContextProps;
   const { proposalId } = useProposalId(index);
+  const [executing, setExecuting] = useState(false);
 
   const {
     data: canExecute,
@@ -34,6 +35,8 @@ export function useProposalExecute(index: number) {
     if (!canExecute) return;
     else if (typeof proposalId === "undefined") return;
 
+    setExecuting(true);
+
     executeWrite({
       chainId: PUB_CHAIN.id,
       abi: OptimisticTokenVotingPluginAbi,
@@ -57,6 +60,7 @@ export function useProposalExecute(index: number) {
           description: "The proposal may contain actions with invalid operations",
         });
       }
+      setExecuting(false);
       return;
     }
 
@@ -83,7 +87,7 @@ export function useProposalExecute(index: number) {
   return {
     executeProposal,
     canExecute: !isCanVoteError && !isCanVoteLoading && !isConfirmed && !!canExecute,
-    isConfirming,
+    isConfirming: executing || isConfirming,
     isConfirmed,
   };
 }

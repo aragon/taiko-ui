@@ -3,7 +3,6 @@ import ProposalHeader from "@/plugins/multisig/components/proposal/header";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalApprove } from "@/plugins/multisig/hooks/useProposalApprove";
 import { useProposalExecute } from "@/plugins/multisig/hooks/useProposalExecute";
-import { useRouter } from "next/router";
 import { BodySection } from "@/components/proposal/proposalBodySection";
 import { ProposalVoting } from "@/components/proposalVoting";
 import { type ITransformedStage, type IVote, ProposalStages } from "@/utils/types";
@@ -11,11 +10,8 @@ import { useProposalStatus } from "../hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
 import { ProposalAction } from "@/components/proposalAction/proposalAction";
 import { CardResources } from "@/components/proposal/cardResources";
-import { IBreadcrumbsLink } from "@aragon/ods";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
-  const router = useRouter();
-
   const {
     proposal,
     proposalFetchStatus,
@@ -26,7 +22,6 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   } = useProposalApprove(proposalId);
 
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
-  const breadcrumbs: IBreadcrumbsLink[] = [{ label: "Proposals", href: "#/" }, { label: proposalId.toString() }];
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalVariant = useProposalStatus(proposal!);
@@ -84,16 +79,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
 
   return (
     <section className="flex w-screen min-w-full max-w-full flex-col items-center">
-      <ProposalHeader
-        proposalNumber={Number(proposalId) + 1}
-        proposal={proposal}
-        breadcrumbs={breadcrumbs}
-        transactionConfirming={isConfirmingApproval || isConfirmingExecution}
-        canApprove={canApprove}
-        canExecute={canExecute}
-        onVetoPressed={() => approveProposal()}
-        onExecutePressed={() => executeProposal()}
-      />
+      <ProposalHeader proposalId={proposalId} proposal={proposal} />
 
       <div className="mx-auto w-full max-w-screen-xl px-4 py-6 md:px-16 md:pb-20 md:pt-10">
         <div className="flex w-full flex-col gap-x-12 gap-y-6 md:flex-row">

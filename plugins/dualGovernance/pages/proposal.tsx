@@ -3,7 +3,6 @@ import ProposalHeader from "@/plugins/dualGovernance/components/proposal/header"
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalVeto } from "@/plugins/dualGovernance/hooks/useProposalVeto";
 import { useProposalExecute } from "@/plugins/dualGovernance/hooks/useProposalExecute";
-import { useRouter } from "next/router";
 import { BodySection } from "@/components/proposal/proposalBodySection";
 import { ProposalVoting } from "@/components/proposalVoting";
 import { ITransformedStage, IVote, ProposalStages } from "@/utils/types";
@@ -14,7 +13,6 @@ import { CardResources } from "@/components/proposal/cardResources";
 import { formatEther } from "viem";
 import { useVotingToken } from "../hooks/useVotingToken";
 import { usePastSupply } from "../hooks/usePastSupply";
-import { IBreadcrumbsLink } from "@aragon/ods";
 
 export default function ProposalDetail({ index: proposalIdx }: { index: number }) {
   const {
@@ -29,7 +27,6 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
   const { symbol: tokenSymbol } = useVotingToken();
 
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalIdx);
-  const breadcrumbs: IBreadcrumbsLink[] = [{ label: "Proposals", href: "#/" }, { label: proposalIdx.toString() }];
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalVariant = useProposalStatus(proposal!);
@@ -101,13 +98,7 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
 
   return (
     <section className="flex w-screen min-w-full max-w-full flex-col items-center">
-      <ProposalHeader
-        proposal={proposal}
-        breadcrumbs={breadcrumbs}
-        transactionConfirming={isConfirmingVeto || isConfirmingExecution}
-        canExecute={canExecute}
-        onExecutePressed={() => executeProposal()}
-      />
+      <ProposalHeader proposalIdx={proposalIdx} proposal={proposal} />
 
       <div className="mx-auto w-full max-w-screen-xl px-4 py-6 md:px-16 md:pb-20 md:pt-10">
         <div className="flex w-full flex-col gap-x-12 gap-y-6 md:flex-row">

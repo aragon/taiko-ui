@@ -4,33 +4,24 @@ import classNames from "classnames";
 import { ReactNode } from "react";
 import { OptimisticProposal } from "@/plugins/dualGovernance/utils/types";
 import { useProposalStatus } from "@/plugins/dualGovernance/hooks/useProposalVariantStatus";
-import dayjs from "dayjs";
-
+import { Else, If, Then } from "@/components/if";
 import { getSimpleRelativeTimeFromDate } from "@/utils/dates";
+import dayjs from "dayjs";
 
 const DEFAULT_PROPOSAL_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_SUMMARY = "(No proposal summary)";
 
 interface ProposalHeaderProps {
+  proposalIdx: number;
   proposal: OptimisticProposal;
-  canExecute: boolean;
-  breadcrumbs: IBreadcrumbsLink[];
-  transactionConfirming: boolean;
-  onExecutePressed: () => void;
 }
 
-const ProposalHeader: React.FC<ProposalHeaderProps> = ({
-  proposal,
-  canExecute,
-  breadcrumbs,
-  transactionConfirming,
-  onExecutePressed,
-}) => {
+const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalIdx, proposal }) => {
   const status = useProposalStatus(proposal);
   const tagVariant = getTagVariantFromStatus(status);
-
-  // TODO: Remake this logic with something less hacky
+  const breadcrumbs: IBreadcrumbsLink[] = [{ label: "Proposals", href: "#/" }, { label: proposalIdx.toString() }];
   const isEmergency = proposal.parameters.vetoStartDate === 0n;
+  const endDateIsInThePast = Number(proposal.parameters.vetoEndDate) * 1000 < Date.now();
 
   return (
     <div className="flex w-full justify-center bg-neutral-0">
@@ -63,10 +54,17 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({
           <div className="flex items-center gap-x-2">
             <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
             <div className="flex gap-x-1 text-base leading-tight ">
-              <span className="text-neutral-800">
-                {getSimpleRelativeTimeFromDate(dayjs(Number(proposal.parameters.vetoEndDate) * 1000))}
-              </span>
-              <span className="text-neutral-500">left until expiration</span>
+              <If condition={endDateIsInThePast}>
+                <Then>
+                  <span className="text-neutral-500">The veto period is over</span>
+                </Then>
+                <Else>
+                  <span className="text-neutral-500">Active for </span>
+                  <span className="text-neutral-800">
+                    {getSimpleRelativeTimeFromDate(dayjs(Number(proposal.parameters.vetoEndDate) * 1000))}
+                  </span>
+                </Else>
+              </If>
             </div>
           </div>
         </div>
