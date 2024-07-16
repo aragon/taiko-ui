@@ -105,7 +105,10 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
         <div className="flex w-full flex-col gap-x-12 gap-y-6 md:flex-row">
           <div className="flex flex-col gap-y-6 md:w-[63%] md:shrink-0">
             <BodySection body={proposal.description || "No description was provided"} />
-            <ProposalVoting stages={proposalStage} />
+            <ProposalVoting
+              stages={proposalStage}
+              description="The optimistic voting flow allows token holders to veto proposals to which they object. If not enough voting power has vetoed for a given period of time, the proposal will become executable on the DAO."
+            />
             <ProposalAction
               canExecute={canExecute}
               isConfirmingExecution={isConfirmingExecution}

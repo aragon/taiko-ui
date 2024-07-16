@@ -76,12 +76,12 @@ describe("Proposal data encryption", () => {
       title: "Proposal title",
       description: "Proposal description",
     };
-    const actionBytes1 = new Uint8Array([
+    const actionBytes = new Uint8Array([
       50, 73, 84, 62, 162, 188, 126, 255, 0, 2, 25, 40, 200, 123, 234, 55, 26, 55, 26, 37, 82, 0, 5, 1,
     ]);
 
     // Encrypt
-    const { encrypted: data, symmetricKey } = encryptProposal(JSON.stringify(metadata), actionBytes1);
+    const { encrypted: data, symmetricKey } = encryptProposal(JSON.stringify(metadata), actionBytes);
 
     const otherKeys = new Array(20).fill(0).map(() => generateSymmetricKey());
 
@@ -91,6 +91,8 @@ describe("Proposal data encryption", () => {
 
       expect(dMetadata.title).toBe(metadata.title);
       expect(dMetadata.description).toBe(metadata.description);
+
+      expect(dActions1.toString()).toBe(actionBytes.toString());
     }).not.toThrow();
 
     for (const otherKey of otherKeys) {
