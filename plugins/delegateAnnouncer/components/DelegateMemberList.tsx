@@ -59,7 +59,7 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifie
 
   if (!totalMembers) {
     return (
-      <DataList.Root entityLabel="No members" itemsCount={totalMembers}>
+      <DataList.Root entityLabel="No members" itemsCount={0}>
         <DataList.Filter
           onSearchValueChange={setSearchValue}
           searchValue={searchValue}
