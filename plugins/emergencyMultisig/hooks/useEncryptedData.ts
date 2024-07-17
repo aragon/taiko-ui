@@ -6,21 +6,28 @@ import { ProposalMetadata, RawAction } from "@/utils/types";
 import { usePublicKeyRegistry } from "./usePublicKeyRegistry";
 import { RawActionListAbi } from "../artifacts/RawActionListAbi";
 import { getContentCid } from "@/utils/ipfs";
+import { useMultisigMembers } from "@/plugins/daoMembers/hooks/useMultisigMembers";
 
 export function useEncryptedData() {
-  const {
-    data: { publicKeys },
-  } = usePublicKeyRegistry();
+  const { data: pubKeyItems, isLoading: isLoadingPubKeys } = usePublicKeyRegistry();
+  const { members: signers, isLoading: isLoadingMultisig, error: multisigMembersError } = useMultisigMembers();
 
   const encryptProposalData = async (privateMetadata: ProposalMetadata, actions: RawAction[]) => {
     const actionsBytes = encodeAbiParameters(RawActionListAbi, [actions]);
+    if (isLoadingPubKeys || isLoadingMultisig) throw new Error("The multisig members are not available yet");
+    else if (multisigMembersError) throw multisigMembersError;
 
     // Encrypt data
     const strMetadata = JSON.stringify(privateMetadata);
     const { encrypted: cipherData, symmetricKey } = encryptProposal(strMetadata, hexToUint8Array(actionsBytes));
+
+    // Only for those who are on the multisig
+    const filteredSignerItems = pubKeyItems.filter((item) => {
+      return signers.includes(item.address);
+    });
     const encryptedSymKeys = encryptSymmetricKey(
       symmetricKey,
-      publicKeys.map((pk) => hexToUint8Array(pk))
+      filteredSignerItems.map((item) => hexToUint8Array(item.publicKey))
     );
 
     // Hash the raw actions

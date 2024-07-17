@@ -18,7 +18,7 @@ export function usePublicKeyRegistry() {
   const { publicKey, requestSignature } = useDerivedWallet();
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["public-key-registry-values"],
+    queryKey: ["public-key-registry-items-fetching"],
     queryFn: () => {
       return readContract(config, {
         abi: PublicKeyRegistryAbi,
@@ -26,28 +26,26 @@ export function usePublicKeyRegistry() {
         functionName: "getRegisteredWallets",
       }).then((addresses) => {
         return Promise.all(
-          addresses.map((addr) => {
+          addresses.map((address) => {
             return readContract(config, {
               abi: PublicKeyRegistryAbi,
               address: PUB_PUBLIC_KEY_REGISTRY_CONTRACT_ADDRESS,
               functionName: "publicKeys",
-              args: [addr],
+              args: [address],
+            }).then((publicKey: Hex) => {
+              // zip values
+              return { address, publicKey };
             });
           })
-        ).then((publicKeys: Hex[]) => {
-          return { addresses, publicKeys };
-        });
+        );
       });
     },
-    initialData: {
-      publicKeys: [],
-      addresses: [],
-    },
+    initialData: [],
     retry: true,
     refetchOnMount: false,
     refetchOnReconnect: false,
     retryOnMount: true,
-    staleTime: 1000 * 60 * 10,
+    staleTime: 1000 * 60 * 5,
   });
 
   const registerPublicKey = async () => {
@@ -105,7 +103,7 @@ export function usePublicKeyRegistry() {
   }, [registrationStatus, createTxHash, isConfirming, isConfirmed]);
 
   return {
-    data,
+    data: data || [],
     registerPublicKey,
     isLoading,
     isConfirming: isRegistering || isConfirming,

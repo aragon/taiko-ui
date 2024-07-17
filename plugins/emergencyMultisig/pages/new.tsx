@@ -14,6 +14,7 @@ import { useCreateProposal } from "../hooks/useCreateProposal";
 import { useCanCreateProposal } from "../hooks/useCanCreateProposal";
 import { ActionType } from "@/utils/types";
 import { usePublicKeyRegistry } from "../hooks/usePublicKeyRegistry";
+import { useMultisigMembers } from "@/plugins/daoMembers/hooks/useMultisigMembers";
 
 export default function Create() {
   const { open } = useWeb3Modal();
@@ -35,11 +36,12 @@ export default function Create() {
     submitProposal,
   } = useCreateProposal();
   const {
-    data: { addresses: registeredSigners },
+    data: registeredSigners,
     registerPublicKey,
     isLoading: isLoadingPubKeys,
     isConfirming: isRegisteringPublicKey,
   } = usePublicKeyRegistry();
+  const { members: multisigMembers } = useMultisigMembers();
 
   const changeActionType = (actionType: ActionType) => {
     setActions([]);
@@ -51,6 +53,12 @@ export default function Create() {
   const handleSummaryInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSummary(event?.target?.value);
   };
+
+  const hasPubKeyRegistered = registeredSigners.some((item) => item.address === selfAddress);
+  const filteredSignerItems = registeredSigners.filter((signer) => {
+    return multisigMembers.includes(signer.address);
+  });
+  const signersWithPubKey = filteredSignerItems.length;
 
   return (
     <MainSection narrow>
@@ -72,7 +80,7 @@ export default function Create() {
               onClick={() => open()}
             />
           </ElseIf>
-          <ElseIf condition={selfAddress && !registeredSigners.includes(selfAddress)}>
+          <ElseIf condition={selfAddress && !hasPubKeyRegistered}>
             {/* Public key not registered yet */}
             <MissingContentView
               message={`You haven't registered a public key yet. A public key is necessary in order for proposals to have
@@ -194,7 +202,7 @@ export default function Create() {
             </div>
             <div>
               <span className="text-md mb-2 block font-normal text-neutral-700 ">
-                {registeredSigners.length} signer(s) registered a public key
+                {signersWithPubKey || 0} signer(s) registered the public key
               </span>
             </div>
 

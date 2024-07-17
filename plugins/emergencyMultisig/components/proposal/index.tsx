@@ -34,9 +34,15 @@ export default function ProposalCard(props: ProposalInputs) {
     // We have the proposal but no metadata yet
     return (
       <Link href={`#/proposals/${props.proposalId}`} className="mb-4 w-full">
-        <Card className="p-4">
-          <span className="xs:px-10 px-4 py-5 md:px-6 lg:px-7">
+        <Card className="px-5">
+          <span className="xs:px-10 px-5 py-5 md:px-6 lg:px-7">
             <PleaseWaitSpinner fullMessage="Loading metadata..." />
+            <div>
+              <p className="pt-2 text-sm text-neutral-400">
+                Note: If your public key was not registered before the proposal was created, you will not be able to
+                decrypt the proposal details.
+              </p>
+            </div>
           </span>
         </Card>
       </Link>
