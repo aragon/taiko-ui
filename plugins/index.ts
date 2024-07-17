@@ -43,8 +43,8 @@ export const plugins: PluginItem[] = [
     hidden: true,
   },
   {
-    id: "members",
-    folderName: "delegateAnnouncer",
+    id: "dao-members",
+    folderName: "daoMembers",
     title: "DAO Members",
     // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_DELEGATION_WALL_CONTRACT_ADDRESS,

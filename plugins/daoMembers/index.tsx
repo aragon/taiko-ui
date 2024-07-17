@@ -3,6 +3,7 @@ import { DelegateProfile } from "./pages/delegate-profile";
 import { useUrl } from "@/hooks/useUrl";
 import { NotFound } from "@/components/not-found";
 import { Address } from "viem";
+import { MainSection } from "@/components/layout/main-section";
 
 export default function PluginPage() {
   // Select the inner pages to display depending on the URL hash

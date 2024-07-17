@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { DataList, IconType, IllustrationHuman, MemberDataListItem, type DataListState } from "@aragon/ods";
-import { MemberListItem } from "./MemberListItem";
+import { DelegateListItem } from "./DelegateListItem";
 import { equalAddresses } from "@/utils/evm";
 import { useRouter } from "next/router";
 import { useDelegates } from "../hooks/useDelegates";
@@ -97,7 +97,7 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifie
         className="grid grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))] gap-3"
       >
         {filteredDelegates.map((delegate) => (
-          <MemberListItem
+          <DelegateListItem
             isMyDelegate={equalAddresses(delegatesTo, delegate)}
             key={delegate}
             onClick={() => push("#/delegates/" + delegate)}

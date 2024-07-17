@@ -6,7 +6,7 @@ import { Address, formatEther } from "viem";
 import { useGovernanceToken } from "../hooks/useGovernanceToken";
 import VerifiedDelegates from "../../../verified-delegates.json";
 
-export interface IMemberDataListItemProps extends IDataListItemProps {
+export interface IDelegateListItemProps extends IDataListItemProps {
   /** Whether the member is a delegate of current user or not */
   isMyDelegate?: boolean;
   /** 0x address of the user */
@@ -15,7 +15,7 @@ export interface IMemberDataListItemProps extends IDataListItemProps {
   avatarSrc?: string;
 }
 
-export const MemberListItem: React.FC<IMemberDataListItemProps> = (props) => {
+export const DelegateListItem: React.FC<IDelegateListItemProps> = (props) => {
   const { isMyDelegate, avatarSrc, address, ...otherProps } = props;
   const { address: currentUserAddress, isConnected } = useAccount();
   const isCurrentUser = isConnected && address && equalAddresses(currentUserAddress, address);
