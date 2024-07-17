@@ -75,7 +75,7 @@ export const useAbi = (contractAddress: Address) => {
         .catch((err) => {
           console.error(err);
           addAlert("Cannot fetch", {
-            description: "The details of the contract could not be fetched",
+            description: "The details of the contract cannot be fetched or are not publicly available",
             type: "error",
           });
           throw err;

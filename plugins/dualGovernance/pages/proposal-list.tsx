@@ -42,8 +42,12 @@ export default function Proposals() {
   }
 
   return (
-    <MainSection className="flex flex-col gap-y-6 md:px-16 md:py-10">
-      <h1 className="justify-self-start align-middle text-3xl font-semibold">Proposals</h1>
+    <MainSection narrow>
+      <div className="flex w-full flex-row content-center justify-between">
+        <h1 className="line-clamp-1 flex flex-1 shrink-0 text-2xl font-normal leading-tight text-neutral-800 md:text-3xl">
+          Proposals
+        </h1>
+      </div>
       <If condition={proposalCount}>
         <Then>
           <DataList.Root

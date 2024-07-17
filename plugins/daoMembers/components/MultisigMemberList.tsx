@@ -4,9 +4,6 @@ import { MultisigMemberListItem } from "./MultisigMemberListItem";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useMultisigMembers } from "../hooks/useMultisigMembers";
 import { PUB_CHAIN } from "@/constants";
-// import { generateSortOptions, sortItems } from "./utils";
-
-// const DEFAULT_PAGE_SIZE = 12;
 
 interface IMultisigMemberListProps {}
 
@@ -27,10 +24,8 @@ export const MultisigMemberList: React.FC<IMultisigMemberListProps> = () => {
 
   const totalMembers = filteredMembers.length || 0;
   const showPagination = false;
-  // const showPagination = (totalMembers ?? 0) > DEFAULT_PAGE_SIZE;
   const resetFilters = () => {
     setSearchValue("");
-    // setActiveSort("");
   };
   const emptyFilteredState = {
     heading: "No members found",
@@ -48,10 +43,7 @@ export const MultisigMemberList: React.FC<IMultisigMemberListProps> = () => {
         <DataList.Filter
           onSearchValueChange={setSearchValue}
           searchValue={searchValue}
-          placeholder="Filter by name or address"
-          // onSortChange={setActiveSort}
-          // activeSort={activeSort}
-          // sortItems={sortItems}
+          placeholder="Filter by address"
         />
         <NoMembersView filtered={!!searchValue?.trim()} />
       </DataList.Root>
@@ -59,25 +51,9 @@ export const MultisigMemberList: React.FC<IMultisigMemberListProps> = () => {
   }
 
   return (
-    <DataList.Root
-      entityLabel={totalMembers === 1 ? "member" : "members"}
-      itemsCount={totalMembers}
-      // pageSize={DEFAULT_PAGE_SIZE}
-      // state={dataListState}
-      // onLoadMore={fetchNextPage}
-    >
-      <DataList.Filter
-        onSearchValueChange={setSearchValue}
-        searchValue={searchValue}
-        placeholder="Filter by name or address"
-        // onSortChange={setActiveSort}
-        // activeSort={activeSort}
-        // sortItems={sortItems}
-      />
+    <DataList.Root entityLabel={totalMembers === 1 ? "member" : "members"} itemsCount={totalMembers}>
+      <DataList.Filter onSearchValueChange={setSearchValue} searchValue={searchValue} placeholder="Filter by address" />
       <DataList.Container
-        // SkeletonElement={MemberDataListItem.Skeleton}
-        // errorState={errorState}
-        // emptyState={emptyState}
         emptyFilteredState={emptyFilteredState}
         className="grid grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))] gap-5"
       >

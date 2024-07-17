@@ -63,7 +63,7 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifie
         <DataList.Filter
           onSearchValueChange={setSearchValue}
           searchValue={searchValue}
-          placeholder="Filter by name or address"
+          placeholder="Filter by address"
           // onSortChange={setActiveSort}
           // activeSort={activeSort}
           // sortItems={sortItems}
@@ -84,7 +84,7 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifie
       <DataList.Filter
         onSearchValueChange={setSearchValue}
         searchValue={searchValue}
-        placeholder="Filter by name or address"
+        placeholder="Filter by address"
         // onSortChange={setActiveSort}
         // activeSort={activeSort}
         // sortItems={sortItems}

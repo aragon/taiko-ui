@@ -53,29 +53,12 @@ export default function Proposals() {
     dataListState = "fetchingNextPage";
   }
 
-  const emptyFilteredState = {
-    heading: "No proposals found",
-    description: "Your applied filters are not matching with any results. Reset and search with other filters!",
-    secondaryButton: {
-      label: "Reset all filters",
-      iconLeft: IconType.RELOAD,
-    },
-  };
-
-  const errorState = {
-    heading: "Error loading proposals",
-    description: "There was an error loading the proposals. Try again!",
-    secondaryButton: {
-      label: "Reload proposals",
-      iconLeft: IconType.RELOAD,
-      onClick: () => refetch(),
-    },
-  };
-
   return (
-    <MainSection className="flex flex-col gap-y-6 md:px-16 md:py-10">
+    <MainSection narrow>
       <SectionView>
-        <h1 className="justify-self-start align-middle text-3xl font-semibold">Proposals</h1>
+        <h1 className="line-clamp-1 flex flex-1 shrink-0 text-2xl font-normal leading-tight text-neutral-800 md:text-3xl">
+          Proposals
+        </h1>
         <div className="justify-self-end">
           <If condition={isConnected && canCreate}>
             <Link href="#/new">
@@ -95,15 +78,11 @@ export default function Proposals() {
             state={dataListState}
             //onLoadMore={fetchNextPage}
           >
-            <DataList.Container
-              SkeletonElement={ProposalDataListItemSkeleton}
-              errorState={errorState}
-              emptyFilteredState={emptyFilteredState}
-            >
+            <DataList.Container SkeletonElement={ProposalDataListItemSkeleton}>
               {proposalCount &&
                 Array.from(Array(proposalCount || 0)?.keys())
                   .reverse()
-                  ?.map((proposalIndex, index) => (
+                  ?.map((proposalIndex) => (
                     // TODO: update with router agnostic ODS DataListItem
                     <ProposalCard key={proposalIndex} proposalId={BigInt(proposalIndex)} />
                   ))}
