@@ -1,11 +1,12 @@
-import { useProposal } from "@/plugins/dualGovernance/hooks/useProposal";
+import type { useProposal } from "@/plugins/dualGovernance/hooks/useProposal";
 import ProposalHeader from "@/plugins/dualGovernance/components/proposal/header";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalVeto } from "@/plugins/dualGovernance/hooks/useProposalVeto";
 import { useProposalExecute } from "@/plugins/dualGovernance/hooks/useProposalExecute";
 import { BodySection } from "@/components/proposal/proposalBodySection";
 import { ProposalVoting } from "@/components/proposalVoting";
-import { ITransformedStage, IVote, ProposalStages } from "@/utils/types";
+import type { ITransformedStage, IVote } from "@/utils/types";
+import { ProposalStages } from "@/utils/types";
 import { useProposalStatus } from "../hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
 import { ProposalAction } from "@/components/proposalAction/proposalAction";
@@ -104,7 +105,10 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
         <div className="flex w-full flex-col gap-x-12 gap-y-6 md:flex-row">
           <div className="flex flex-col gap-y-6 md:w-[63%] md:shrink-0">
             <BodySection body={proposal.description || "No description was provided"} />
-            <ProposalVoting stages={proposalStage} />
+            <ProposalVoting
+              stages={proposalStage}
+              description="The optimistic voting flow allows token holders to veto proposals to which they object. If not enough voting power has vetoed for a given period of time, the proposal will become executable on the DAO."
+            />
             <ProposalAction
               canExecute={canExecute}
               isConfirmingExecution={isConfirmingExecution}

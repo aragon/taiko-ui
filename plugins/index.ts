@@ -13,7 +13,7 @@ type PluginItem = {
   folderName: string;
   /** Title on menu */
   title: string;
-  icon: IconType;
+  icon?: IconType;
   pluginAddress: string;
   hidden?: boolean;
 };
@@ -23,14 +23,14 @@ export const plugins: PluginItem[] = [
     id: "community-vote",
     folderName: "dualGovernance",
     title: "Community Vote",
-    icon: IconType.APP_MEMBERS,
+    // icon: IconType.APP_MEMBERS,
     pluginAddress: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
   },
   {
     id: "core-proposals",
     folderName: "multisig",
     title: "Core Team Multisig",
-    icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
+    // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_MULTISIG_PLUGIN_ADDRESS,
     hidden: true,
   },
@@ -38,15 +38,15 @@ export const plugins: PluginItem[] = [
     id: "emergency-proposals",
     folderName: "emergencyMultisig",
     title: "Emergency Multisig",
-    icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
+    // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
     hidden: true,
   },
   {
-    id: "members",
-    folderName: "delegateAnnouncer",
-    title: "Delegates",
-    icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
+    id: "dao-members",
+    folderName: "daoMembers",
+    title: "DAO Members",
+    // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_DELEGATION_WALL_CONTRACT_ADDRESS,
   },
 ];

@@ -12,14 +12,14 @@ export const Navbar: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
 
   const navLinks: INavLink[] = [
-    { path: "/", id: "dashboard", name: "Dashboard", icon: IconType.APP_DASHBOARD },
+    { path: "/", id: "dashboard", name: "Dashboard" /*, icon: IconType.APP_DASHBOARD*/ },
     ...plugins
       // .filter((p) => !p.hidden)
       .map((p) => ({
         id: p.id,
         name: p.title,
         path: `/plugins/${p.id}/#/`,
-        icon: p.icon,
+        // icon: p.icon,
       })),
   ];
 

@@ -1,5 +1,5 @@
-import { Address, Hex } from "viem";
-import { IProposalResource, RawAction } from "@/utils/types";
+import type { Address, Hex } from "viem";
+import type { IProposalResource, RawAction } from "@/utils/types";
 
 export type ProposalInputs = {
   proposalId: bigint;

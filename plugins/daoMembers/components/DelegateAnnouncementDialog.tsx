@@ -1,6 +1,6 @@
 // import { MemberProfile } from "@/components/nav/routes";
-import { useAnnounceDelegation } from "@/plugins/delegateAnnouncer/hooks/useAnnounceDelegation";
-import { type IAnnouncementMetadata } from "@/plugins/delegateAnnouncer/utils/types";
+import { useAnnounceDelegation } from "@/plugins/daoMembers/hooks/useAnnounceDelegation";
+import { type IAnnouncementMetadata } from "@/plugins/daoMembers/utils/types";
 import { EMAIL_PATTERN, URL_PATTERN, URL_WITH_PROTOCOL_PATTERN } from "@/utils/input-values";
 import {
   Button,

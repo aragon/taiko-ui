@@ -119,7 +119,7 @@ export default function Proposals() {
               emptyFilteredState={emptyFilteredState}
             >
               {proposalCount &&
-                Array.from(Array(proposalCount)?.keys())
+                Array.from(Array(proposalCount || 0)?.keys())
                   .reverse()
                   ?.map((proposalIndex, index) => (
                     // TODO: update with router agnostic ODS DataListItem

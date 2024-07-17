@@ -38,7 +38,7 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
   const isVerified = VerifiedDelegates.findIndex((d) => equalAddresses(d.address, memberAddress)) >= 0;
 
   return (
-    <div className="flex w-full justify-center bg-gradient-to-b from-neutral-0 to-transparent">
+    <div className="flex w-full justify-center bg-neutral-0 from-neutral-0 to-transparent">
       <div className="flex w-full max-w-screen-xl flex-col gap-y-6 px-4 py-6 md:px-16 md:py-10">
         <Breadcrumbs
           links={breadcrumbs.map((v) => ({ ...v, label: formatHexString(v.label) }))}

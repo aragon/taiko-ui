@@ -111,7 +111,10 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
             <div className="flex w-full flex-col gap-x-12 gap-y-6 md:flex-row">
               <div className="flex flex-col gap-y-6 md:w-[63%] md:shrink-0">
                 <BodySection body={proposal.description || "No description was provided"} />
-                <ProposalVoting stages={proposalStage} />
+                <ProposalVoting
+                  stages={proposalStage}
+                  description="The on-chain emergency multisig flow allows its members to create proposals that, if approved by a super majority, will be executed directly on the DAO."
+                />
                 <ProposalAction
                   actions={proposal.actions}
                   canExecute={canExecute}
