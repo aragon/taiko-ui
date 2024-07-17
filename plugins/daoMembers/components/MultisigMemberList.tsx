@@ -43,7 +43,7 @@ export const MultisigMemberList: React.FC<IMultisigMemberListProps> = () => {
         <DataList.Filter
           onSearchValueChange={setSearchValue}
           searchValue={searchValue}
-          placeholder="Filter by name or address"
+          placeholder="Filter by address"
         />
         <NoMembersView filtered={!!searchValue?.trim()} />
       </DataList.Root>
@@ -52,11 +52,7 @@ export const MultisigMemberList: React.FC<IMultisigMemberListProps> = () => {
 
   return (
     <DataList.Root entityLabel={totalMembers === 1 ? "member" : "members"} itemsCount={totalMembers}>
-      <DataList.Filter
-        onSearchValueChange={setSearchValue}
-        searchValue={searchValue}
-        placeholder="Filter by name or address"
-      />
+      <DataList.Filter onSearchValueChange={setSearchValue} searchValue={searchValue} placeholder="Filter by address" />
       <DataList.Container
         emptyFilteredState={emptyFilteredState}
         className="grid grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))] gap-5"
