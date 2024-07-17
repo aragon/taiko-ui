@@ -52,7 +52,10 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({ onAddAction }) => 
           <AlertInline message="The address of the contract is not valid" variant="critical" />
         </ElseIf>
         <ElseIf not={abi?.length}>
-          <AlertInline message="Cannot find any public interface for the given contract address" variant="critical" />
+          <AlertInline
+            message="Cannot find the public interface for the given address. Check that the address is a contract with a public ABI."
+            variant="critical"
+          />
         </ElseIf>
         <Else>
           <If condition={isProxy}>

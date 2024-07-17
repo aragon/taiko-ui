@@ -53,7 +53,7 @@ export default function Create() {
   };
 
   return (
-    <MainSection className="flex flex-col gap-y-6 md:px-16 md:py-10">
+    <MainSection narrow>
       <div className="w-full justify-between">
         <h1 className="mb-6 text-3xl font-semibold text-neutral-900">Create Proposal</h1>
 

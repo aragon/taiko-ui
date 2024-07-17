@@ -34,7 +34,7 @@ export default function MembersList() {
   const { announce } = useDelegateAnnounce(address);
 
   return (
-    <MainSection className="lg:px-16 lg:pb-20 xl:pt-12">
+    <MainSection>
       <div className="flex w-full max-w-[1280] flex-col gap-x-10 gap-y-8 lg:flex-row">
         <div className="flex flex-1 flex-col gap-y-6">
           <div className="flex items-center justify-between">

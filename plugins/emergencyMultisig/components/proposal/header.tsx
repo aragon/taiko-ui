@@ -1,12 +1,11 @@
 import { AvatarIcon, Breadcrumbs, Button, Heading, IBreadcrumbsLink, IconType, Tag, TagVariant } from "@aragon/ods";
 import { useProposalStatus } from "@/plugins/emergencyMultisig/hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
-import classNames from "classnames";
-import { ReactNode } from "react";
 import { Publisher } from "@/components/publisher";
 import { getSimpleRelativeTimeFromDate } from "@/utils/dates";
 import { EmergencyProposal } from "../../utils/types";
 import { Else, If, Then } from "@/components/if";
+import { HeaderSection } from "@/components/layout/header-section";
 
 interface ProposalHeaderProps {
   proposalId: string;
@@ -22,7 +21,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalId, proposal })
   return (
     <div className="flex w-full justify-center bg-neutral-0">
       {/* Wrapper */}
-      <MainSection className="flex flex-col gap-y-6 md:px-16 md:py-10">
+      <HeaderSection>
         <Breadcrumbs
           links={breadcrumbs}
           tag={
@@ -64,22 +63,12 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalId, proposal })
             </div>
           </div>
         </div>
-      </MainSection>
+      </HeaderSection>
     </div>
   );
 };
 
 export default ProposalHeader;
-
-interface IMainSectionProps {
-  children?: ReactNode;
-  className?: string;
-}
-const MainSection: React.FC<IMainSectionProps> = (props) => {
-  const { children, className } = props;
-
-  return <div className={classNames("mx-auto w-full max-w-screen-xl px-4 py-6", className)}>{children}</div>;
-};
 
 const getTagVariantFromStatus = (status: string | undefined): TagVariant => {
   switch (status) {
