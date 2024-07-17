@@ -19,6 +19,9 @@ export const useAbi = (contractAddress: Address) => {
     queryKey: ["proxy-check", contractAddress, !!publicClient],
     queryFn: () => {
       if (!contractAddress || !publicClient) return null;
+      else if (!isAddress(contractAddress) || !publicClient) {
+        return null;
+      }
 
       return isProxyContract(publicClient, contractAddress)
         .then((isProxy) => {
@@ -27,14 +30,15 @@ export const useAbi = (contractAddress: Address) => {
         })
         .catch(() => null);
     },
-    retry: 4,
+    initialData: null,
+    retry: 6,
     refetchOnMount: false,
     refetchOnReconnect: false,
     retryOnMount: true,
     staleTime: Infinity,
   });
 
-  const resolvedAddress = isAddress(implementationAddress) ? implementationAddress : contractAddress;
+  const resolvedAddress = isAddress(implementationAddress) ? (implementationAddress as Address) : contractAddress;
 
   const {
     data: abi,
@@ -59,14 +63,15 @@ export const useAbi = (contractAddress: Address) => {
         .then(({ abi }) => {
           const functionItems: AbiFunction[] = [];
           for (const item of abi) {
-            if (item.type === "event") continue;
+            // "event", "error", "constructor", "receive", "fallback"
+            if (item.type !== "function") continue;
 
             functionItems.push({
-              name: (item as any).name ?? "(function)",
-              inputs: item.inputs ?? [],
-              outputs: item.outputs ?? [],
-              stateMutability: item.stateMutability || "payable",
-              type: item.type,
+              name: ((item as any).name as string) || "(unknown function)",
+              inputs: item?.inputs ?? [],
+              outputs: item?.outputs ?? [],
+              stateMutability: item?.stateMutability || "payable",
+              type: item?.type,
             });
           }
           functionItems.sort(abiSortCallback);
@@ -81,11 +86,11 @@ export const useAbi = (contractAddress: Address) => {
           throw err;
         });
     },
-    retry: 4,
+    retry: 6,
     refetchOnMount: false,
     refetchOnReconnect: false,
     retryOnMount: true,
-    staleTime: Infinity,
+    staleTime: 1000 * 60 * 60 * 24 * 30,
   });
 
   return {

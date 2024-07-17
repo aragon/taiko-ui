@@ -53,7 +53,7 @@ export const FunctionCallForm: FC<FunctionCallFormProps> = ({ onAddAction }) => 
         </ElseIf>
         <ElseIf not={abi?.length}>
           <AlertInline
-            message="Cannot find the public interface for the given address. Check that the address is a contract with a public ABI."
+            message="Cannot find the public interface for the given address. Check that the address is a contract with a public ABI and that the contract exposes functions to be called."
             variant="critical"
           />
         </ElseIf>

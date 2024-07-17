@@ -69,7 +69,11 @@ export const FunctionSelector = ({ abi, actionEntered }: IFunctionSelectorProps)
     }
   };
 
-  const functionAbiList = (abi || []).filter((item) => item.type === "function");
+  const functionAbiList = (abi || []).filter((item) => {
+    if (["function"].includes(item.type)) return true;
+    else if (["payable", "nonpayable"].includes(item.stateMutability)) return true;
+    return false;
+  });
 
   return (
     <div className="flex h-96 rounded-lg border border-neutral-200 bg-neutral-0">
