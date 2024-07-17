@@ -26,21 +26,21 @@ export const Navbar: React.FC = () => {
   return (
     <>
       <nav className="h-30 sticky top-0 z-[var(--hub-navbar-z-index)] flex w-full items-center justify-center border-b border-b-neutral-100 bg-neutral-0">
-        <div className="w-full max-w-[1280px] flex-col gap-2 p-3 md:px-6 md:pb-0 md:pt-5 lg:gap-3">
+        <div className="w-full max-w-[1280px] flex-col gap-2 p-3 md:px-6 md:pb-0 lg:gap-3">
           <div className="flex w-full items-center justify-between">
-            <div className="flex">
+            <div className="pb-3 lg:ml-10">
               <Link
                 href="/"
                 className={classNames(
-                  "flex items-center gap-x-5 rounded-full py-3 pb-5 md:rounded-lg lg:ml-10",
+                  "flex items-center gap-x-5 rounded-full py-2 md:rounded-lg",
                   "outline-none focus:outline-none focus-visible:ring focus-visible:ring-primary focus-visible:ring-offset" // focus styles
                 )}
               >
-                <img src={PUB_PROJECT_LOGO} width="164" height="32" className="shrink-0" alt={PUB_APP_NAME + " logo"} />
+                <img src={PUB_PROJECT_LOGO} width="130" height="32" className="shrink-0" alt={PUB_APP_NAME + " logo"} />
               </Link>
-              <div className="flex items-center gap-x-2 px-4">
-                <span className="text-sm leading-tight text-neutral-500">Powered by</span>
-                <img src="/logo-aragon-bw-sm.png" width="18" height="18" alt="Aragon" />
+              <div className="flex items-center gap-x-2">
+                <span className="text-md leading-tight text-neutral-500">Governed on</span>
+                <img src="/logo-aragon-text.svg" alt="Aragon" className="h-6" />
               </div>
             </div>
 
