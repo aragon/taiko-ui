@@ -99,7 +99,7 @@ export const FunctionSelector = ({ abi, actionEntered }: IFunctionSelectorProps)
         </ul>
       </div>
       {/* Form */}
-      <div className="w-2/3 overflow-y-auto rounded-r-lg bg-primary-50 py-4">
+      <div className="w-2/3 overflow-y-auto rounded-r-lg bg-neutral-50 py-4">
         <If condition={!!selectedAbiItem}>
           <Then>
             <div className="">
@@ -116,7 +116,7 @@ export const FunctionSelector = ({ abi, actionEntered }: IFunctionSelectorProps)
               <If condition={["pure", "view"].includes(selectedAbiItem?.stateMutability ?? "")}>
                 <div className="mx-4">
                   <AlertInline
-                    message="This function is marked as read only. An action with it would have no impact"
+                    message="This function is marked as read only. An action sent to it will have no impact"
                     variant="warning"
                   />
                 </div>
@@ -126,7 +126,7 @@ export const FunctionSelector = ({ abi, actionEntered }: IFunctionSelectorProps)
                   <InputParameter abi={paramAbi} idx={i} onChange={onParameterChange} />
                 </div>
               ))}
-              <If condition={selectedAbiItem?.stateMutability === "payable" || selectedAbiItem?.payable}>
+              <If condition={selectedAbiItem?.stateMutability === "payable" || !!selectedAbiItem?.payable}>
                 <div className="mx-4 my-3">
                   <InputText
                     className=""
