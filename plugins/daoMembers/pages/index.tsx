@@ -1,5 +1,6 @@
 import { MainSection } from "@/components/layout/main-section";
 import { Button, Heading, Toggle, ToggleGroup } from "@aragon/ods";
+import { PUB_APP_NAME, PUB_PROJECT_URL } from "@/constants";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { DelegateAnnouncementDialog } from "../components/DelegateAnnouncementDialog";
@@ -71,6 +72,16 @@ export default function MembersList() {
             </If>
           </div>
           <dl className="divide-y divide-neutral-100">
+            <div className="flex flex-col items-baseline gap-y-2 py-3 lg:gap-x-6 lg:py-4">
+              <dt className="line-clamp-1 shrink-0 text-lg leading-tight text-neutral-800 lg:line-clamp-6 lg:w-40">
+                About the project
+              </dt>
+              <dd className="size-full text-base leading-tight text-neutral-500">
+                <a href={PUB_PROJECT_URL} target="_blank" className="font-semibold text-primary-400 underline">
+                  Learn more about {PUB_APP_NAME}
+                </a>
+              </dd>
+            </div>
             <If condition={toggleValue === "all" || toggleValue === "verified"}>
               <Then>
                 <div className="flex flex-col items-baseline gap-y-2 py-3 lg:gap-x-6 lg:py-4">
@@ -110,10 +121,10 @@ export default function MembersList() {
             </Then>
             <ElseIf condition={toggleValue === "multisig"}>{/* nop */}</ElseIf>
             <ElseIf condition={announce}>
-              <Button onClick={() => setShowProfileCreationDialog(true)}>Update delegation profile</Button>
+              <Button onClick={() => setShowProfileCreationDialog(true)}>Update my delegation profile</Button>
             </ElseIf>
             <Else>
-              <Button onClick={() => setShowProfileCreationDialog(true)}>Create delegation profile</Button>
+              <Button onClick={() => setShowProfileCreationDialog(true)}>Create my delegation profile</Button>
             </Else>
           </If>
           <DelegateAnnouncementDialog
