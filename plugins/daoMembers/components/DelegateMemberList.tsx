@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DataList, IconType, IllustrationHuman, MemberDataListItem, type DataListState } from "@aragon/ods";
+import { DataList, IconType, IllustrationHuman } from "@aragon/ods";
 import { DelegateListItem } from "./DelegateListItem";
 import { equalAddresses } from "@/utils/evm";
 import { useRouter } from "next/router";

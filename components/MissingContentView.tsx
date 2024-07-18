@@ -1,12 +1,13 @@
 import { Button, IllustrationHuman } from "@aragon/ods";
+import { ReactNode } from "react";
 
 export const MissingContentView = ({
-  message,
+  children,
   callToAction,
   onClick,
   isLoading,
 }: {
-  message: string;
+  children: ReactNode;
   callToAction?: string;
   onClick?: () => any;
   isLoading?: boolean;
@@ -14,7 +15,7 @@ export const MissingContentView = ({
   if (!callToAction) {
     return (
       <div className="w-full">
-        <p className="text-md text-neutral-400">{message}</p>
+        <p className="text-md text-neutral-400">{children}</p>
         <Illustration />
       </div>
     );
@@ -22,7 +23,7 @@ export const MissingContentView = ({
 
   return (
     <div className="w-full">
-      <p className="text-md text-neutral-400">{message}</p>
+      <p className="text-md text-neutral-400">{children}</p>
       <Illustration />
       <div className="flex justify-center">
         <Button size="md" variant="primary" isLoading={!!isLoading} onClick={onClick ? onClick : () => {}}>
@@ -34,5 +35,5 @@ export const MissingContentView = ({
 };
 
 function Illustration() {
-  return <IllustrationHuman className="mx-auto mb-10 max-w-96" body="BLOCKS" expression="SMILE_WINK" hairs="CURLY" />;
+  return <IllustrationHuman className="mx-auto my-8 max-w-96" body="VOTING" expression="SMILE_WINK" hairs="CURLY" />;
 }

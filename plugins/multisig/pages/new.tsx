@@ -50,17 +50,15 @@ export default function Create() {
         <If condition={!selfAddress || !isConnected}>
           <Then>
             {/* Not connected */}
-            <MissingContentView
-              message={`Please, connect your Ethereum wallet in order to continue.`}
-              callToAction="Connect wallet"
-              onClick={() => open()}
-            />
+            <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
+              Please, connect your Ethereum wallet to continue.
+            </MissingContentView>
           </Then>
           <ElseIf condition={!canCreate}>
             {/* Not a member */}
-            <MissingContentView
-              message={`You cannot create proposals on the multisig because you are not currently defined as a member.`}
-            />
+            <MissingContentView>
+              You cannot create proposals on the multisig because you are not currently defined as a member.
+            </MissingContentView>
           </ElseIf>
           <Else>
             <div className="mb-6">

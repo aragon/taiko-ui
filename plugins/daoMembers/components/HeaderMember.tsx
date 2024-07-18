@@ -26,16 +26,16 @@ interface IHeaderMemberProps {
 }
 
 export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
-  const { address: memberAddress, bio, name } = props;
+  const { address: delegateAddress, bio, name } = props;
   const breadcrumbs: IBreadcrumbsLink[] = [{ label: "Delegates", href: "#/" }, { label: props.address }];
   const { open } = useWeb3Modal();
-  const { address: connectedAccount, isConnected } = useAccount();
-  const { data: ensName } = useEnsName({ chainId: mainnet.id, address: memberAddress });
-  const { votingPower, balance: tokenBalance, refetch } = useGovernanceToken(memberAddress);
-  const { delegatesTo } = useGovernanceToken(connectedAccount);
-  const { delegateVotingPower, isLoading: isConfirming } = useDelegateVotingPower(memberAddress, refetch);
-  const formattedAddress = formatHexString(memberAddress);
-  const isVerified = VerifiedDelegates.findIndex((d) => equalAddresses(d.address, memberAddress)) >= 0;
+  const { address: myAddress, isConnected } = useAccount();
+  const { data: ensName } = useEnsName({ chainId: mainnet.id, address: delegateAddress });
+  const { votingPower, balance: delegateTokenBalance, refetch } = useGovernanceToken(delegateAddress);
+  const { delegatesTo } = useGovernanceToken(myAddress);
+  const { delegateVotingPower, isLoading: isConfirming } = useDelegateVotingPower(delegateAddress, refetch);
+  const formattedAddress = formatHexString(delegateAddress);
+  const isVerified = VerifiedDelegates.findIndex((d) => equalAddresses(d.address, delegateAddress)) >= 0;
 
   return (
     <div className="flex w-full justify-center bg-neutral-0 from-neutral-0 to-transparent">
@@ -66,7 +66,7 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
                 {/* Token Balance */}
                 <div className="flex flex-col gap-y-1 leading-tight">
                   <div className="flex items-baseline gap-x-1">
-                    <span className="text-2xl text-neutral-800">{formatEther(tokenBalance ?? BigInt(0))}</span>
+                    <span className="text-2xl text-neutral-800">{formatEther(delegateTokenBalance ?? BigInt(0))}</span>
                     <span className="text-base text-neutral-500">{PUB_TOKEN_SYMBOL}</span>
                   </div>
                   <span className="text-sm text-neutral-500">Token balance</span>
@@ -74,7 +74,7 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
               </div>
             </div>
             <span>
-              <MemberAvatar address={memberAddress} size="lg" responsiveSize={{}} />
+              <MemberAvatar address={delegateAddress} size="lg" responsiveSize={{}} />
             </span>
           </div>
           <div>
@@ -83,13 +83,15 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
                 <Then>
                   <Button onClick={() => open()}>Connect to delegate</Button>
                 </Then>
-                <ElseIf condition={equalAddresses(memberAddress, delegatesTo)}>
+                <ElseIf condition={equalAddresses(delegateAddress, delegatesTo)}>
                   <Button disabled>Already delegated</Button>
                 </ElseIf>
-                <ElseIf condition={equalAddresses(memberAddress, connectedAccount)}>
-                  <Button isLoading={isConfirming} onClick={delegateVotingPower}>
-                    Reclaim voting power
-                  </Button>
+                <ElseIf condition={equalAddresses(delegateAddress, myAddress)}>
+                  <If condition={(delegateTokenBalance || BigInt(0)) > BigInt(0)}>
+                    <Button isLoading={isConfirming} onClick={delegateVotingPower}>
+                      Reclaim voting power
+                    </Button>
+                  </If>
                 </ElseIf>
                 <Else>
                   <Button isLoading={isConfirming} onClick={delegateVotingPower}>
@@ -117,7 +119,7 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
                 <Dropdown.Item
                   icon={IconType.COPY}
                   iconPosition="right"
-                  onClick={() => clipboardUtils.copy(memberAddress)}
+                  onClick={() => clipboardUtils.copy(delegateAddress)}
                 >
                   {formattedAddress}
                 </Dropdown.Item>

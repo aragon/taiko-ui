@@ -2,25 +2,21 @@ import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { type ReactNode, useEffect } from "react";
 import ProposalCard from "@/plugins/multisig/components/proposal";
 import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin";
-import {
-  Button,
-  DataList,
-  IconType,
-  IllustrationHuman,
-  ProposalDataListItemSkeleton,
-  type DataListState,
-} from "@aragon/ods";
+import { Button, DataList, IconType, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
 import { useCanCreateProposal } from "@/plugins/multisig/hooks/useCanCreateProposal";
 import Link from "next/link";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PUB_MULTISIG_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { MainSection } from "@/components/layout/main-section";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { MissingContentView } from "@/components/MissingContentView";
 
 const DEFAULT_PAGE_SIZE = 6;
 
 export default function Proposals() {
   const { isConnected } = useAccount();
   const canCreate = useCanCreateProposal();
+  const { open } = useWeb3Modal();
 
   const { data: blockNumber } = useBlockNumber({ watch: true });
 
@@ -69,8 +65,25 @@ export default function Proposals() {
           </If>
         </div>
       </SectionView>
-      <If condition={proposalCount}>
+
+      <If condition={!isConnected}>
         <Then>
+          <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
+            Please, connect your Ethereum wallet to access the proposals section.
+          </MissingContentView>
+        </Then>
+        <ElseIf condition={!proposalCount}>
+          <MissingContentView>
+            No proposals have been created yet. Here you will see the proposals created by the Security Council before
+            they can be submitted to the{" "}
+            <Link href="/plugins/community-proposals/#/" className="underline">
+              community voting stage
+            </Link>
+            .<br />
+            <If condition={canCreate}>Be the first to create one.</If>
+          </MissingContentView>
+        </ElseIf>
+        <Else>
           <DataList.Root
             entityLabel={entityLabel}
             itemsCount={proposalCount}
@@ -89,28 +102,6 @@ export default function Proposals() {
             </DataList.Container>
             <DataList.Pagination />
           </DataList.Root>
-        </Then>
-        <Else>
-          <div className="w-full">
-            <p className="text-md text-neutral-400">
-              No proposals have been created yet. Here you will see the proposals created by the Security Council before
-              they can be submitted to the{" "}
-              <Link href="/plugins/community-proposals/#/" className="underline">
-                community voting stage
-              </Link>
-              .
-            </p>
-            <IllustrationHuman className="mx-auto mb-10 max-w-72" body="BLOCKS" expression="SMILE_WINK" hairs="CURLY" />
-            <If condition={isConnected && canCreate}>
-              <div className="flex justify-center">
-                <Link href="#/new">
-                  <Button iconLeft={IconType.PLUS} size="md" variant="primary">
-                    Submit Proposal
-                  </Button>
-                </Link>
-              </div>
-            </If>
-          </div>
         </Else>
       </If>
     </MainSection>

@@ -1,11 +1,12 @@
 import { useBlockNumber, useReadContract } from "wagmi";
 import { useEffect } from "react";
 import ProposalCard from "@/plugins/dualGovernance/components/proposal";
-import { DataList, IllustrationHuman, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
+import { DataList, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
 import { Else, If, Then } from "@/components/if";
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisticTokenVotingPlugin.sol";
 import { MainSection } from "@/components/layout/main-section";
+import { MissingContentView } from "@/components/MissingContentView";
 
 const DEFAULT_PAGE_SIZE = 6;
 
@@ -68,12 +69,10 @@ export default function Proposals() {
           </DataList.Root>
         </Then>
         <Else>
-          <div className="w-full">
-            <p className="text-md text-neutral-400">
-              No proposals have been created yet. Here you will see the proposals approved by the Security Council.
-            </p>
-            <IllustrationHuman className="mx-auto mb-10 max-w-72" body="BLOCKS" expression="SMILE_WINK" hairs="CURLY" />
-          </div>
+          <MissingContentView>
+            No proposals have been created yet. Here you will see the list of proposals approved by the Security Council
+            which need to be ratified by the community.
+          </MissingContentView>
         </Else>
       </If>
     </MainSection>

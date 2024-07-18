@@ -74,36 +74,33 @@ export default function Create() {
           </Then>
           <ElseIf condition={!selfAddress || !isConnected}>
             {/* Not connected */}
-            <MissingContentView
-              message={`Please, connect your Ethereum wallet in order to continue.`}
-              callToAction="Connect wallet"
-              onClick={() => open()}
-            />
+            <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
+              Please, connect your Ethereum wallet to continue.
+            </MissingContentView>
           </ElseIf>
           <ElseIf condition={selfAddress && !hasPubKeyRegistered}>
             {/* Public key not registered yet */}
             <MissingContentView
-              message={`You haven't registered a public key yet. A public key is necessary in order for proposals to have
-                  private data that only members can decrypt. You will sign a deterministic text, which will be used to
-                  generate an encryption key only for this DAO.`}
               callToAction="Register your public key"
               onClick={() => registerPublicKey()}
               isLoading={isRegisteringPublicKey}
-            />
+            >
+              You haven&apos;t registered a public key yet. A public key is necessary in order for proposals to have
+              private data that only members can decrypt. You will sign a deterministic text, which will be used to
+              generate an encryption key only for this DAO.
+            </MissingContentView>
           </ElseIf>
           <ElseIf condition={!publicKey}>
             {/* Not signed in */}
-            <MissingContentView
-              message={`Please, sign in with your wallet in order to decrypt the private proposal data.`}
-              callToAction="Sign in to continue"
-              onClick={() => requestSignature()}
-            />
+            <MissingContentView callToAction="Sign in to continue" onClick={() => requestSignature()}>
+              Please, sign in with your Ethereum wallet to decrypt the private proposal data.
+            </MissingContentView>
           </ElseIf>
           <ElseIf condition={!canCreate}>
             {/* Not a member */}
-            <MissingContentView
-              message={`You cannot create proposals on the multisig because you are not currently defined as a member.`}
-            />
+            <MissingContentView>
+              You cannot create proposals on the multisig because you are not currently defined as a member.
+            </MissingContentView>
           </ElseIf>
           <Else>
             {/* All ready */}

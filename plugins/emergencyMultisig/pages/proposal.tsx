@@ -90,20 +90,16 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       <If condition={!isConnected}>
         <Then>
           <div className="mt-12">
-            <MissingContentView
-              message={`Please, connect your Ethereum wallet in order to continue.`}
-              callToAction="Connect wallet"
-              onClick={() => open()}
-            />
+            <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
+              Please, connect your Ethereum wallet to access the emergency proposals section.
+            </MissingContentView>
           </div>
         </Then>
         <ElseIf condition={!publicKey}>
           <div className="mt-12">
-            <MissingContentView
-              message={`Please, sign in with your wallet in order to decrypt the private proposal data.`}
-              callToAction="Sign in to continue"
-              onClick={() => requestSignature()}
-            />
+            <MissingContentView callToAction="Sign in to continue" onClick={() => requestSignature()}>
+              Please, sign in with your Ethereum wallet to decrypt the private proposal data.
+            </MissingContentView>
           </div>
         </ElseIf>
         <Else>
