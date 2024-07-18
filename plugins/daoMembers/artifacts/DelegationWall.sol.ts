@@ -43,12 +43,7 @@ export const DelegateAnnouncerAbi = [
     ],
     outputs: [
       {
-        name: "message",
-        type: "bytes",
-        internalType: "bytes",
-      },
-      {
-        name: "socialUrl",
+        name: "contentUrl",
         type: "bytes",
         internalType: "bytes",
       },
@@ -73,12 +68,7 @@ export const DelegateAnnouncerAbi = [
     name: "register",
     inputs: [
       {
-        name: "_message",
-        type: "bytes",
-        internalType: "bytes",
-      },
-      {
-        name: "_socialUrl",
+        name: "_contentUrl",
         type: "bytes",
         internalType: "bytes",
       },
@@ -97,13 +87,7 @@ export const DelegateAnnouncerAbi = [
         internalType: "address",
       },
       {
-        name: "message",
-        type: "bytes",
-        indexed: false,
-        internalType: "bytes",
-      },
-      {
-        name: "socialUrl",
+        name: "contentUrl",
         type: "bytes",
         indexed: false,
         internalType: "bytes",
@@ -113,7 +97,7 @@ export const DelegateAnnouncerAbi = [
   },
   {
     type: "error",
-    name: "EmptyMessage",
+    name: "EmptyContent",
     inputs: [],
   },
 ] as const;

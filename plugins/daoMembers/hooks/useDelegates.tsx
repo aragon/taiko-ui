@@ -1,5 +1,5 @@
 import { useReadContract } from "wagmi";
-import { DelegateAnnouncerAbi } from "@/plugins/daoMembers/artifacts/DelegateAnnouncer.sol";
+import { DelegateAnnouncerAbi } from "@/plugins/daoMembers/artifacts/DelegationWall.sol";
 import { PUB_CHAIN, PUB_DELEGATION_WALL_CONTRACT_ADDRESS } from "@/constants";
 
 /** Returns the list of delegates who posted a candidacy */

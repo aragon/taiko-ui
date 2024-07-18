@@ -1,4 +1,4 @@
-import { DelegateAnnouncerAbi } from "../artifacts/DelegateAnnouncer.sol";
+import { DelegateAnnouncerAbi } from "../artifacts/DelegationWall.sol";
 import { PUB_DELEGATION_WALL_CONTRACT_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
 import { fromHex, type Address } from "viem";
@@ -15,9 +15,7 @@ export const useDelegateAnnounce = (delegateAddress?: Address, options = {}) => 
     query: { enabled: !!delegateAddress, ...options },
   });
 
-  const { data: metadata, isLoading } = useMetadata<IAnnouncementMetadata>(
-    delegate ? fromHex(delegate[0], "string") : ""
-  );
+  const { data: metadata, isLoading } = useMetadata<IAnnouncementMetadata>(delegate ? fromHex(delegate, "string") : "");
 
   return {
     announce: metadata,

@@ -1,4 +1,4 @@
-import { DelegateAnnouncerAbi } from "../artifacts/DelegateAnnouncer.sol";
+import { DelegateAnnouncerAbi } from "../artifacts/DelegationWall.sol";
 import { PUB_DELEGATION_WALL_CONTRACT_ADDRESS } from "@/constants";
 import { useAlerts } from "@/context/Alerts";
 import { logger } from "@/services/logger";
@@ -58,8 +58,7 @@ export function useAnnounceDelegation(onSuccess?: () => void) {
             abi: DelegateAnnouncerAbi,
             address: PUB_DELEGATION_WALL_CONTRACT_ADDRESS,
             functionName: "register",
-            // TODO: Remove the second parameter
-            args: [toHex(ipfsUrl), toHex("")],
+            args: [toHex(ipfsUrl)],
           });
         }
       } catch (error) {
