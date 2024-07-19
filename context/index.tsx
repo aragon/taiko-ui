@@ -1,13 +1,14 @@
 import { AlertProvider } from "./Alerts";
-import { ReactNode } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { ReactNode } from "react";
+import { QueryClient } from "@tanstack/react-query";
 import { config } from "@/context/Web3Modal";
 import { createWeb3Modal } from "@web3modal/wagmi/react";
-import { State, WagmiProvider, deserialize, serialize } from "wagmi";
+import { type State, WagmiProvider, deserialize, serialize } from "wagmi";
 import { PUB_WALLET_CONNECT_PROJECT_ID } from "@/constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { UseDerivedWalletProvider } from "../hooks/useDerivedWallet";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,7 +44,9 @@ export function RootContextProvider({ children, initialState }: { children: Reac
   return (
     <WagmiProvider config={config} initialState={initialState}>
       <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
-        <AlertProvider>{children}</AlertProvider>
+        <AlertProvider>
+          <UseDerivedWalletProvider>{children}</UseDerivedWalletProvider>
+        </AlertProvider>
       </PersistQueryClientProvider>
     </WagmiProvider>
   );

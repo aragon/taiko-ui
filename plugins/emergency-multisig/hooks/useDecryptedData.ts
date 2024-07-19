@@ -2,8 +2,8 @@ import { decodeAbiParameters } from "viem";
 import { EncryptedProposalMetadata } from "../utils/types";
 import { hexToUint8Array } from "@/utils/hex";
 import { decryptProposal, decryptSymmetricKey } from "@/utils/encryption";
-import { ProposalMetadata, RawAction } from "@/utils/types";
-import { useDerivedWallet } from "./useDerivedWallet";
+import type { ProposalMetadata, RawAction } from "@/utils/types";
+import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
 import { RawActionListAbi } from "../artifacts/RawActionListAbi";
 
 export function useDecryptedData(encryptedMetadata?: EncryptedProposalMetadata) {

@@ -6,7 +6,7 @@ import { readContract } from "@wagmi/core";
 import { PUB_PUBLIC_KEY_REGISTRY_CONTRACT_ADDRESS } from "@/constants";
 import { useQuery } from "@tanstack/react-query";
 import { uint8ArrayToHex } from "@/utils/hex";
-import { useDerivedWallet } from "./useDerivedWallet";
+import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
 import { useAlerts } from "@/context/Alerts";
 
 export function usePublicKeyRegistry() {

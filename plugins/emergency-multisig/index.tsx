@@ -3,7 +3,6 @@ import ProposalCreate from "./pages/new";
 import ProposalList from "./pages/proposal-list";
 import ProposalDetail from "./pages/proposal";
 import { useUrl } from "@/hooks/useUrl";
-import { UseDerivedWalletProvider } from "./hooks/useDerivedWallet";
 import { Else, ElseIf, If, Then } from "@/components/if";
 
 export default function PluginPage() {
@@ -11,24 +10,22 @@ export default function PluginPage() {
   const { hash } = useUrl();
 
   return (
-    <UseDerivedWalletProvider>
-      <If condition={!hash || hash === "#/"}>
-        <Then>
-          <ProposalList />
-        </Then>
-        <ElseIf condition={hash === "#/new"}>
-          <ProposalCreate />
-        </ElseIf>
-        <ElseIf condition={hash.startsWith("#/proposals/")}>
-          <ProposalView hash={hash} />
-        </ElseIf>
-        <Else>
-          <main className="flex w-full flex-col items-center px-4 py-6 md:w-4/5 md:p-6 lg:w-2/3 xl:py-10 2xl:w-3/5">
-            <NotFound />
-          </main>
-        </Else>
-      </If>
-    </UseDerivedWalletProvider>
+    <If condition={!hash || hash === "#/"}>
+      <Then>
+        <ProposalList />
+      </Then>
+      <ElseIf condition={hash === "#/new"}>
+        <ProposalCreate />
+      </ElseIf>
+      <ElseIf condition={hash.startsWith("#/proposals/")}>
+        <ProposalView hash={hash} />
+      </ElseIf>
+      <Else>
+        <main className="flex w-full flex-col items-center px-4 py-6 md:w-4/5 md:p-6 lg:w-2/3 xl:py-10 2xl:w-3/5">
+          <NotFound />
+        </main>
+      </Else>
+    </If>
   );
 }
 

@@ -1,8 +1,8 @@
-import { useState, useContext, createContext, ReactNode } from "react";
+import { useState, useContext, createContext, type ReactNode, useEffect } from "react";
 import { keccak256 } from "viem";
 import { signMessage } from "@wagmi/core";
 import { computePublicKey } from "@/utils/encryption/asymmetric";
-import { useConfig } from "wagmi";
+import { useAccount, useConfig } from "wagmi";
 import { hexToUint8Array } from "@/utils/hex";
 import { DETERMINISTIC_EMERGENCY_PAYLOAD } from "@/constants";
 import { useAlerts } from "@/context/Alerts";
@@ -23,7 +23,12 @@ const DerivedWalletContext = createContext<Result>({
 export function UseDerivedWalletProvider({ children }: { children: ReactNode }) {
   const config = useConfig();
   const { addAlert } = useAlerts();
+  const { address } = useAccount();
   const [keys, setKeys] = useState<KeyPair>({});
+
+  useEffect(() => {
+    setKeys({});
+  }, [address]);
 
   const requestSignature = () => {
     return signMessage(config, { message: DETERMINISTIC_EMERGENCY_PAYLOAD })

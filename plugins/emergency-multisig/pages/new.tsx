@@ -8,7 +8,7 @@ import { PleaseWaitSpinner } from "@/components/please-wait";
 import { ActionCard } from "@/components/actions/action";
 import { MissingContentView } from "@/components/MissingContentView";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { useDerivedWallet } from "../hooks/useDerivedWallet";
+import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
 import { MainSection } from "@/components/layout/main-section";
 import { useCreateProposal } from "../hooks/useCreateProposal";
 import { useCanCreateProposal } from "../hooks/useCanCreateProposal";
