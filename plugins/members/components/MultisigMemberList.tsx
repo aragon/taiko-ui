@@ -24,18 +24,6 @@ export const MultisigMemberList: React.FC<IMultisigMemberListProps> = () => {
 
   const totalMembers = filteredMembers.length || 0;
   const showPagination = false;
-  const resetFilters = () => {
-    setSearchValue("");
-  };
-  const emptyFilteredState = {
-    heading: "No members found",
-    description: "Your applied filters are not matching with any results. Reset and search with other filters!",
-    secondaryButton: {
-      label: "Reset all filters",
-      iconLeft: IconType.RELOAD,
-      onclick: () => resetFilters(),
-    },
-  };
 
   if (!totalMembers) {
     return (
@@ -53,10 +41,7 @@ export const MultisigMemberList: React.FC<IMultisigMemberListProps> = () => {
   return (
     <DataList.Root entityLabel={totalMembers === 1 ? "member" : "members"} itemsCount={totalMembers}>
       <DataList.Filter onSearchValueChange={setSearchValue} searchValue={searchValue} placeholder="Filter by address" />
-      <DataList.Container
-        emptyFilteredState={emptyFilteredState}
-        className="grid grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))] gap-5"
-      >
+      <DataList.Container className="grid grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))] gap-5">
         {filteredMembers.map((member) => (
           <MultisigMemberListItem
             key={member}

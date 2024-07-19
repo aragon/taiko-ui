@@ -43,19 +43,6 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifie
   const totalMembers = filteredDelegates.length || 0;
   const showPagination = false;
   // const showPagination = (totalMembers ?? 0) > DEFAULT_PAGE_SIZE;
-  const resetFilters = () => {
-    setSearchValue("");
-    // setActiveSort("");
-  };
-  const emptyFilteredState = {
-    heading: "No delegates found",
-    description: "Your applied filters are not matching with any results. Reset and search with other filters!",
-    secondaryButton: {
-      label: "Reset all filters",
-      iconLeft: IconType.RELOAD,
-      onclick: () => resetFilters(),
-    },
-  };
 
   if (!totalMembers) {
     return (
@@ -93,7 +80,6 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifie
         // SkeletonElement={MemberDataListItem.Skeleton}
         // errorState={errorState}
         // emptyState={emptyState}
-        emptyFilteredState={emptyFilteredState}
         className="grid grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))] gap-3"
       >
         {filteredDelegates.map((delegate) => (
