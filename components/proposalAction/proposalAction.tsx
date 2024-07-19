@@ -15,6 +15,7 @@ import { EncodedView } from "./encodedView";
 import type { RawAction } from "@/utils/types";
 import { Else, If, Then } from "../if";
 import { useAction } from "@/hooks/useAction";
+import { capitalizeFirstLetter } from "@/utils/text";
 
 interface IProposalActionProps {
   canExecute: boolean;
@@ -66,7 +67,7 @@ const ActionItem = ({ index, rawAction }: { index: number; rawAction: RawAction 
   const action = useAction(rawAction);
   const title = `Action ${index + 1}`;
   const isEthTransfer = !action.data || action.data === "0x";
-  const functionName = isEthTransfer ? "Withdraw assets" : action.functionName;
+  const functionName = isEthTransfer ? "Withdraw assets" : capitalizeFirstLetter(action.functionName || "(function)");
   const functionAbi = action.functionAbi ?? null;
   const explorerUrl = `${PUB_CHAIN.blockExplorers?.default.url}/address/${action.to}`;
 

@@ -34,7 +34,11 @@ export function useProposalApprove(proposalId: string) {
         });
       } else {
         console.error(approveError);
-        addAlert("Could not approve the proposal", { type: "error" });
+        addAlert("Could not approve the proposal", {
+          type: "error",
+          description:
+            "Check that you were part of the multisig when the proposal was created and that the proposal doesn't contain actions that could revert",
+        });
       }
       return;
     }
