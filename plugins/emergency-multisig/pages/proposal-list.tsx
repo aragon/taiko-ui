@@ -1,25 +1,25 @@
+import { type ReactNode, useEffect, useState } from "react";
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
-import { type ReactNode, useEffect } from "react";
-import ProposalCard from "@/plugins/multisig/components/proposal";
-import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+import ProposalCard from "@/plugins/emergency-multisig/components/proposal";
+import { EmergencyMultisigPluginAbi } from "@/plugins/emergency-multisig/artifacts/EmergencyMultisigPlugin";
 import { Button, DataList, IconType, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
-import { useCanCreateProposal } from "@/plugins/multisig/hooks/useCanCreateProposal";
+import { useCanCreateProposal } from "@/plugins/emergency-multisig/hooks/useCanCreateProposal";
 import Link from "next/link";
 import { Else, ElseIf, If, Then } from "@/components/if";
-import { PUB_MULTISIG_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
-import { MainSection } from "@/components/layout/main-section";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
+import { useDerivedWallet } from "../hooks/useDerivedWallet";
 import { MissingContentView } from "@/components/MissingContentView";
+import { MainSection } from "@/components/layout/main-section";
 
 const DEFAULT_PAGE_SIZE = 6;
 
 export default function Proposals() {
   const { isConnected } = useAccount();
-  const canCreate = useCanCreateProposal();
   const { open } = useWeb3Modal();
-
   const { data: blockNumber } = useBlockNumber({ watch: true });
-
+  const { publicKey, requestSignature } = useDerivedWallet();
+  const canCreate = useCanCreateProposal();
   const {
     data: proposalCountResponse,
     error: isError,
@@ -27,12 +27,12 @@ export default function Proposals() {
     isFetching: isFetchingNextPage,
     refetch,
   } = useReadContract({
-    address: PUB_MULTISIG_PLUGIN_ADDRESS,
-    abi: MultisigPluginAbi,
+    address: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
+    abi: EmergencyMultisigPluginAbi,
     functionName: "proposalCount",
     chainId: PUB_CHAIN.id,
   });
-  const proposalCount = Number(proposalCountResponse);
+  const proposalCount = proposalCountResponse ? Number(proposalCountResponse) : 0;
 
   useEffect(() => {
     refetch();
@@ -69,9 +69,14 @@ export default function Proposals() {
       <If condition={!isConnected}>
         <Then>
           <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
-            Please, connect your Ethereum wallet to access the proposals section.
+            Please, connect your Ethereum wallet to access the emergency proposals section.
           </MissingContentView>
         </Then>
+        <ElseIf condition={!publicKey}>
+          <MissingContentView callToAction="Sign in to continue" onClick={() => requestSignature()}>
+            Please, sign in with your Ethereum wallet to decrypt the private proposal data.
+          </MissingContentView>
+        </ElseIf>
         <ElseIf condition={!proposalCount}>
           <MissingContentView>
             No proposals have been created yet. <br />

@@ -1,7 +1,7 @@
 import { toHex } from "viem";
 import { deploymentPublicClient as publicClient, deploymentWalletClient as walletClient } from "./lib/util/client";
 import { deploymentAccount as account } from "./lib/util/account";
-import { DelegateAnnouncerAbi } from "../plugins/daoMembers/artifacts/DelegationWall.sol";
+import { DelegateAnnouncerAbi } from "../plugins/members/artifacts/DelegationWall.sol";
 
 async function main() {
   console.log("Emitting delegation event");
