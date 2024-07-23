@@ -8,7 +8,7 @@ import { ProposalVoting } from "@/components/proposalVoting";
 import { ITransformedStage, IVote, ProposalStages } from "@/utils/types";
 import { useProposalStatus } from "../hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
-import { ProposalAction } from "@/components/proposalAction/proposalAction";
+import { ProposalActions } from "@/components/proposalActions/proposalActions";
 import { CardResources } from "@/components/proposal/cardResources";
 import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
 import { MissingContentView } from "@/components/MissingContentView";
@@ -111,7 +111,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
                   stages={proposalStage}
                   description="The on-chain emergency multisig flow allows its members to create proposals that, if approved by a super majority, will be executed directly on the DAO."
                 />
-                <ProposalAction
+                <ProposalActions
                   actions={proposal.actions}
                   canExecute={canExecute}
                   isConfirmingExecution={isConfirmingExecution}

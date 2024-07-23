@@ -4,12 +4,15 @@ import { InputText, InputNumber, AlertInline } from "@aragon/ods";
 import { type Address, parseEther } from "viem";
 import { isAddress } from "@/utils/evm";
 import { ElseIf, If, Then } from "../if";
+import { PUB_CHAIN } from "@/constants";
 
 interface WithdrawalInputProps {
-  setActions: (actions: RawAction[]) => any;
+  onChange: (actions: RawAction) => any;
+  onSubmit?: () => any;
 }
 
-const WithdrawalInput: FC<WithdrawalInputProps> = ({ setActions }) => {
+const WithdrawalInput: FC<WithdrawalInputProps> = ({ onChange, onSubmit }) => {
+  const coinName = PUB_CHAIN.nativeCurrency.symbol;
   const [to, setTo] = useState<Address>();
   const [value, setValue] = useState<string>("");
 
@@ -17,8 +20,8 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setActions }) => {
     if (!isAddress(to)) return;
     else if (!isNumeric(value)) return;
 
-    setActions([{ to, value: BigInt(value), data: "" } as unknown as RawAction]);
-  }, [setActions, to, value]);
+    onChange({ to, value: BigInt(value), data: "" } as unknown as RawAction);
+  }, [to, value]);
 
   const handleTo = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTo(event?.target?.value as Address);
@@ -28,7 +31,7 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setActions }) => {
     <div className="my-6">
       <div className="mb-3 pb-3">
         <InputText
-          label="Address"
+          label="Recipient address"
           placeholder="0x1234..."
           variant={!to || isAddress(to) ? "default" : "critical"}
           value={to}
@@ -36,20 +39,21 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setActions }) => {
         />
         <If not={to}>
           <Then>
-            <p className="mt-3">Enter the address to transfer to</p>
+            <p className="mt-3">Enter the address to transfer {coinName} to</p>
           </Then>
           <ElseIf not={isAddress(to)}>
             <AlertInline className="mt-3" message="The address of the contract is not valid" variant="critical" />
           </ElseIf>
         </If>
       </div>
-      <div className="mb-6">
+      <div>
         <InputNumber
-          label="Amount"
-          placeholder="1.234 ETH"
+          label={`${coinName} amount`}
+          placeholder="1.234"
           min={0}
-          variant={typeof value === "undefined" || isNumeric(value) ? "default" : "critical"}
+          variant={!value || isNumeric(value) ? "default" : "critical"}
           onChange={(val: string) => setValue(parseEther(val).toString())}
+          onKeyDown={(e) => (e.key == "enter" ? onSubmit?.() : null)}
         />
       </div>
     </div>
@@ -57,7 +61,7 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ setActions }) => {
 };
 
 function isNumeric(value: string): boolean {
-  if (!value) return true;
+  if (!value) return false;
   return !!value.match(/^[0-9]+$/);
 }
 

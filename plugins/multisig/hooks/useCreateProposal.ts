@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { ActionType, ProposalMetadata, RawAction } from "@/utils/types";
+import { ProposalMetadata, RawAction } from "@/utils/types";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { useAlerts } from "@/context/Alerts";
 import {
@@ -24,7 +24,6 @@ export function useCreateProposal() {
   const [actions, setActions] = useState<RawAction[]>([]);
   const { writeContract: createProposalWrite, data: createTxHash, error, status } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: createTxHash });
-  const [actionType, setActionType] = useState<ActionType>(ActionType.Signaling);
 
   useEffect(() => {
     if (status === "idle" || status === "pending") return;
@@ -76,27 +75,6 @@ export function useCreateProposal() {
         type: "error",
       });
 
-    // Check the action
-    switch (actionType) {
-      case ActionType.Signaling:
-        break;
-      case ActionType.Withdrawal:
-        if (!actions.length) {
-          return addAlert("Invalid proposal details", {
-            description: "Please ensure that the withdrawal address and the amount to transfer are valid",
-            type: "error",
-          });
-        }
-        break;
-      default:
-        if (!actions.length || !actions[0].data || actions[0].data === "0x") {
-          return addAlert("Invalid proposal details", {
-            description: "Please ensure that the values of the action to execute are complete and correct",
-            type: "error",
-          });
-        }
-    }
-
     try {
       setIsCreating(true);
       const proposalMetadataJsonObject: ProposalMetadata = {
@@ -126,12 +104,10 @@ export function useCreateProposal() {
     summary,
     description,
     actions,
-    actionType,
     setTitle,
     setSummary,
     setDescription,
     setActions,
-    setActionType,
     submitProposal,
   };
 }

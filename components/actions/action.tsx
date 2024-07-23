@@ -9,6 +9,7 @@ import { type AbiFunction, type AbiParameter, type Address, type Hex, formatEthe
 import { compactNumber } from "@/utils/numbers";
 import { decodeCamelCase } from "@/utils/case";
 import { type InputValue } from "@/utils/input-values";
+import { PUB_CHAIN } from "@/constants";
 
 type ActionCardProps = {
   action: RawAction;
@@ -26,6 +27,7 @@ type CallParameterFieldType =
 
 export const ActionCard = function ({ action, idx }: ActionCardProps) {
   const { isLoading, args, functionName, functionAbi } = useAction(action);
+  const coinName = PUB_CHAIN.nativeCurrency.symbol;
 
   const isEthTransfer = !action.data || action.data === "0x";
 
@@ -42,7 +44,9 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
             </div>
             <div>
               <h3 className="font-semibold">Transfer</h3>
-              <p>{compactNumber(formatEther(action.value))} ETH</p>
+              <p>
+                {compactNumber(formatEther(action.value))} {coinName}
+              </p>
             </div>
           </div>
           <Tag label={(idx + 1).toString()} variant="primary"></Tag>
@@ -76,7 +80,7 @@ export const ActionCard = function ({ action, idx }: ActionCardProps) {
               <div>
                 <h3 className="font-semibold">Transfer</h3>
                 <p>
-                  <span className="font-semibold">{compactNumber(formatEther(action.value))}</span> ETH{" "}
+                  <span className="font-semibold">{compactNumber(formatEther(action.value))}</span> {coinName}{" "}
                 </p>
               </div>
             </If>
@@ -139,7 +143,7 @@ const CallParameterField = ({
   return (
     <InputText
       className="w-full"
-      addon={decodeCamelCase(addon)}
+      label={decodeCamelCase(addon)}
       value={resolveValue(value, functionAbi.inputs?.[idx])}
       readOnly={true}
       addonPosition="left"

@@ -9,7 +9,7 @@ import type { ITransformedStage, IVote } from "@/utils/types";
 import { ProposalStages } from "@/utils/types";
 import { useProposalStatus } from "../hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
-import { ProposalAction } from "@/components/proposalAction/proposalAction";
+import { ProposalActions } from "@/components/proposalActions/proposalActions";
 import { CardResources } from "@/components/proposal/cardResources";
 import { formatEther } from "viem";
 import { useVotingToken } from "../hooks/useVotingToken";
@@ -109,7 +109,7 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
               stages={proposalStage}
               description="The optimistic voting flow allows token holders to veto proposals to which they object. If not enough voting power has vetoed for a given period of time, the proposal will become executable on the DAO."
             />
-            <ProposalAction
+            <ProposalActions
               canExecute={canExecute}
               isConfirmingExecution={isConfirmingExecution}
               onExecute={() => executeProposal()}

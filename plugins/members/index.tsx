@@ -1,15 +1,14 @@
-import DelegationPage from "./pages/index";
+import MembersPage from "./pages/index";
 import { DelegateProfile } from "./pages/delegate-profile";
 import { useUrl } from "@/hooks/useUrl";
 import { NotFound } from "@/components/not-found";
 import { Address } from "viem";
-import { MainSection } from "@/components/layout/main-section";
 
 export default function PluginPage() {
   // Select the inner pages to display depending on the URL hash
   const { hash } = useUrl();
 
-  if (!hash || hash === "#/") return <DelegationPage />;
+  if (!hash || hash === "#/") return <MembersPage />;
   else if (hash.startsWith("#/delegates/")) {
     const address = hash.replace("#/delegates/", "") as Address;
     return <DelegateProfile address={address} />;

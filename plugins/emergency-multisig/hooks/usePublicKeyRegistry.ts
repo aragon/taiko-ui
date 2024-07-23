@@ -18,7 +18,7 @@ export function usePublicKeyRegistry() {
   const { publicKey, requestSignature } = useDerivedWallet();
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["public-key-registry-items-fetching"],
+    queryKey: ["public-key-registry-items-fetching", PUB_PUBLIC_KEY_REGISTRY_CONTRACT_ADDRESS],
     queryFn: () => {
       return readContract(config, {
         abi: PublicKeyRegistryAbi,

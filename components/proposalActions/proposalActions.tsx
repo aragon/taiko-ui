@@ -13,18 +13,18 @@ import Link from "next/link";
 import { CallParamField } from "./callParamField";
 import { EncodedView } from "./encodedView";
 import type { RawAction } from "@/utils/types";
-import { Else, If, Then } from "../if";
+import { Else, ElseIf, If, Then } from "../if";
 import { useAction } from "@/hooks/useAction";
-import { capitalizeFirstLetter } from "@/utils/text";
+import { decodeCamelCase } from "@/utils/case";
 
-interface IProposalActionProps {
+interface IProposalActionsProps {
   canExecute: boolean;
   isConfirmingExecution: boolean;
   onExecute: () => void;
   actions?: RawAction[];
 }
 
-export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
+export const ProposalActions: React.FC<IProposalActionsProps> = (props) => {
   const { actions, canExecute, onExecute, isConfirmingExecution } = props;
 
   return (
@@ -66,8 +66,9 @@ export const ProposalAction: React.FC<IProposalActionProps> = (props) => {
 const ActionItem = ({ index, rawAction }: { index: number; rawAction: RawAction }) => {
   const action = useAction(rawAction);
   const title = `Action ${index + 1}`;
+  const coin = PUB_CHAIN.nativeCurrency.symbol;
   const isEthTransfer = !action.data || action.data === "0x";
-  const functionName = isEthTransfer ? "Withdraw assets" : capitalizeFirstLetter(action.functionName || "(function)");
+  const functionName = isEthTransfer ? `Transfer ${coin}` : decodeCamelCase(action.functionName || "(function)");
   const functionAbi = action.functionAbi ?? null;
   const explorerUrl = `${PUB_CHAIN.blockExplorers?.default.url}/address/${action.to}`;
 
@@ -104,10 +105,13 @@ const ActionItem = ({ index, rawAction }: { index: number; rawAction: RawAction 
 
       <AccordionItemContent className="!overflow-none">
         <div className="flex flex-col gap-y-4">
-          <If condition={!action?.args?.length}>
+          <If not={action?.functionAbi}>
             <Then>
-              <EncodedView rawAction={action} />
+              <EncodedView rawAction={rawAction} />
             </Then>
+            <ElseIf not={action?.args?.length}>
+              <p>The action receives no parameters</p>
+            </ElseIf>
             <Else>
               {action?.args?.map((arg, i) => (
                 <div className="flex" key={i}>

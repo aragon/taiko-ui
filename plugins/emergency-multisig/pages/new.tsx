@@ -1,8 +1,6 @@
-import React from "react";
-import { Button, IconType, Icon, InputText, TextAreaRichText } from "@aragon/ods";
+import React, { ReactNode, useState } from "react";
+import { Button, IconType, InputText, TextAreaRichText } from "@aragon/ods";
 import { useAccount } from "wagmi";
-import WithdrawalInput from "@/components/input/withdrawal";
-import { FunctionCallForm } from "@/components/input/function-call-form";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { ActionCard } from "@/components/actions/action";
@@ -12,49 +10,48 @@ import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
 import { MainSection } from "@/components/layout/main-section";
 import { useCreateProposal } from "../hooks/useCreateProposal";
 import { useCanCreateProposal } from "../hooks/useCanCreateProposal";
-import { ActionType } from "@/utils/types";
 import { usePublicKeyRegistry } from "../hooks/usePublicKeyRegistry";
 import { useMultisigMembers } from "@/plugins/members/hooks/useMultisigMembers";
+import { RawAction } from "@/utils/types";
+import { NewActionDialog, NewActionType } from "@/components/dialogs/NewActionDialog";
+import { Address } from "viem";
+import { AddActionCard } from "@/components/cards/AddActionCard";
 
 export default function Create() {
-  const { open } = useWeb3Modal();
   const { address: selfAddress, isConnected } = useAccount();
-  const { publicKey, requestSignature } = useDerivedWallet();
   const canCreate = useCanCreateProposal();
+  const [addActionType, setAddActionType] = useState<NewActionType>("");
+  const { data: registeredSigners } = usePublicKeyRegistry();
   const {
     title,
     summary,
     description,
     actions,
-    actionType,
     setTitle,
     setSummary,
     setDescription,
     setActions,
-    setActionType,
     isCreating,
     submitProposal,
   } = useCreateProposal();
-  const {
-    data: registeredSigners,
-    registerPublicKey,
-    isLoading: isLoadingPubKeys,
-    isConfirming: isRegisteringPublicKey,
-  } = usePublicKeyRegistry();
   const { members: multisigMembers } = useMultisigMembers();
 
-  const changeActionType = (actionType: ActionType) => {
-    setActions([]);
-    setActionType(actionType);
-  };
   const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event?.target?.value);
   };
   const handleSummaryInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSummary(event?.target?.value);
   };
+  const handleNewActionDialogClose = (newAction: RawAction | null) => {
+    if (!newAction) {
+      setAddActionType("");
+      return;
+    }
 
-  const hasPubKeyRegistered = registeredSigners.some((item) => item.address === selfAddress);
+    setActions(actions.concat(newAction));
+    setAddActionType("");
+  };
+
   const filteredSignerItems = registeredSigners.filter((signer) => {
     return multisigMembers.includes(signer.address);
   });
@@ -63,191 +60,187 @@ export default function Create() {
   return (
     <MainSection narrow>
       <div className="w-full justify-between">
-        <h1 className="mb-6 text-3xl font-semibold text-neutral-900">Create Proposal</h1>
+        <h1 className="mb-10 text-3xl font-semibold text-neutral-900">Create Proposal</h1>
 
-        <If condition={isLoadingPubKeys}>
-          <Then>
-            {/* No public keys yet */}
-            <div>
-              <PleaseWaitSpinner fullMessage="Loading the signer public keys..." />
+        <PlaceHolderOr selfAddress={selfAddress} canCreate={canCreate} isConnected={isConnected}>
+          <div className="mb-6">
+            <InputText
+              className=""
+              label="Title"
+              maxLength={100}
+              placeholder="A short title that describes the main purpose"
+              variant="default"
+              value={title}
+              onChange={handleTitleInput}
+            />
+          </div>
+          <div className="mb-6">
+            <InputText
+              className=""
+              label="Summary"
+              maxLength={280}
+              placeholder="A short summary that outlines the main purpose of the proposal"
+              variant="default"
+              value={summary}
+              onChange={handleSummaryInput}
+            />
+          </div>
+          <div className="mb-6">
+            <TextAreaRichText
+              label="Description"
+              className="pt-2"
+              value={description}
+              onChange={setDescription}
+              placeholder="A description for what the proposal is all about"
+            />
+          </div>
+
+          {/* Actions */}
+
+          <label className="flex flex-col gap-0.5 pb-3 md:gap-1">
+            <div className="flex flex-row items-center gap-3">
+              <p className="text-base font-normal leading-tight text-neutral-800 md:text-lg">Actions</p>
             </div>
-          </Then>
-          <ElseIf condition={!selfAddress || !isConnected}>
-            {/* Not connected */}
-            <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
-              Please, connect your Ethereum wallet to continue.
-            </MissingContentView>
-          </ElseIf>
-          <ElseIf condition={selfAddress && !hasPubKeyRegistered}>
-            {/* Public key not registered yet */}
-            <MissingContentView
-              callToAction="Register your public key"
-              onClick={() => registerPublicKey()}
-              isLoading={isRegisteringPublicKey}
-            >
-              You haven&apos;t registered a public key yet. A public key is necessary in order for proposals to have
-              private data that only members can decrypt. You will sign a deterministic text, which will be used to
-              generate an encryption key only for this DAO.
-            </MissingContentView>
-          </ElseIf>
-          <ElseIf condition={!publicKey}>
-            {/* Not signed in */}
-            <MissingContentView callToAction="Sign in to continue" onClick={() => requestSignature()}>
-              Please, sign in with your Ethereum wallet to decrypt the private proposal data.
-            </MissingContentView>
-          </ElseIf>
-          <ElseIf condition={!canCreate}>
-            {/* Not a member */}
-            <MissingContentView>
-              You cannot create proposals on the multisig because you are not currently defined as a member.
-            </MissingContentView>
-          </ElseIf>
-          <Else>
-            {/* All ready */}
-            {/* Form */}
-            <div className="mb-6">
-              <InputText
-                className=""
-                label="Title"
-                maxLength={100}
-                placeholder="A short title that describes the main purpose"
-                variant="default"
-                value={title}
-                onChange={handleTitleInput}
-              />
+          </label>
+
+          {actions.map((action, idx) => (
+            <div className="mb-4" key={`${idx}-${action.to}-${action.data}`}>
+              <ActionCard action={action} idx={idx} />
             </div>
-            <div className="mb-6">
-              <InputText
-                className=""
-                label="Summary"
-                maxLength={280}
-                placeholder="A short summary that outlines the main purpose of the proposal"
-                variant="default"
-                value={summary}
-                onChange={handleSummaryInput}
-              />
-            </div>
-            <div className="mb-6">
-              <TextAreaRichText
-                label="Description"
-                className="pt-2"
-                value={description}
-                onChange={setDescription}
-                placeholder="A description for what the proposal is all about"
-              />
-            </div>
-            <div className="mb-6">
-              <span className="mb-2 block text-lg font-normal text-neutral-900 ">Select the type of proposal</span>
-              <div className="mt-2 grid h-24 grid-cols-3 gap-5">
-                <div
-                  onClick={() => {
-                    changeActionType(ActionType.Signaling);
-                  }}
-                  className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
-                    actionType === ActionType.Signaling ? "border-primary-300" : "border-neutral-100"
-                  }`}
-                >
-                  <Icon
-                    className={
-                      "mt-2 !h-12 !w-10 p-2 " +
-                      (actionType === ActionType.Signaling ? "text-primary-400" : "text-neutral-400")
-                    }
-                    icon={IconType.INFO}
-                    size="lg"
-                  />
-                  <span className="text-center text-sm text-neutral-400">Signaling</span>
-                </div>
-                <div
-                  onClick={() => changeActionType(ActionType.Withdrawal)}
-                  className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
-                    actionType === ActionType.Withdrawal ? "border-primary-300" : "border-neutral-100"
-                  }`}
-                >
-                  <Icon
-                    className={
-                      "mt-2 !h-12 !w-10 p-2 " +
-                      (actionType === ActionType.Withdrawal ? "text-primary-400" : "text-neutral-400")
-                    }
-                    icon={IconType.WITHDRAW}
-                    size="lg"
-                  />
-                  <span className="text-center text-sm text-neutral-400">DAO Payment</span>
-                </div>
-                <div
-                  onClick={() => changeActionType(ActionType.Custom)}
-                  className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
-                    actionType === ActionType.Custom ? "border-primary-300" : "border-neutral-100"
-                  }`}
-                >
-                  <Icon
-                    className={
-                      "mt-2 !h-12 !w-10 p-2 " +
-                      (actionType === ActionType.Custom ? "text-primary-400" : "text-neutral-400")
-                    }
-                    icon={IconType.BLOCKCHAIN_BLOCKCHAIN}
-                    size="lg"
-                  />
-                  <span className="text-center text-sm text-neutral-400">Custom action</span>
-                </div>
-              </div>
-              <div className="mb-6">
-                {actionType === ActionType.Withdrawal && <WithdrawalInput setActions={setActions} />}
-                {actionType === ActionType.Custom && (
-                  <FunctionCallForm onAddAction={(action) => setActions(actions.concat([action]))} />
-                )}
+          ))}
+
+          <If condition={!actions.length}>
+            <div className="-mb-4 flex flex-col gap-4 rounded-xl border border-solid border-neutral-100 bg-neutral-0 p-4">
+              <div className="w-full">
+                <p className="text-md text-neutral-400">
+                  The proposal has no actions defined yet. Add the first one to turn a signaling proposal into a binding
+                  execution proposal.
+                </p>
               </div>
             </div>
+          </If>
+
+          <div className="mt-8 grid w-full grid-cols-2 gap-4 md:grid-cols-4">
+            <AddActionCard
+              title="Add a payment"
+              icon={IconType.WITHDRAW}
+              onClick={() => setAddActionType("withdrawal")}
+            />
+            <AddActionCard
+              title="Select a function"
+              icon={IconType.BLOCKCHAIN_BLOCKCHAIN}
+              onClick={() => setAddActionType("select-abi-function")}
+            />
+            <AddActionCard
+              title="Use a custom ABI"
+              disabled
+              icon={IconType.INFO}
+              onClick={() => setAddActionType("custom-abi")}
+            />
+            <AddActionCard
+              title="Enter the calldata"
+              disabled
+              icon={IconType.DOTS_HORIZONTAL}
+              onClick={() => setAddActionType("calldata")}
+            />
+          </div>
+
+          {/* Dialog */}
+
+          <NewActionDialog
+            newActionType={addActionType}
+            onClose={(newAction) => handleNewActionDialogClose(newAction)}
+          />
+
+          {/* Submit */}
+
+          <div className="mt-6 flex w-full flex-col items-center">
             <div>
               <span className="text-md mb-2 block font-normal text-neutral-700 ">
                 {signersWithPubKey || 0} signer(s) registered the public key
               </span>
             </div>
-
-            <If condition={actionType !== ActionType.Custom}>
-              <Then>
-                <Button
-                  isLoading={isCreating}
-                  className="mb-6 mt-14"
-                  size="lg"
-                  variant="primary"
-                  onClick={() => submitProposal()}
-                >
-                  Submit proposal
-                </Button>
-              </Then>
-              <Else>
-                <div className="mb-6 mt-14">
-                  <If not={actions.length}>
-                    <Then>
-                      <p>Add the first action to continue</p>
-                    </Then>
-                    <Else>
-                      <p className="flex-grow pb-3 text-lg font-semibold text-neutral-900">Actions</p>
-                      <div className="mb-10">
-                        {actions?.map?.((action, i) => (
-                          <div className="mb-3" key={`${i}-${action.to}-${action.data}`}>
-                            <ActionCard action={action} idx={i} />
-                          </div>
-                        ))}
-                      </div>
-                    </Else>
-                  </If>
-                  <Button
-                    isLoading={isCreating}
-                    className="mt-3"
-                    size="lg"
-                    variant="primary"
-                    disabled={!actions.length}
-                    onClick={() => submitProposal()}
-                  >
-                    Submit proposal
-                  </Button>
-                </div>
-              </Else>
-            </If>
-          </Else>
-        </If>
+            <Button
+              isLoading={isCreating}
+              className="mt-3 border-primary-400"
+              size="lg"
+              variant={actions.length ? "primary" : "secondary"}
+              onClick={() => submitProposal()}
+            >
+              <If condition={actions.length}>
+                <Then>Submit proposal</Then>
+                <Else>Submit signaling proposal</Else>
+              </If>
+            </Button>
+          </div>
+        </PlaceHolderOr>
       </div>
     </MainSection>
   );
 }
+
+// HELPERS
+
+const PlaceHolderOr = ({
+  selfAddress,
+  isConnected,
+  canCreate,
+  children,
+}: {
+  selfAddress: Address | undefined;
+  isConnected: boolean;
+  canCreate: boolean | undefined;
+  children: ReactNode;
+}) => {
+  const { open } = useWeb3Modal();
+  const { publicKey, requestSignature } = useDerivedWallet();
+  const {
+    data: registeredSigners,
+    registerPublicKey,
+    isLoading: isLoadingPubKeys,
+    isConfirming: isRegisteringPublicKey,
+  } = usePublicKeyRegistry();
+  const hasPubKeyRegistered = registeredSigners.some((item) => item.address === selfAddress);
+
+  return (
+    <If condition={isLoadingPubKeys}>
+      <Then>
+        {/* No public keys yet */}
+        <div>
+          <PleaseWaitSpinner fullMessage="Loading the signer public keys..." />
+        </div>
+      </Then>
+      <ElseIf condition={!selfAddress || !isConnected}>
+        {/* Not connected */}
+        <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
+          Please, connect your Ethereum wallet to continue.
+        </MissingContentView>
+      </ElseIf>
+      <ElseIf condition={selfAddress && !hasPubKeyRegistered}>
+        {/* Public key not registered yet */}
+        <MissingContentView
+          callToAction="Register your public key"
+          onClick={() => registerPublicKey()}
+          isLoading={isRegisteringPublicKey}
+        >
+          You haven&apos;t registered a public key yet. A public key is necessary in order for proposals to have private
+          data that only members can decrypt. You will sign a deterministic text, which will be used to generate an
+          encryption key only for this DAO.
+        </MissingContentView>
+      </ElseIf>
+      <ElseIf condition={!publicKey}>
+        {/* Not signed in */}
+        <MissingContentView callToAction="Sign in to continue" onClick={() => requestSignature()}>
+          Please, sign in with your Ethereum wallet to decrypt the private proposal data.
+        </MissingContentView>
+      </ElseIf>
+      <ElseIf condition={!canCreate}>
+        {/* Not a member */}
+        <MissingContentView>
+          You cannot create proposals on the multisig because you are not currently defined as a member.
+        </MissingContentView>
+      </ElseIf>
+      <Else>{children}</Else>
+    </If>
+  );
+};
