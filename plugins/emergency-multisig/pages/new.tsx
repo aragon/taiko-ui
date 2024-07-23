@@ -3,7 +3,6 @@ import { Button, IconType, InputText, TextAreaRichText } from "@aragon/ods";
 import { useAccount } from "wagmi";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { ActionCard } from "@/components/actions/action";
 import { MissingContentView } from "@/components/MissingContentView";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
@@ -16,6 +15,7 @@ import { RawAction } from "@/utils/types";
 import { NewActionDialog, NewActionType } from "@/components/dialogs/NewActionDialog";
 import { Address } from "viem";
 import { AddActionCard } from "@/components/cards/AddActionCard";
+import { ProposalActions } from "@/components/proposalActions/proposalActions";
 
 export default function Create() {
   const { address: selfAddress, isConnected } = useAccount();
@@ -97,28 +97,10 @@ export default function Create() {
 
           {/* Actions */}
 
-          <label className="flex flex-col gap-0.5 pb-3 md:gap-1">
-            <div className="flex flex-row items-center gap-3">
-              <p className="text-base font-normal leading-tight text-neutral-800 md:text-lg">Actions</p>
-            </div>
-          </label>
-
-          {actions.map((action, idx) => (
-            <div className="mb-4" key={`${idx}-${action.to}-${action.data}`}>
-              <ActionCard action={action} idx={idx} />
-            </div>
-          ))}
-
-          <If condition={!actions.length}>
-            <div className="-mb-4 flex flex-col gap-4 rounded-xl border border-solid border-neutral-100 bg-neutral-0 p-4">
-              <div className="w-full">
-                <p className="text-md text-neutral-400">
-                  The proposal has no actions defined yet. Add the first one to turn a signaling proposal into a binding
-                  execution proposal.
-                </p>
-              </div>
-            </div>
-          </If>
+          <ProposalActions
+            actions={actions}
+            emptyListDescription="The proposal has no actions defined yet. Select a type of action to add to the proposal."
+          />
 
           <div className="mt-8 grid w-full grid-cols-2 gap-4 md:grid-cols-4">
             <AddActionCard

@@ -35,7 +35,7 @@ export const FunctionParamsForm = ({ functionAbi, onActionChanged, onActionClear
   useEffect(() => {
     // Attempt to sync when possible
     trySubmit();
-  }, [functionAbi, inputValues.join(","), canSend]);
+  }, [functionAbi, inputValues.join(","), value, canSend]);
 
   const onParameterChange = (paramIdx: number, value: InputValue) => {
     const newInputValues = [...inputValues];

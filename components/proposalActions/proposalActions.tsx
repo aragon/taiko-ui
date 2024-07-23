@@ -6,26 +6,37 @@ import {
   AccordionItemContent,
   AccordionItemHeader,
   AvatarIcon,
-  Button,
   IconType,
+  InputText,
 } from "@aragon/ods";
 import Link from "next/link";
-import { CallParamField } from "./callParamField";
+import { CallFunctionSignatureField, CallParamField } from "./callParamField";
 import { EncodedView } from "./encodedView";
 import type { RawAction } from "@/utils/types";
 import { Else, ElseIf, If, Then } from "../if";
 import { useAction } from "@/hooks/useAction";
 import { decodeCamelCase } from "@/utils/case";
+import { formatEther } from "viem";
+
+const DEFAULT_DESCRIPTION =
+  "When the proposal passes the community vote, the following actions will be executable on the DAO.";
+const DEFAULT_EMPTY_LIST_DESCRIPTION = "The proposal has no actions defined, it will behave as a signaling poll.";
 
 interface IProposalActionsProps {
-  canExecute: boolean;
-  isConfirmingExecution: boolean;
-  onExecute: () => void;
+  description?: string;
+  emptyListDescription?: string;
   actions?: RawAction[];
 }
 
 export const ProposalActions: React.FC<IProposalActionsProps> = (props) => {
-  const { actions, canExecute, onExecute, isConfirmingExecution } = props;
+  const { actions, description, emptyListDescription } = props;
+
+  let message: string;
+  if (actions?.length) {
+    message = description ? description : DEFAULT_DESCRIPTION;
+  } else {
+    message = emptyListDescription ? emptyListDescription : DEFAULT_EMPTY_LIST_DESCRIPTION;
+  }
 
   return (
     <div className="overflow-hidden rounded-xl bg-neutral-0 pb-2 shadow-neutral">
@@ -33,24 +44,8 @@ export const ProposalActions: React.FC<IProposalActionsProps> = (props) => {
       <div className="flex flex-col gap-y-2 px-4 py-4 md:gap-y-3 md:px-6 md:py-6">
         <div className="flex justify-between gap-x-2 gap-y-2">
           <p className="text-xl leading-tight text-neutral-800 md:text-2xl">Actions</p>
-          <If condition={canExecute && actions?.length}>
-            <Button size="md" disabled={isConfirmingExecution} onClick={() => onExecute()} className="">
-              Execute
-            </Button>
-          </If>
         </div>
-        <If condition={actions?.length}>
-          <Then>
-            <p className="text-base leading-normal text-neutral-500 md:text-lg">
-              When the proposal passes the community vote, the following actions will be executable on the DAO.
-            </p>
-          </Then>
-          <Else>
-            <p className="text-base leading-normal text-neutral-500 md:text-lg">
-              This is a signaling proposal, no actions are defined.
-            </p>
-          </Else>
-        </If>
+        <p className="md:text-md text-base leading-normal text-neutral-500">{message}</p>
       </div>
 
       {/* Content */}
@@ -66,9 +61,9 @@ export const ProposalActions: React.FC<IProposalActionsProps> = (props) => {
 const ActionItem = ({ index, rawAction }: { index: number; rawAction: RawAction }) => {
   const action = useAction(rawAction);
   const title = `Action ${index + 1}`;
-  const coin = PUB_CHAIN.nativeCurrency.symbol;
+  const coinName = PUB_CHAIN.nativeCurrency.symbol;
   const isEthTransfer = !action.data || action.data === "0x";
-  const functionName = isEthTransfer ? `Transfer ${coin}` : decodeCamelCase(action.functionName || "(function)");
+  const functionName = isEthTransfer ? `Transfer ${coinName}` : decodeCamelCase(action.functionName || "(function)");
   const functionAbi = action.functionAbi ?? null;
   const explorerUrl = `${PUB_CHAIN.blockExplorers?.default.url}/address/${action.to}`;
 
@@ -77,24 +72,26 @@ const ActionItem = ({ index, rawAction }: { index: number; rawAction: RawAction 
       <AccordionItemHeader className="!items-start">
         <div className="flex w-full gap-x-6">
           <div className="flex flex-1 flex-col items-start gap-y-2">
-            {functionName && (
-              <div className="flex">
-                {/* Method name */}
-                <span className="flex w-full text-left text-lg leading-tight text-neutral-800 md:text-xl">
-                  {functionName}
-                </span>
-              </div>
-            )}
+            <div className="flex">
+              {/* Method name */}
+              <span className="flex w-full text-left text-lg leading-tight text-neutral-800 md:text-xl">
+                {functionName}
+              </span>
+            </div>
             <div className="flex w-full gap-x-6 text-sm leading-tight md:text-base">
               <Link href={explorerUrl} target="_blank">
                 <span className="flex items-center gap-x-2 text-neutral-500">
                   {formatHexString(rawAction.to)}
-                  {functionName != null && <AvatarIcon variant="primary" size="sm" icon={IconType.CHECKMARK} />}
-                  {functionName == null && (
-                    <span className="flex items-center gap-x-2">
-                      Not Verified <AvatarIcon variant="warning" size="sm" icon={IconType.WARNING} />
-                    </span>
-                  )}
+                  <If condition={functionAbi}>
+                    <Then>
+                      <AvatarIcon variant="primary" size="sm" icon={IconType.CHECKMARK} />
+                    </Then>
+                    <ElseIf not={isEthTransfer}>
+                      <span className="flex items-center gap-x-2">
+                        – &nbsp;Not Verified <AvatarIcon variant="warning" size="sm" icon={IconType.WARNING} />
+                      </span>
+                    </ElseIf>
+                  </If>
                 </span>
               </Link>
             </div>
@@ -110,14 +107,24 @@ const ActionItem = ({ index, rawAction }: { index: number; rawAction: RawAction 
               <EncodedView rawAction={rawAction} />
             </Then>
             <ElseIf not={action?.args?.length}>
+              <CallFunctionSignatureField functionAbi={functionAbi} />
               <p>The action receives no parameters</p>
             </ElseIf>
             <Else>
+              <CallFunctionSignatureField functionAbi={functionAbi} />
               {action?.args?.map((arg, i) => (
                 <div className="flex" key={i}>
                   <CallParamField value={arg} idx={i} functionAbi={functionAbi} />
                 </div>
               ))}
+              <If condition={action.value > BigInt(0)}>
+                <InputText
+                  label={coinName + " value"}
+                  className="w-full"
+                  value={formatEther(action.value ?? BigInt(0))}
+                  disabled={true}
+                />
+              </If>
             </Else>
           </If>
         </div>

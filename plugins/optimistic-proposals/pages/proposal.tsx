@@ -109,12 +109,7 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
               stages={proposalStage}
               description="The optimistic voting flow allows token holders to veto proposals to which they object. If not enough voting power has vetoed for a given period of time, the proposal will become executable on the DAO."
             />
-            <ProposalActions
-              canExecute={canExecute}
-              isConfirmingExecution={isConfirmingExecution}
-              onExecute={() => executeProposal()}
-              actions={proposal.actions}
-            />
+            <ProposalActions actions={proposal.actions} />
           </div>
           <div className="flex flex-col gap-y-6 md:w-[33%]">
             <CardResources resources={proposal.resources} title="Resources" />

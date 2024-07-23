@@ -11,15 +11,15 @@ export type CallParameterFieldType =
   | CallParameterFieldType[]
   | { [k: string]: CallParameterFieldType };
 
-export function resolveValue(value: CallParameterFieldType, abi?: AbiParameter): string {
+export function resolveParamValue(value: CallParameterFieldType, abi?: AbiParameter): string {
   if (!abi?.type) {
     if (Array.isArray(value)) return value.join(", ");
     return value.toString();
   } else if (abi.type === "tuple[]") {
-    const abiClone = { ...abi };
+    const abiClone = Object.assign({}, { ...abi });
     abiClone.type = abiClone.type.replace(/\[\]$/, "");
 
-    const items = (value as any as any[]).map((item) => resolveValue(item, abiClone));
+    const items = (value as any as any[]).map((item) => resolveParamValue(item, abiClone));
     return items.join(", ");
   } else if (abi.type === "tuple") {
     const result = {} as Record<string, string>;
@@ -27,7 +27,7 @@ export function resolveValue(value: CallParameterFieldType, abi?: AbiParameter):
 
     for (const element of components) {
       const k = element.name!;
-      result[k] = resolveValue((value as any)[k], element);
+      result[k] = resolveParamValue((value as any)[k], element);
     }
 
     return getReadableJson(result);
@@ -45,7 +45,7 @@ export function resolveValue(value: CallParameterFieldType, abi?: AbiParameter):
   return value.toString();
 }
 
-export function resolveAddon(name: string, abiType: string | undefined, idx: number): string {
+export function resolveFieldTitle(name: string, abiType: string | undefined, idx: number): string {
   if (name) return name;
   else if (abiType) {
     if (abiType === "address") {

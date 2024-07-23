@@ -89,12 +89,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
               stages={proposalStage}
               description="The on-chain multisig flow allows its members to create proposals that, if approved, will be moved to the Optimistic Proposal stage."
             />
-            <ProposalActions
-              onExecute={() => executeProposal()}
-              isConfirmingExecution={isConfirmingExecution}
-              canExecute={canExecute}
-              actions={proposal.actions}
-            />
+            <ProposalActions actions={proposal.actions} />
           </div>
           <div className="flex flex-col gap-y-6 md:w-[33%]">
             <CardResources resources={proposal.resources} title="Resources" />
