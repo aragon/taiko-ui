@@ -18,7 +18,7 @@ export const WithdrawalForm: FC<IWithdrawalFormProps> = ({ onChange, onSubmit })
 
   useEffect(() => {
     if (!isAddress(to)) return;
-    else if (!isNumeric(value)) return;
+    else if (!value) return;
 
     onChange({ to, value: BigInt(value), data: "" } as unknown as RawAction);
   }, [to, value]);
@@ -51,7 +51,6 @@ export const WithdrawalForm: FC<IWithdrawalFormProps> = ({ onChange, onSubmit })
           label={`${coinName} amount`}
           placeholder="1.234"
           min={0}
-          variant={!value || isNumeric(value) ? "default" : "critical"}
           onChange={(val: string) => setValue(parseEther(val).toString())}
           onKeyDown={(e) => (e.key === "Enter" ? onSubmit?.() : null)}
         />
@@ -59,8 +58,3 @@ export const WithdrawalForm: FC<IWithdrawalFormProps> = ({ onChange, onSubmit })
     </div>
   );
 };
-
-function isNumeric(value: string): boolean {
-  if (!value) return false;
-  return !!value.match(/^[0-9]+$/);
-}

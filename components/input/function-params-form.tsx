@@ -72,7 +72,7 @@ export const FunctionParamsForm = ({
 
   return (
     <div className="w-full overflow-y-auto rounded-r-lg pt-4">
-      <If condition={functionAbi?.inputs.length}>
+      <If condition={functionAbi?.inputs.length || 0 > 0}>
         <div className="flex flex-row items-center justify-between border-b border-neutral-200 pb-4">
           <p className="text-md font-semibold text-neutral-800">Parameters</p>
         </div>
@@ -96,7 +96,6 @@ export const FunctionParamsForm = ({
             label={`${coinName} amount (optional)`}
             placeholder="1.234"
             min={0}
-            variant={!value || isNumeric(value) ? "default" : "critical"}
             onChange={(val: string) => setValue(parseEther(val).toString())}
             onKeyDown={(e) => (e.key === "Enter" ? onSubmit?.() : null)}
           />
@@ -105,8 +104,3 @@ export const FunctionParamsForm = ({
     </div>
   );
 };
-
-function isNumeric(value: string): boolean {
-  if (!value) return false;
-  return !!value.match(/^[0-9]+$/);
-}

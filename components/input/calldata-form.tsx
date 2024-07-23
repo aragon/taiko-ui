@@ -25,7 +25,6 @@ export const CalldataForm: FC<ICalldataFormProps> = ({ onChange, onSubmit }) => 
   useEffect(() => {
     if (!isAddress(to)) return;
     else if (!isHex(calldata) || calldata.trim().length % 2 !== 0) return;
-    else if (!!value && !isNumeric(value)) return;
 
     onChange({ to, value: BigInt(value || "0"), data: calldata } as unknown as RawAction);
   }, [to, calldata, value]);
@@ -81,7 +80,6 @@ export const CalldataForm: FC<ICalldataFormProps> = ({ onChange, onSubmit }) => 
             label={`${coinName} amount (optional)`}
             placeholder="1.234"
             min={0}
-            variant={!value || isNumeric(value) ? "default" : "critical"}
             onChange={(val: string) => setValue(parseEther(val).toString())}
             onKeyDown={(e) => (e.key === "Enter" ? onSubmit?.() : null)}
           />
@@ -90,8 +88,3 @@ export const CalldataForm: FC<ICalldataFormProps> = ({ onChange, onSubmit }) => 
     </div>
   );
 };
-
-function isNumeric(value: string): boolean {
-  if (!value) return false;
-  return !!value.match(/^[0-9]+$/);
-}
