@@ -1,10 +1,11 @@
 import { RawAction } from "@/utils/types";
-import WithdrawalInput from "@/components/input/withdrawal";
+import { WithdrawalForm } from "@/components/input/withdrawal-form";
 import { FunctionAbiSelectForm } from "@/components/input/function-abi-select-form";
 import { Button, DialogContent, DialogFooter, DialogHeader, DialogRoot, type IDialogRootProps } from "@aragon/ods";
 import { ElseIf, If, Then } from "@/components/if";
 import { useState } from "react";
 import { AbiFunction } from "viem";
+import { CalldataForm } from "../input/calldata-form";
 
 export type NewActionType = "" | "withdrawal" | "select-abi-function" | "calldata" | "custom-abi";
 
@@ -45,7 +46,7 @@ export const NewActionDialog: React.FC<INewActionDialogProps> = (props) => {
       <DialogContent className="flex flex-col gap-y-4 md:gap-y-6">
         <If condition={newActionType === "withdrawal"}>
           <Then>
-            <WithdrawalInput onChange={(action) => setStagedAction(action)} />
+            <WithdrawalForm onChange={(action) => setStagedAction(action)} onSubmit={() => handleSubmit()} />
           </Then>
           <ElseIf condition={newActionType === "select-abi-function"}>
             <FunctionAbiSelectForm
@@ -53,8 +54,10 @@ export const NewActionDialog: React.FC<INewActionDialogProps> = (props) => {
               onActionCleared={onActionCleared}
             />
           </ElseIf>
-          <ElseIf condition={newActionType === "calldata"}></ElseIf>
           <ElseIf condition={newActionType === "custom-abi"}></ElseIf>
+          <ElseIf condition={newActionType === "calldata"}>
+            <CalldataForm onChange={(action) => setStagedAction(action)} onSubmit={() => handleSubmit()} />
+          </ElseIf>
         </If>
 
         <div className="flex justify-between">

@@ -6,12 +6,12 @@ import { isAddress } from "@/utils/evm";
 import { ElseIf, If, Then } from "../if";
 import { PUB_CHAIN } from "@/constants";
 
-interface WithdrawalInputProps {
+interface IWithdrawalFormProps {
   onChange: (actions: RawAction) => any;
   onSubmit?: () => any;
 }
 
-const WithdrawalInput: FC<WithdrawalInputProps> = ({ onChange, onSubmit }) => {
+export const WithdrawalForm: FC<IWithdrawalFormProps> = ({ onChange, onSubmit }) => {
   const coinName = PUB_CHAIN.nativeCurrency.symbol;
   const [to, setTo] = useState<Address>();
   const [value, setValue] = useState<string>("");
@@ -53,7 +53,7 @@ const WithdrawalInput: FC<WithdrawalInputProps> = ({ onChange, onSubmit }) => {
           min={0}
           variant={!value || isNumeric(value) ? "default" : "critical"}
           onChange={(val: string) => setValue(parseEther(val).toString())}
-          onKeyDown={(e) => (e.key == "enter" ? onSubmit?.() : null)}
+          onKeyDown={(e) => (e.key === "Enter" ? onSubmit?.() : null)}
         />
       </div>
     </div>
@@ -64,5 +64,3 @@ function isNumeric(value: string): boolean {
   if (!value) return false;
   return !!value.match(/^[0-9]+$/);
 }
-
-export default WithdrawalInput;

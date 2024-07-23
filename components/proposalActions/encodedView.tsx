@@ -29,5 +29,18 @@ function getEncodedArgs(action: RawAction) {
     ];
   }
 
-  return Object.entries(action).map(([key, value]) => ({ title: capitalizeFirstLetter(key), value: value.toString() }));
+  // Force the value to appear last
+  const v = action.value;
+  delete (action as any).value;
+  action.value = v;
+
+  return Object.entries(action).map(([key, value]) => {
+    if (key === "value") {
+      return {
+        title: capitalizeFirstLetter(key),
+        value: formatEther(value as bigint, "wei") + " " + PUB_CHAIN.nativeCurrency.symbol,
+      };
+    }
+    return { title: capitalizeFirstLetter(key), value: value.toString() };
+  });
 }

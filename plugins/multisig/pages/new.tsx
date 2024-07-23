@@ -103,15 +103,14 @@ export default function Create() {
               onClick={() => setAddActionType("select-abi-function")}
             />
             <AddActionCard
-              title="Use a custom ABI"
+              title="Enter the function ABI"
               disabled
-              icon={IconType.INFO}
+              icon={IconType.RICHTEXT_LIST_UNORDERED}
               onClick={() => setAddActionType("custom-abi")}
             />
             <AddActionCard
-              title="Enter the calldata"
-              disabled
-              icon={IconType.DOTS_HORIZONTAL}
+              title="Copy the calldata"
+              icon={IconType.COPY}
               onClick={() => setAddActionType("calldata")}
             />
           </div>

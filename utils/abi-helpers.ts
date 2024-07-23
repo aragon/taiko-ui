@@ -46,8 +46,13 @@ export function resolveParamValue(value: CallParameterFieldType, abi?: AbiParame
 }
 
 export function resolveFieldTitle(name: string, abiType: string | undefined, idx: number): string {
-  if (name) return name;
-  else if (abiType) {
+  if (name) {
+    if (!abiType) return name;
+    else if (abiType.startsWith("uint") || abiType.startsWith("int")) {
+      return name + " (in wei)";
+    }
+    return name;
+  } else if (abiType) {
     if (abiType === "address") {
       return "Address";
     } else if (abiType === "bytes32") {
@@ -62,7 +67,7 @@ export function resolveFieldTitle(name: string, abiType: string | undefined, idx
       return "Boolean";
     }
   }
-  return (idx + 1).toString();
+  return "Parameter " + (idx + 1).toString();
 }
 
 function getReadableJson(value: Record<string, InputValue>): string {

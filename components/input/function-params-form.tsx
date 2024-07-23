@@ -1,18 +1,26 @@
 import { useEffect, useState } from "react";
-import { type Hex, encodeFunctionData } from "viem";
-import { AlertInline, InputText } from "@aragon/ods";
+import { type Hex, encodeFunctionData, parseEther } from "viem";
+import { AlertInline, InputNumber, InputText } from "@aragon/ods";
 import { type AbiFunction } from "abitype";
 import { If } from "@/components/if";
 import { InputParameter } from "./input-parameter";
 import { type InputValue } from "@/utils/input-values";
 import { logger } from "@/services/logger";
+import { PUB_CHAIN } from "@/constants";
 
 interface IFunctionParamsFormProps {
   functionAbi?: AbiFunction;
   onActionChanged: (calldata: Hex, value: bigint, abi: AbiFunction) => void;
   onActionCleared: () => any;
+  onSubmit?: () => any;
 }
-export const FunctionParamsForm = ({ functionAbi, onActionChanged, onActionCleared }: IFunctionParamsFormProps) => {
+export const FunctionParamsForm = ({
+  functionAbi,
+  onActionChanged,
+  onActionCleared,
+  onSubmit,
+}: IFunctionParamsFormProps) => {
+  const coinName = PUB_CHAIN.nativeCurrency.symbol;
   const [inputValues, setInputValues] = useState<InputValue[]>([]);
   const [value, setValue] = useState<string>("");
 
@@ -84,16 +92,21 @@ export const FunctionParamsForm = ({ functionAbi, onActionChanged, onActionClear
       ))}
       <If condition={functionAbi?.stateMutability === "payable" || !!functionAbi?.payable}>
         <div className="my-4">
-          <InputText
-            className=""
-            label="Value (in wei)"
-            placeholder="1000000000000000000"
-            variant={value.match(/^[0-9]*$/) ? "default" : "critical"}
-            value={value}
-            onChange={(e) => setValue(e.target.value || "")}
+          <InputNumber
+            label={`${coinName} amount (optional)`}
+            placeholder="1.234"
+            min={0}
+            variant={!value || isNumeric(value) ? "default" : "critical"}
+            onChange={(val: string) => setValue(parseEther(val).toString())}
+            onKeyDown={(e) => (e.key === "Enter" ? onSubmit?.() : null)}
           />
         </div>
       </If>
     </div>
   );
 };
+
+function isNumeric(value: string): boolean {
+  if (!value) return false;
+  return !!value.match(/^[0-9]+$/);
+}

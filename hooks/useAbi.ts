@@ -3,7 +3,7 @@ import { whatsabi } from "@shazow/whatsabi";
 import { usePublicClient } from "wagmi";
 import { AbiFunction } from "abitype";
 import { useQuery } from "@tanstack/react-query";
-import { isAddress } from "@/utils/evm";
+import { isAddress, isContract } from "@/utils/evm";
 import { PUB_CHAIN, PUB_ETHERSCAN_API_KEY } from "@/constants";
 import { useAlerts } from "@/context/Alerts";
 import { getImplementation, isProxyContract } from "@/utils/proxies";
@@ -136,14 +136,6 @@ function getEtherscanAbiLoader() {
     default:
       throw new Error("Unknown chain");
   }
-}
-
-function isContract(address: Address, publicClient: ReturnType<typeof usePublicClient>) {
-  if (!publicClient) return Promise.reject(new Error("Invalid client"));
-
-  return publicClient.getCode({ address }).then((bytecode) => {
-    return bytecode !== undefined && bytecode !== "0x";
-  });
 }
 
 function abiSortCallback(a: AbiFunction, b: AbiFunction) {

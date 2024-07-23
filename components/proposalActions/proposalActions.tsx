@@ -63,7 +63,9 @@ const ActionItem = ({ index, rawAction }: { index: number; rawAction: RawAction 
   const title = `Action ${index + 1}`;
   const coinName = PUB_CHAIN.nativeCurrency.symbol;
   const isEthTransfer = !action.data || action.data === "0x";
-  const functionName = isEthTransfer ? `Transfer ${coinName}` : decodeCamelCase(action.functionName || "(function)");
+  const functionName = isEthTransfer
+    ? `Transfer ${coinName}`
+    : decodeCamelCase(action.functionName || "(function call)");
   const functionAbi = action.functionAbi ?? null;
   const explorerUrl = `${PUB_CHAIN.blockExplorers?.default.url}/address/${action.to}`;
 
@@ -121,7 +123,7 @@ const ActionItem = ({ index, rawAction }: { index: number; rawAction: RawAction 
                 <InputText
                   label={coinName + " value"}
                   className="w-full"
-                  value={formatEther(action.value ?? BigInt(0))}
+                  value={formatEther(action.value ?? BigInt(0)) + " " + coinName}
                   disabled={true}
                 />
               </If>
