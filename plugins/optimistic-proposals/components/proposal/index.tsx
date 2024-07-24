@@ -72,22 +72,21 @@ export default function ProposalCard(props: ProposalInputs) {
       : 0;
 
   return (
-    <Link href={`#/proposals/${props.proposalIndex}`} className="mb-4 w-full cursor-pointer">
-      <ProposalDataListItem.Structure
-        id=""
-        title={proposal.title}
-        summary={proposal.summary}
-        voted={hasVetoed}
-        result={{
-          option: "Veto",
-          voteAmount: formatEther(proposal.vetoTally) + " " + (tokenSymbol || "TKO"),
-          votePercentage: vetoPercentage,
-        }}
-        publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
-        status={proposalVariant!}
-        type={"majorityVoting"}
-      />
-    </Link>
+    <ProposalDataListItem.Structure
+      title={proposal.title}
+      summary={proposal.summary}
+      href={`#/proposals/${props.proposalIndex}`}
+      voted={hasVetoed}
+      date={proposal.parameters.vetoEndDate ? Number(proposal.parameters.vetoEndDate) * 1000 : ""}
+      result={{
+        option: "Veto",
+        voteAmount: formatEther(proposal.vetoTally) + " " + (tokenSymbol || "TKO"),
+        votePercentage: vetoPercentage,
+      }}
+      publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
+      status={proposalVariant!}
+      type={"majorityVoting"}
+    />
   );
 }
 

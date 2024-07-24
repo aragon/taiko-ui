@@ -45,7 +45,8 @@ export const MultisigMemberList: React.FC<IMultisigMemberListProps> = () => {
         {filteredMembers.map((member) => (
           <MultisigMemberListItem
             key={member}
-            onClick={() => open(`${PUB_CHAIN.blockExplorers?.default.url}/address/${member}`)}
+            href={`${PUB_CHAIN.blockExplorers?.default.url}/address/${member}`}
+            target="_blank"
             address={member}
           />
         ))}

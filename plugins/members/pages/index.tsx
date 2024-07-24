@@ -49,17 +49,14 @@ export default function MembersList() {
             </If>
 
             <ToggleGroup isMultiSelect={false} onChange={onToggleChange} value={toggleValue}>
-              <Toggle value="verified" label="Verified" />
               <Toggle value="all" label="Registered" />
+              <Toggle value="verified" label="Verified" />
               <Toggle value="multisig" label="Security council" />
             </ToggleGroup>
           </div>
           <If condition={toggleValue === "all" || toggleValue === "verified"}>
             <Then>
-              <DelegateMemberList
-                verifiedOnly={toggleValue === "verified"}
-                onAnnounceDelegation={() => setShowProfileCreationDialog(true)}
-              />
+              <DelegateMemberList verifiedOnly={toggleValue === "verified"} />
             </Then>
             <Else>
               <MultisigMemberList />

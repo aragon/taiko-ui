@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { DataList, IconType, IllustrationHuman } from "@aragon/ods";
+import { DataList, IllustrationHuman } from "@aragon/ods";
 import { DelegateListItem } from "./DelegateListItem";
 import { equalAddresses } from "@/utils/evm";
-import { useRouter } from "next/router";
 import { useDelegates } from "../hooks/useDelegates";
 import { useGovernanceToken } from "../hooks/useGovernanceToken";
 import { useAccount } from "wagmi";
@@ -14,11 +13,9 @@ import { PleaseWaitSpinner } from "@/components/please-wait";
 
 interface IDelegateMemberListProps {
   verifiedOnly?: boolean;
-  onAnnounceDelegation: () => void;
 }
 
-export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifiedOnly, onAnnounceDelegation }) => {
-  const { push } = useRouter();
+export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifiedOnly }) => {
   const { address } = useAccount();
   const [searchValue, setSearchValue] = useState<string>();
   //   const [activeSort, setActiveSort] = useState<string>();
@@ -86,7 +83,7 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifie
           <DelegateListItem
             isMyDelegate={equalAddresses(delegatesTo, delegate)}
             key={delegate}
-            onClick={() => push("#/delegates/" + delegate)}
+            href={"#/delegates/" + delegate}
             address={delegate}
           />
         ))}

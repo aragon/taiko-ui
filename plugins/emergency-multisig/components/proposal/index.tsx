@@ -63,19 +63,20 @@ export default function ProposalCard(props: ProposalInputs) {
   }
 
   return (
-    <Link href={`#/proposals/${props.proposalId}`} className="mb-4 w-full cursor-pointer">
-      <ProposalDataListItem.Structure
-        {...proposal}
-        voted={hasApproved}
-        result={{
-          approvalAmount: proposal.approvals,
-          approvalThreshold: proposal.parameters.minApprovals,
-        }}
-        publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
-        status={proposalVariant!}
-        type={"approvalThreshold"}
-      />
-    </Link>
+    <ProposalDataListItem.Structure
+      title={proposal.title}
+      summary={proposal.summary}
+      href={`#/proposals/${props.proposalId}`}
+      voted={hasApproved}
+      date={proposal.parameters.expirationDate ? Number(proposal.parameters.expirationDate) * 1000 : ""}
+      result={{
+        approvalAmount: proposal.approvals,
+        approvalThreshold: proposal.parameters.minApprovals,
+      }}
+      publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
+      status={proposalVariant!}
+      type={"approvalThreshold"}
+    />
   );
 }
 

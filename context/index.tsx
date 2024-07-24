@@ -9,6 +9,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { UseDerivedWalletProvider } from "../hooks/useDerivedWallet";
+import { OdsCoreProvider, OdsModulesProvider } from "@aragon/ods";
+import { odsCoreProviderValues } from "@/components/ods-customizations";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,9 +46,11 @@ export function RootContextProvider({ children, initialState }: { children: Reac
   return (
     <WagmiProvider config={config} initialState={initialState}>
       <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
-        <AlertProvider>
-          <UseDerivedWalletProvider>{children}</UseDerivedWalletProvider>
-        </AlertProvider>
+        <OdsCoreProvider values={odsCoreProviderValues}>
+          <AlertProvider>
+            <UseDerivedWalletProvider>{children}</UseDerivedWalletProvider>
+          </AlertProvider>
+        </OdsCoreProvider>
       </PersistQueryClientProvider>
     </WagmiProvider>
   );

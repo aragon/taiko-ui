@@ -93,21 +93,21 @@ export const VotingStage: React.FC<IVotingStageProps> = (props) => {
         </div>
       </AccordionItemHeader>
 
-      <AccordionItemContent ref={contentRef} asChild={true} className="!md:pb-0 !pb-0">
+      <AccordionItemContent ref={contentRef} className="!md:pb-0 !pb-0">
         <RadixTabsRoot defaultValue={defaultTab} ref={setRef}>
           <Tabs.List>
             <Tabs.Trigger value="breakdown" label="Breakdown" />
             <Tabs.Trigger value="votes" label="Votes" />
             <Tabs.Trigger value="details" label="Details" />
           </Tabs.List>
-          <Tabs.Content value="breakdown" asChild={true}>
+          <Tabs.Content value="breakdown">
             <div className="py-4 pb-8">
               {result && <VotingBreakdown cta={result.cta} variant={variant} result={result} />}
             </div>
           </Tabs.Content>
           <Tabs.Content value="votes">
             <div className="py-4 pb-8">
-              <VotesDataList votes={votes || []} proposalId={proposalId} stageTitle={title as ProposalStages} />
+              <VotesDataList votes={votes || []} />
             </div>
           </Tabs.Content>
           <Tabs.Content value="details">
