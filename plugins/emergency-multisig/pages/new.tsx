@@ -19,7 +19,7 @@ import { ProposalActions } from "@/components/proposalActions/proposalActions";
 
 export default function Create() {
   const { address: selfAddress, isConnected } = useAccount();
-  const canCreate = useCanCreateProposal();
+  const { canCreate } = useCanCreateProposal();
   const [addActionType, setAddActionType] = useState<NewActionType>("");
   const { data: registeredSigners } = usePublicKeyRegistry();
   const {

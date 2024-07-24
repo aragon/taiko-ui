@@ -6,7 +6,6 @@ import { isAddress } from "@/utils/evm";
 import { If } from "../if";
 import { PUB_CHAIN } from "@/constants";
 import { useIsContract } from "@/hooks/useIsContract";
-import { usePublicClient } from "wagmi";
 import { PleaseWaitSpinner } from "../please-wait";
 
 interface ICalldataFormProps {
@@ -19,8 +18,7 @@ export const CalldataForm: FC<ICalldataFormProps> = ({ onChange, onSubmit }) => 
   const [to, setTo] = useState<Address>();
   const [calldata, setCalldata] = useState<string>("");
   const [value, setValue] = useState<string>("");
-  const publicClient = usePublicClient();
-  const { isContract, isLoading, error: isContractError } = useIsContract(to, publicClient);
+  const { isContract, isLoading, error: isContractError } = useIsContract(to);
 
   useEffect(() => {
     if (!isAddress(to)) return;
@@ -49,7 +47,7 @@ export const CalldataForm: FC<ICalldataFormProps> = ({ onChange, onSubmit }) => 
                 : isContractError
                   ? { message: "Cannot check the given address", variant: "critical" }
                   : !!to && !isContract
-                    ? { message: "The given address is not a contract", variant: "critical" }
+                    ? { message: "The given address is not a contract", variant: "warning" }
                     : undefined
           }
           onChange={handleTo}
@@ -60,7 +58,7 @@ export const CalldataForm: FC<ICalldataFormProps> = ({ onChange, onSubmit }) => 
           </div>
         </If>
       </div>
-      <If condition={!!to && !isLoading && isContract}>
+      <If condition={!!to && !isLoading}>
         <div className="pb-4">
           <TextArea
             className=""

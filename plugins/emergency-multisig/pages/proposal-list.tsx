@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect } from "react";
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import ProposalCard from "@/plugins/emergency-multisig/components/proposal";
@@ -19,7 +19,7 @@ export default function Proposals() {
   const { open } = useWeb3Modal();
   const { data: blockNumber } = useBlockNumber({ watch: true });
   const { publicKey, requestSignature } = useDerivedWallet();
-  const canCreate = useCanCreateProposal();
+  const { canCreate } = useCanCreateProposal();
   const {
     data: proposalCountResponse,
     error: isError,

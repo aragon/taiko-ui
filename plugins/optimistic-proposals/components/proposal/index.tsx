@@ -41,7 +41,7 @@ export default function ProposalCard(props: ProposalInputs) {
     // We have the proposal but no metadata yet
     return (
       <Link href={`#/proposals/${props.proposalIndex}`} className="mb-4 w-full">
-        <Card className="px-5">
+        <Card className="p-4">
           <span className="xs:px-10 px-4 py-5 md:px-6 lg:px-7">
             <PleaseWaitSpinner fullMessage="Loading metadata..." />
           </span>

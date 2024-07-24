@@ -40,7 +40,6 @@ export function usePublicKeyRegistry() {
         );
       });
     },
-    initialData: [],
     retry: true,
     refetchOnMount: false,
     refetchOnReconnect: false,

@@ -15,7 +15,7 @@ const DEFAULT_PAGE_SIZE = 6;
 
 export default function Proposals() {
   const { isConnected } = useAccount();
-  const canCreate = useCanCreateProposal();
+  const { canCreate } = useCanCreateProposal();
   const { open } = useWeb3Modal();
 
   const { data: blockNumber } = useBlockNumber({ watch: true });
