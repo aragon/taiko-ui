@@ -13,7 +13,10 @@ import {
 } from "@/constants";
 import { uploadToPinata } from "@/utils/ipfs";
 import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin";
+import { URL_PATTERN } from "@/utils/input-values";
 import { toHex } from "viem";
+
+const UrlRegex = new RegExp(URL_PATTERN);
 
 export function useCreateProposal() {
   const { push } = useRouter();
@@ -23,6 +26,9 @@ export function useCreateProposal() {
   const [summary, setSummary] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [actions, setActions] = useState<RawAction[]>([]);
+  const [resources, setResources] = useState<{ name: string; url: string }[]>([
+    { name: PUB_APP_NAME, url: PUB_PROJECT_URL },
+  ]);
   const { writeContract: createProposalWrite, data: createTxHash, error, status } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: createTxHash });
   const { encryptProposalData } = useEncryptedData();
@@ -66,17 +72,33 @@ export function useCreateProposal() {
 
   const submitProposal = async () => {
     // Check metadata
-    if (!title.trim())
+    if (!title.trim()) {
       return addAlert("Invalid proposal details", {
         description: "Please, enter a title",
         type: "error",
       });
+    }
 
-    if (!summary.trim())
+    if (!summary.trim()) {
       return addAlert("Invalid proposal details", {
         description: "Please, enter a summary of what the proposal is about",
         type: "error",
       });
+    }
+
+    for (const item of resources) {
+      if (!item.name.trim()) {
+        return addAlert("Invalid resource name", {
+          description: "Please, enter a name for all the resources",
+          type: "error",
+        });
+      } else if (!UrlRegex.test(item.url.trim())) {
+        return addAlert("Invalid resource URL", {
+          description: "Please, enter valid URL for all the resources",
+          type: "error",
+        });
+      }
+    }
 
     try {
       setIsCreating(true);
@@ -84,7 +106,7 @@ export function useCreateProposal() {
         title,
         summary,
         description,
-        resources: [{ name: PUB_APP_NAME, url: PUB_PROJECT_URL }],
+        resources,
       };
 
       // Encrypt the proposal data
@@ -110,10 +132,12 @@ export function useCreateProposal() {
     summary,
     description,
     actions,
+    resources,
     setTitle,
     setSummary,
     setDescription,
     setActions,
+    setResources,
     submitProposal,
   };
 }

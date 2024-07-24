@@ -1,5 +1,5 @@
 import React, { ReactNode, useState } from "react";
-import { Button, IconType, InputText, TextAreaRichText } from "@aragon/ods";
+import { Button, Dropdown, IconType, InputText, Tag, TextAreaRichText } from "@aragon/ods";
 import { useAccount } from "wagmi";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
@@ -27,10 +27,12 @@ export default function Create() {
     summary,
     description,
     actions,
+    resources,
     setTitle,
     setSummary,
     setDescription,
     setActions,
+    setResources,
     isCreating,
     submitProposal,
   } = useCreateProposal();
@@ -50,6 +52,18 @@ export default function Create() {
 
     setActions(actions.concat(newAction));
     setAddActionType("");
+  };
+  const removeResource = (idx: number) => {
+    resources.splice(idx, 1);
+    setResources([].concat(resources as any));
+  };
+  const onResourceNameChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    resources[idx].name = event.target.value;
+    setResources([].concat(resources as any));
+  };
+  const onResourceUrlChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    resources[idx].url = event.target.value;
+    setResources([].concat(resources as any));
   };
 
   const filteredSignerItems = registeredSigners.filter((signer) => {
@@ -71,6 +85,7 @@ export default function Create() {
               placeholder="A short title that describes the main purpose"
               variant="default"
               value={title}
+              readOnly={isCreating}
               onChange={handleTitleInput}
             />
           </div>
@@ -82,6 +97,7 @@ export default function Create() {
               placeholder="A short summary that outlines the main purpose of the proposal"
               variant="default"
               value={summary}
+              readOnly={isCreating}
               onChange={handleSummaryInput}
             />
           </div>
@@ -93,6 +109,65 @@ export default function Create() {
               onChange={setDescription}
               placeholder="A description for what the proposal is all about"
             />
+          </div>
+
+          <div className="mb-6 flex flex-col gap-y-2 md:gap-y-3">
+            <div className="flex flex-col gap-0.5 md:gap-1">
+              <div className="flex gap-x-3">
+                <p className="text-base font-normal leading-tight text-neutral-800 md:text-lg">Resources</p>
+                <Tag label="Optional" />
+              </div>
+              <p className="text-sm font-normal leading-normal text-neutral-500 md:text-base">
+                Add links to external resources
+              </p>
+            </div>
+            <div className="flex flex-col gap-y-4 rounded-xl border border-neutral-100 bg-neutral-0 p-4">
+              <If not={!!resources.length}>
+                <p className="text-sm font-normal leading-normal text-neutral-500 md:text-base">
+                  There are no resources yet. Click the button below to add the first one.
+                </p>
+              </If>
+              {resources.map((resource, idx) => {
+                return (
+                  <div key={idx} className="flex flex-col gap-y-3 py-3 md:py-4">
+                    <div className="flex items-end gap-x-3">
+                      <InputText
+                        label="Resource name"
+                        readOnly={isCreating}
+                        value={resource.name}
+                        onChange={(e) => onResourceNameChange(e, idx)}
+                        placeholder="GitHub, Twitter, etc."
+                      />
+                      <Button
+                        size="lg"
+                        variant="tertiary"
+                        onClick={() => removeResource(idx)}
+                        iconLeft={IconType.MINUS}
+                      />
+                    </div>
+                    <InputText
+                      label="URL"
+                      value={resource.url}
+                      onChange={(e) => onResourceUrlChange(e, idx)}
+                      placeholder="https://..."
+                      readOnly={isCreating}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            <span className="mt-3">
+              <Button
+                variant="tertiary"
+                size="lg"
+                iconLeft={IconType.PLUS}
+                onClick={() => {
+                  setResources(resources.concat({ url: "", name: "" }));
+                }}
+              >
+                Add resource
+              </Button>
+            </span>
           </div>
 
           {/* Actions */}

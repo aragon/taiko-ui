@@ -149,7 +149,7 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
               <Tag label={"Optional"} />
             </div>
             <p className="text-sm font-normal leading-normal text-neutral-500 md:text-base">
-              Share external resources here
+              Add links to external resources here
             </p>
           </div>
           {fields.length > 0 && (
