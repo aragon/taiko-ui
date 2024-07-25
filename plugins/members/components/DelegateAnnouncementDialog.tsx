@@ -212,6 +212,9 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
           </span>
         </div>
         <div className="mt-4 flex justify-between">
+          <Button variant="secondary" size="lg" onClick={onClose} disabled={isConfirming || status === "pending"}>
+            Cancel
+          </Button>
           <Button
             variant="primary"
             size="lg"
@@ -219,9 +222,6 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
             onClick={handleSubmit(handleAnnouncement)}
           >
             {ctaLabel}
-          </Button>
-          <Button variant="secondary" size="lg" onClick={onClose} disabled={isConfirming || status === "pending"}>
-            Cancel
           </Button>
         </div>
       </DialogContent>
