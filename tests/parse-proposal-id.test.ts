@@ -1,4 +1,4 @@
-import { parseProposalId } from "@/plugins/dualGovernance/utils/proposal-id";
+import { parseProposalId } from "@/plugins/optimistic-proposals/utils/proposal-id";
 import { expect, test, describe } from "bun:test";
 
 describe("Optimistic proposal ID", () => {

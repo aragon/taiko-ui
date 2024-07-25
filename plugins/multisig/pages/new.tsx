@@ -1,205 +1,251 @@
-import { Button, IconType, Icon, InputText, TextAreaRichText } from "@aragon/ods";
-import React from "react";
-import WithdrawalInput from "@/components/input/withdrawal";
-import { FunctionCallForm } from "@/components/input/function-call-form";
-import { ActionType } from "@/utils/types";
+import { Button, Dropdown, IconType, InputText, Tag, TextAreaRichText } from "@aragon/ods";
+import React, { ReactNode, useState } from "react";
+import { RawAction } from "@/utils/types";
 import { Else, ElseIf, If, Then } from "@/components/if";
-import { ActionCard } from "@/components/actions/action";
 import { MainSection } from "@/components/layout/main-section";
 import { useCreateProposal } from "../hooks/useCreateProposal";
 import { useAccount } from "wagmi";
 import { useCanCreateProposal } from "../hooks/useCanCreateProposal";
 import { MissingContentView } from "@/components/MissingContentView";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { Address } from "viem";
+import { NewActionDialog, NewActionType } from "@/components/dialogs/NewActionDialog";
+import { AddActionCard } from "@/components/cards/AddActionCard";
+import { ProposalActions } from "@/components/proposalActions/proposalActions";
 
 export default function Create() {
-  const { open } = useWeb3Modal();
   const { address: selfAddress, isConnected } = useAccount();
-  const canCreate = useCanCreateProposal();
+  const { canCreate } = useCanCreateProposal();
+  const [addActionType, setAddActionType] = useState<NewActionType>("");
   const {
     title,
     summary,
     description,
     actions,
-    actionType,
+    resources,
     setTitle,
     setSummary,
     setDescription,
     setActions,
-    setActionType,
+    setResources,
     isCreating,
     submitProposal,
   } = useCreateProposal();
 
-  const changeActionType = (actionType: ActionType) => {
-    setActions([]);
-    setActionType(actionType);
-  };
   const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event?.target?.value);
   };
   const handleSummaryInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSummary(event?.target?.value);
   };
+  const handleNewActionDialogClose = (newAction: RawAction | null) => {
+    if (!newAction) {
+      setAddActionType("");
+      return;
+    }
+
+    setActions(actions.concat(newAction));
+    setAddActionType("");
+  };
+  const removeResource = (idx: number) => {
+    resources.splice(idx, 1);
+    setResources([].concat(resources as any));
+  };
+  const onResourceNameChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    resources[idx].name = event.target.value;
+    setResources([].concat(resources as any));
+  };
+  const onResourceUrlChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    resources[idx].url = event.target.value;
+    setResources([].concat(resources as any));
+  };
 
   return (
     <MainSection narrow>
-      <div className="w-full justify-between py-5">
+      <div className="w-full justify-between">
         <h1 className="mb-10 text-3xl font-semibold text-neutral-900">Create Proposal</h1>
 
-        <If condition={!selfAddress || !isConnected}>
-          <Then>
-            {/* Not connected */}
-            <MissingContentView
-              message={`Please, connect your Ethereum wallet in order to continue.`}
-              callToAction="Connect wallet"
-              onClick={() => open()}
+        <PlaceHolderOr selfAddress={selfAddress} canCreate={canCreate} isConnected={isConnected}>
+          <div className="mb-6">
+            <InputText
+              className=""
+              label="Title"
+              maxLength={100}
+              placeholder="A short title that describes the main purpose"
+              variant="default"
+              value={title}
+              readOnly={isCreating}
+              onChange={handleTitleInput}
             />
-          </Then>
-          <ElseIf condition={!canCreate}>
-            {/* Not a member */}
-            <MissingContentView
-              message={`You cannot create proposals on the multisig because you are not currently defined as a member.`}
+          </div>
+          <div className="mb-6">
+            <InputText
+              className=""
+              label="Summary"
+              maxLength={280}
+              placeholder="A short summary that outlines the main purpose of the proposal"
+              variant="default"
+              value={summary}
+              readOnly={isCreating}
+              onChange={handleSummaryInput}
             />
-          </ElseIf>
-          <Else>
-            <div className="mb-6">
-              <InputText
-                className=""
-                label="Title"
-                maxLength={100}
-                placeholder="A short title that describes the main purpose"
-                variant="default"
-                value={title}
-                onChange={handleTitleInput}
-              />
-            </div>
-            <div className="mb-6">
-              <InputText
-                className=""
-                label="Summary"
-                maxLength={280}
-                placeholder="A short summary that outlines the main purpose of the proposal"
-                variant="default"
-                value={summary}
-                onChange={handleSummaryInput}
-              />
-            </div>
-            <div className="mb-6">
-              <TextAreaRichText
-                label="Description"
-                className="pt-2"
-                value={description}
-                onChange={setDescription}
-                placeholder="A description for what the proposal is all about"
-              />
-            </div>
-            <div className="mb-6">
-              <span className="mb-2 block text-lg font-normal text-neutral-900 ">Select the type of proposal</span>
-              <div className="mt-2 grid h-24 grid-cols-3 gap-5">
-                <div
-                  onClick={() => {
-                    changeActionType(ActionType.Signaling);
-                  }}
-                  className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
-                    actionType === ActionType.Signaling ? "border-primary-300" : "border-neutral-100"
-                  }`}
-                >
-                  <Icon
-                    className={
-                      "mt-2 !h-12 !w-10 p-2 " +
-                      (actionType === ActionType.Signaling ? "text-primary-400" : "text-neutral-400")
-                    }
-                    icon={IconType.INFO}
-                    size="lg"
-                  />
-                  <span className="text-center text-sm text-neutral-400">Signaling</span>
-                </div>
-                <div
-                  onClick={() => changeActionType(ActionType.Withdrawal)}
-                  className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
-                    actionType === ActionType.Withdrawal ? "border-primary-300" : "border-neutral-100"
-                  }`}
-                >
-                  <Icon
-                    className={
-                      "mt-2 !h-12 !w-10 p-2 " +
-                      (actionType === ActionType.Withdrawal ? "text-primary-400" : "text-neutral-400")
-                    }
-                    icon={IconType.WITHDRAW}
-                    size="lg"
-                  />
-                  <span className="text-center text-sm text-neutral-400">DAO Payment</span>
-                </div>
-                <div
-                  onClick={() => changeActionType(ActionType.Custom)}
-                  className={`flex cursor-pointer flex-col items-center rounded-xl border border-2 border-solid bg-neutral-0 hover:bg-neutral-50 ${
-                    actionType === ActionType.Custom ? "border-primary-300" : "border-neutral-100"
-                  }`}
-                >
-                  <Icon
-                    className={
-                      "mt-2 !h-12 !w-10 p-2 " +
-                      (actionType === ActionType.Custom ? "text-primary-400" : "text-neutral-400")
-                    }
-                    icon={IconType.BLOCKCHAIN_BLOCKCHAIN}
-                    size="lg"
-                  />
-                  <span className="text-center text-sm text-neutral-400">Custom action</span>
-                </div>
-              </div>
-              <div className="mb-6">
-                {actionType === ActionType.Withdrawal && <WithdrawalInput setActions={setActions} />}
-                {actionType === ActionType.Custom && (
-                  <FunctionCallForm onAddAction={(action) => setActions(actions.concat([action]))} />
-                )}
-              </div>
-            </div>
+          </div>
+          <div className="mb-6">
+            <TextAreaRichText
+              label="Description"
+              className="pt-2"
+              value={description}
+              onChange={setDescription}
+              placeholder="A description for what the proposal is all about"
+            />
+          </div>
 
-            <If condition={actionType !== ActionType.Custom}>
-              <Then>
-                <Button
-                  isLoading={isCreating}
-                  className="mb-6 mt-14"
-                  size="lg"
-                  variant="primary"
-                  onClick={() => submitProposal()}
-                >
-                  Submit proposal
-                </Button>
-              </Then>
-              <Else>
-                <div className="mb-6 mt-14">
-                  <If not={actions.length}>
-                    <Then>
-                      <p>Add the first action to continue</p>
-                    </Then>
-                    <Else>
-                      <p className="flex-grow pb-3 text-lg font-semibold text-neutral-900">Actions</p>
-                      <div className="mb-10">
-                        {actions?.map?.((action, i) => (
-                          <div className="mb-3" key={`${i}-${action.to}-${action.data}`}>
-                            <ActionCard action={action} idx={i} />
-                          </div>
-                        ))}
-                      </div>
-                    </Else>
-                  </If>
-                  <Button
-                    className="mt-3"
-                    size="lg"
-                    variant="primary"
-                    disabled={!actions.length}
-                    onClick={() => submitProposal()}
-                  >
-                    Submit proposal
-                  </Button>
-                </div>
-              </Else>
-            </If>
-          </Else>
-        </If>
+          <div className="mb-6 flex flex-col gap-y-2 md:gap-y-3">
+            <div className="flex flex-col gap-0.5 md:gap-1">
+              <div className="flex gap-x-3">
+                <p className="text-base font-normal leading-tight text-neutral-800 md:text-lg">Resources</p>
+                <Tag label="Optional" />
+              </div>
+              <p className="text-sm font-normal leading-normal text-neutral-500 md:text-base">
+                Add links to external resources
+              </p>
+            </div>
+            <div className="flex flex-col gap-y-4 rounded-xl border border-neutral-100 bg-neutral-0 p-4">
+              <If not={!!resources.length}>
+                <p className="text-sm font-normal leading-normal text-neutral-500 md:text-base">
+                  There are no resources yet. Click the button below to add the first one.
+                </p>
+              </If>
+              {resources.map((resource, idx) => {
+                return (
+                  <div key={idx} className="flex flex-col gap-y-3 py-3 md:py-4">
+                    <div className="flex items-end gap-x-3">
+                      <InputText
+                        label="Resource name"
+                        readOnly={isCreating}
+                        value={resource.name}
+                        onChange={(e) => onResourceNameChange(e, idx)}
+                        placeholder="GitHub, Twitter, etc."
+                      />
+                      <Button
+                        size="lg"
+                        variant="tertiary"
+                        onClick={() => removeResource(idx)}
+                        iconLeft={IconType.MINUS}
+                      />
+                    </div>
+                    <InputText
+                      label="URL"
+                      value={resource.url}
+                      onChange={(e) => onResourceUrlChange(e, idx)}
+                      placeholder="https://..."
+                      readOnly={isCreating}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            <span className="mt-3">
+              <Button
+                variant="tertiary"
+                size="lg"
+                iconLeft={IconType.PLUS}
+                onClick={() => {
+                  setResources(resources.concat({ url: "", name: "" }));
+                }}
+              >
+                Add resource
+              </Button>
+            </span>
+          </div>
+
+          {/* Actions */}
+
+          <ProposalActions
+            actions={actions}
+            emptyListDescription="The proposal has no actions defined yet. Select a type of action to add to the proposal."
+          />
+
+          <div className="mt-8 grid w-full grid-cols-2 gap-4 md:grid-cols-4">
+            <AddActionCard
+              title="Add a payment"
+              icon={IconType.WITHDRAW}
+              onClick={() => setAddActionType("withdrawal")}
+            />
+            <AddActionCard
+              title="Select a function"
+              icon={IconType.BLOCKCHAIN_BLOCKCHAIN}
+              onClick={() => setAddActionType("select-abi-function")}
+            />
+            <AddActionCard
+              title="Enter the function ABI"
+              disabled
+              icon={IconType.RICHTEXT_LIST_UNORDERED}
+              onClick={() => setAddActionType("custom-abi")}
+            />
+            <AddActionCard
+              title="Copy the calldata"
+              icon={IconType.COPY}
+              onClick={() => setAddActionType("calldata")}
+            />
+          </div>
+
+          {/* Dialog */}
+
+          <NewActionDialog
+            newActionType={addActionType}
+            onClose={(newAction) => handleNewActionDialogClose(newAction)}
+          />
+
+          {/* Submit */}
+
+          <div className="mt-6 flex w-full flex-col items-center">
+            <Button
+              isLoading={isCreating}
+              className="mt-3 border-primary-400"
+              size="lg"
+              variant={actions.length ? "primary" : "secondary"}
+              onClick={() => submitProposal()}
+            >
+              <If condition={actions.length}>
+                <Then>Submit proposal</Then>
+                <Else>Submit signaling proposal</Else>
+              </If>
+            </Button>
+          </div>
+        </PlaceHolderOr>
       </div>
     </MainSection>
   );
 }
+
+const PlaceHolderOr = ({
+  selfAddress,
+  isConnected,
+  canCreate,
+  children,
+}: {
+  selfAddress: Address | undefined;
+  isConnected: boolean;
+  canCreate: boolean | undefined;
+  children: ReactNode;
+}) => {
+  const { open } = useWeb3Modal();
+  return (
+    <If condition={!selfAddress || !isConnected}>
+      <Then>
+        {/* Not connected */}
+        <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
+          Please, connect your Ethereum wallet to continue.
+        </MissingContentView>
+      </Then>
+      <ElseIf condition={!canCreate}>
+        {/* Not a member */}
+        <MissingContentView>
+          You cannot create proposals on the multisig because you are not currently defined as a member.
+        </MissingContentView>
+      </ElseIf>
+      <Else>{children}</Else>
+    </If>
+  );
+};

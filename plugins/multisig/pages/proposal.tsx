@@ -8,7 +8,7 @@ import { ProposalVoting } from "@/components/proposalVoting";
 import { type ITransformedStage, type IVote, ProposalStages } from "@/utils/types";
 import { useProposalStatus } from "../hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
-import { ProposalAction } from "@/components/proposalAction/proposalAction";
+import { ProposalActions } from "@/components/proposalActions/proposalActions";
 import { CardResources } from "@/components/proposal/cardResources";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
@@ -89,12 +89,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
               stages={proposalStage}
               description="The on-chain multisig flow allows its members to create proposals that, if approved, will be moved to the Optimistic Proposal stage."
             />
-            <ProposalAction
-              onExecute={() => executeProposal()}
-              isConfirmingExecution={isConfirmingExecution}
-              canExecute={canExecute}
-              actions={proposal.actions}
-            />
+            <ProposalActions actions={proposal.actions} />
           </div>
           <div className="flex flex-col gap-y-6 md:w-[33%]">
             <CardResources resources={proposal.resources} title="Resources" />

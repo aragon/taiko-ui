@@ -17,10 +17,8 @@ export default function ProposalCard(props: ProposalInputs) {
   const { address } = useAccount();
   const { proposal, proposalFetchStatus, approvals } = useProposalApprove(props.proposalId.toString());
 
-  const proposalVariant = useProposalStatus(proposal!);
-
+  const proposalStatus = useProposalStatus(proposal!);
   const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
-
   const hasApproved = approvals?.some((veto) => veto.approver === address);
 
   if (!proposal && showLoading) {
@@ -37,7 +35,7 @@ export default function ProposalCard(props: ProposalInputs) {
     // We have the proposal but no metadata yet
     return (
       <Link href={`#/proposals/${props.proposalId}`} className="mb-4 w-full">
-        <Card className="px-5">
+        <Card className="p-4">
           <span className="xs:px-10 px-4 py-5 md:px-6 lg:px-7">
             <PleaseWaitSpinner fullMessage="Loading metadata..." />
           </span>
@@ -60,19 +58,24 @@ export default function ProposalCard(props: ProposalInputs) {
   }
 
   return (
-    <Link href={`#/proposals/${props.proposalId}`} className="mb-4 w-full cursor-pointer">
-      <ProposalDataListItem.Structure
-        {...proposal}
-        voted={hasApproved}
-        result={{
-          approvalAmount: proposal.approvals,
-          approvalThreshold: proposal.parameters.minApprovals,
-        }}
-        publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
-        status={proposalVariant!}
-        type={"approvalThreshold"}
-      />
-    </Link>
+    <ProposalDataListItem.Structure
+      title={proposal.title}
+      summary={proposal.summary}
+      href={`#/proposals/${props.proposalId}`}
+      voted={hasApproved}
+      date={
+        ["active", "accepted"].includes(proposalStatus!) && proposal.parameters.expirationDate
+          ? Number(proposal.parameters.expirationDate) * 1000
+          : undefined
+      }
+      result={{
+        approvalAmount: proposal.approvals,
+        approvalThreshold: proposal.parameters.minApprovals,
+      }}
+      publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
+      status={proposalStatus!}
+      type={"approvalThreshold"}
+    />
   );
 }
 

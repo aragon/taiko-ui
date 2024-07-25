@@ -7,25 +7,31 @@ import { MobileNavDialog } from "./mobileNavDialog";
 import { NavLink, type INavLink } from "./navLink";
 import { AvatarIcon, IconType } from "@aragon/ods";
 import { PUB_APP_NAME, PUB_PROJECT_LOGO } from "@/constants";
+import { useAccount } from "wagmi";
+import { useMultisigMembers } from "@/plugins/members/hooks/useMultisigMembers";
 
 export const Navbar: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
+  const { address } = useAccount();
+  const { members } = useMultisigMembers();
+  const showAllLinks = address && members.includes(address);
 
   const navLinks: INavLink[] = [
-    { path: "/", id: "dashboard", name: "Dashboard" /*, icon: IconType.APP_DASHBOARD*/ },
+    // { path: "/", id: "dashboard", name: "Dashboard" /*, icon: IconType.APP_DASHBOARD*/ },
     ...plugins
-      // .filter((p) => !p.hidden)
+      .filter((link) => showAllLinks || !link.hiddenIfNotSigner)
       .map((p) => ({
         id: p.id,
         name: p.title,
         path: `/plugins/${p.id}/#/`,
+        hiddenIfNotSigner: p.hiddenIfNotSigner,
         // icon: p.icon,
       })),
   ];
 
   return (
     <>
-      <nav className="h-30 sticky top-0 z-[var(--hub-navbar-z-index)] flex w-full items-center justify-center border-b border-b-neutral-100 bg-neutral-0">
+      <nav className="h-30 sticky top-0 z-[var(--hub-navbar-z-index)] flex w-full select-none items-center justify-center border-b border-b-neutral-100 bg-neutral-0">
         <div className="w-full max-w-[1280px] flex-col gap-2 p-3 md:px-6 md:pb-0 lg:gap-3">
           <div className="flex w-full items-center justify-between">
             <div className="pb-3 lg:ml-10">

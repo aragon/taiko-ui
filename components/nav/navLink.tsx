@@ -10,6 +10,7 @@ export interface INavLink {
   id: string;
   name: string;
   icon?: IconType;
+  hiddenIfNotSigner?: boolean;
 }
 
 interface INavLinkProps extends INavLink {

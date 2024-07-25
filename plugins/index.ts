@@ -15,37 +15,37 @@ type PluginItem = {
   title: string;
   icon?: IconType;
   pluginAddress: string;
-  hidden?: boolean;
+  hiddenIfNotSigner?: boolean;
 };
 
 export const plugins: PluginItem[] = [
   {
-    id: "community-vote",
-    folderName: "dualGovernance",
-    title: "Community Vote",
+    id: "community-proposals",
+    folderName: "optimistic-proposals",
+    title: "Proposals",
     // icon: IconType.APP_MEMBERS,
     pluginAddress: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
   },
   {
-    id: "core-proposals",
+    id: "multisig-proposals",
     folderName: "multisig",
-    title: "Core Team Multisig",
+    title: "Security Council Multisig",
     // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_MULTISIG_PLUGIN_ADDRESS,
-    hidden: true,
+    hiddenIfNotSigner: true,
   },
   {
     id: "emergency-proposals",
-    folderName: "emergencyMultisig",
+    folderName: "emergency-multisig",
     title: "Emergency Multisig",
     // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
-    hidden: true,
+    hiddenIfNotSigner: true,
   },
   {
-    id: "dao-members",
-    folderName: "daoMembers",
-    title: "DAO Members",
+    id: "members",
+    folderName: "members",
+    title: "Members",
     // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_DELEGATION_WALL_CONTRACT_ADDRESS,
   },
