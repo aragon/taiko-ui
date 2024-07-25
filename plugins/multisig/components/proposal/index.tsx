@@ -17,10 +17,8 @@ export default function ProposalCard(props: ProposalInputs) {
   const { address } = useAccount();
   const { proposal, proposalFetchStatus, approvals } = useProposalApprove(props.proposalId.toString());
 
-  const proposalVariant = useProposalStatus(proposal!);
-
+  const proposalStatus = useProposalStatus(proposal!);
   const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
-
   const hasApproved = approvals?.some((veto) => veto.approver === address);
 
   if (!proposal && showLoading) {
@@ -65,13 +63,17 @@ export default function ProposalCard(props: ProposalInputs) {
       summary={proposal.summary}
       href={`#/proposals/${props.proposalId}`}
       voted={hasApproved}
-      date={proposal.parameters.expirationDate ? Number(proposal.parameters.expirationDate) * 1000 : ""}
+      date={
+        ["active", "accepted"].includes(proposalStatus!) && proposal.parameters.expirationDate
+          ? Number(proposal.parameters.expirationDate) * 1000
+          : undefined
+      }
       result={{
         approvalAmount: proposal.approvals,
         approvalThreshold: proposal.parameters.minApprovals,
       }}
       publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
-      status={proposalVariant!}
+      status={proposalStatus!}
       type={"approvalThreshold"}
     />
   );

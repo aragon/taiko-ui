@@ -22,9 +22,8 @@ export default function ProposalCard(props: ProposalInputs) {
   const pastSupply = usePastSupply(proposal);
   const { symbol: tokenSymbol } = useVotingToken();
 
-  const proposalVariant = useProposalStatus(proposal!);
+  const proposalStatus = useProposalStatus(proposal!);
   const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
-
   const hasVetoed = vetoes?.some((veto) => veto.voter === address);
 
   if (!proposal && showLoading) {
@@ -77,14 +76,18 @@ export default function ProposalCard(props: ProposalInputs) {
       summary={proposal.summary}
       href={`#/proposals/${props.proposalIndex}`}
       voted={hasVetoed}
-      date={proposal.parameters.vetoEndDate ? Number(proposal.parameters.vetoEndDate) * 1000 : ""}
+      date={
+        ["active", "accepted"].includes(proposalStatus!) && proposal.parameters.vetoEndDate
+          ? Number(proposal.parameters.vetoEndDate) * 1000
+          : undefined
+      }
       result={{
         option: "Veto",
         voteAmount: formatEther(proposal.vetoTally) + " " + (tokenSymbol || "TKO"),
         votePercentage: vetoPercentage,
       }}
       publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
-      status={proposalVariant!}
+      status={proposalStatus!}
       type={"majorityVoting"}
     />
   );

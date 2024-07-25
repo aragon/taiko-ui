@@ -2,7 +2,7 @@ import { AvatarIcon, Breadcrumbs, Button, Heading, IBreadcrumbsLink, IconType, T
 import { Publisher } from "@/components/publisher";
 import { OptimisticProposal } from "@/plugins/optimistic-proposals/utils/types";
 import { useProposalStatus } from "@/plugins/optimistic-proposals/hooks/useProposalVariantStatus";
-import { Else, If, Then } from "@/components/if";
+import { Else, ElseIf, If, Then } from "@/components/if";
 import { getSimpleRelativeTimeFromDate } from "@/utils/dates";
 import dayjs from "dayjs";
 import { HeaderSection } from "@/components/layout/header-section";
@@ -53,10 +53,13 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalIdx, proposal }
           <div className="flex items-center gap-x-2">
             <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
             <div className="flex gap-x-1 text-base leading-tight ">
-              <If condition={endDateIsInThePast}>
+              <If condition={status == "vetoed"}>
                 <Then>
-                  <span className="text-neutral-500">The veto period is over</span>
+                  <span className="text-neutral-500">The proposal has been defeated</span>
                 </Then>
+                <ElseIf condition={endDateIsInThePast}>
+                  <span className="text-neutral-500">The veto period is over</span>
+                </ElseIf>
                 <Else>
                   <span className="text-neutral-500">Active for </span>
                   <span className="text-neutral-800">

@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import { HeaderSection } from "@/components/layout/header-section";
 import { Publisher } from "@/components/publisher";
 import { getSimpleRelativeTimeFromDate } from "@/utils/dates";
-import { Else, If, Then } from "@/components/if";
+import { Else, ElseIf, If, Then } from "@/components/if";
 
 interface ProposalHeaderProps {
   proposalId: string;
@@ -13,8 +13,8 @@ interface ProposalHeaderProps {
 }
 
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalId, proposal }) => {
-  const status = useProposalStatus(proposal);
-  const tagVariant = getTagVariantFromStatus(status);
+  const proposalStatus = useProposalStatus(proposal);
+  const tagVariant = getTagVariantFromStatus(proposalStatus);
   const breadcrumbs: IBreadcrumbsLink[] = [{ label: "Proposals", href: "#/" }, { label: proposalId.toString() }];
   const expired = Number(proposal.parameters.expirationDate) * 1000 <= Date.now();
 
@@ -25,8 +25,8 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalId, proposal })
         <Breadcrumbs
           links={breadcrumbs}
           tag={
-            status && {
-              label: status,
+            proposalStatus && {
+              label: proposalStatus,
               className: "capitalize",
               variant: tagVariant,
             }
@@ -49,10 +49,13 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalId, proposal })
           <div className="flex items-center gap-x-2">
             <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
             <div className="flex gap-x-1 text-base leading-tight ">
-              <If condition={expired}>
+              <If condition={proposalStatus == "executed"}>
                 <Then>
-                  <span className="text-neutral-500">The proposal expired</span>
+                  <span className="text-neutral-500">The proposal was sent to the community stage</span>
                 </Then>
+                <ElseIf condition={expired}>
+                  <span className="text-neutral-500">The proposal expired</span>
+                </ElseIf>
                 <Else>
                   <span className="text-neutral-800">
                     {getSimpleRelativeTimeFromDate(dayjs(Number(proposal.parameters.expirationDate) * 1000))}
