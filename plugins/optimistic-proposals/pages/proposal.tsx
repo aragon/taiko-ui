@@ -4,7 +4,7 @@ import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalVeto } from "@/plugins/optimistic-proposals/hooks/useProposalVeto";
 import { useProposalExecute } from "@/plugins/optimistic-proposals/hooks/useProposalExecute";
 import { BodySection } from "@/components/proposal/proposalBodySection";
-import { ProposalVoting } from "@/components/proposalVoting";
+import { IBreakdownMajorityVotingResult, ProposalVoting } from "@/components/proposalVoting";
 import type { ITransformedStage, IVote } from "@/utils/types";
 import { ProposalStages } from "@/utils/types";
 import { useProposalStatus } from "../hooks/useProposalVariantStatus";
@@ -29,8 +29,11 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
 
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalIdx);
 
+  const startDate = dayjs(Number(proposal?.parameters.vetoStartDate) * 1000).toString();
+  const endDate = dayjs(Number(proposal?.parameters.vetoEndDate) * 1000).toString();
+
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
-  const proposalVariant = useProposalStatus(proposal!);
+  const proposalStatus = useProposalStatus(proposal!);
   const vetoPercentage =
     proposal?.vetoTally && pastSupply && proposal.parameters.minVetoRatio
       ? Number(
@@ -39,35 +42,40 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
         )
       : 0;
 
-  // TODO: This is not revelant anymore
+  let cta: IBreakdownMajorityVotingResult["cta"];
+  if (proposal?.executed) {
+    cta = {
+      disabled: true,
+      label: "Executed",
+    };
+  } else if (proposalStatus === "accepted") {
+    cta = {
+      disabled: !canExecute,
+      isLoading: isConfirmingExecution,
+      label: "Execute",
+      onClick: executeProposal,
+    };
+  } else if (proposalStatus === "active") {
+    cta = {
+      disabled: !canVeto,
+      isLoading: isConfirmingVeto,
+      label: "Veto",
+      onClick: vetoProposal,
+    };
+  }
+
   const proposalStage: ITransformedStage[] = [
     {
       id: "1",
       type: ProposalStages.OPTIMISTIC_EXECUTION,
       variant: "majorityVoting",
       title: "Optimistic voting",
-      status: proposalVariant!,
+      status: proposalStatus!,
       disabled: false,
       proposalId: proposalIdx.toString(),
       providerId: "1",
       result: {
-        cta: proposal?.executed
-          ? {
-              disabled: true,
-              label: "Executed",
-            }
-          : canExecute
-            ? {
-                isLoading: isConfirmingExecution,
-                label: "Execute",
-                onClick: executeProposal,
-              }
-            : {
-                disabled: !canVeto,
-                isLoading: isConfirmingVeto,
-                label: "Veto",
-                onClick: vetoProposal,
-              },
+        cta,
         votingScores: [
           {
             option: "Veto",
@@ -80,8 +88,8 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
       },
       details: {
         censusTimestamp: Number(proposal?.parameters.snapshotTimestamp || 0) || 0,
-        startDate: dayjs(Number(proposal?.parameters.vetoStartDate) * 1000).toString(),
-        endDate: dayjs(Number(proposal?.parameters.vetoEndDate) * 1000).toString(),
+        startDate,
+        endDate,
         strategy: "Optimistic voting",
         options: "Veto",
       },
