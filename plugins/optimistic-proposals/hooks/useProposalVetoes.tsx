@@ -1,36 +1,37 @@
 import { useState, useEffect } from "react";
-import { Address, getAbiItem } from "viem";
-import { PublicClient } from "viem";
+import { getAbiItem } from "viem";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/optimistic-proposals/artifacts/OptimisticTokenVotingPlugin.sol";
-import { VetoCastEvent, VoteCastResponse } from "@/plugins/optimistic-proposals/utils/types";
+import { VetoCastEvent } from "@/plugins/optimistic-proposals/utils/types";
+import { usePublicClient } from "wagmi";
+import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 
 const event = getAbiItem({
   abi: OptimisticTokenVotingPluginAbi,
   name: "VetoCast",
 });
 
-export function useProposalVetoes(publicClient: PublicClient, address: Address, proposalId: bigint | undefined) {
+export function useProposalVetoes(proposalId?: bigint) {
+  const publicClient = usePublicClient();
   const [proposalLogs, setLogs] = useState<VetoCastEvent[]>([]);
 
-  async function getLogs() {
-    if (!proposalId) return;
-
-    const logs: VoteCastResponse[] = (await publicClient.getLogs({
-      address,
-      event: event as any,
-      args: {
-        proposalId,
-      } as any,
-      toBlock: "latest", // TODO: Make this variable between 'latest' and proposal last block
-    })) as any;
-
-    const newLogs = logs.flatMap((log) => log.args);
-    if (newLogs.length > proposalLogs.length) setLogs(newLogs);
-  }
-
   useEffect(() => {
-    getLogs();
-  }, [proposalId]);
+    if (!proposalId || !publicClient) return;
+
+    publicClient
+      .getLogs({
+        address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
+        event: event,
+        args: {
+          proposalId,
+        },
+        fromBlock: BigInt(0),
+        toBlock: "latest",
+      })
+      .then((logs) => {
+        const newLogs = logs.flatMap((log) => log.args as VetoCastEvent);
+        if (newLogs.length > proposalLogs.length) setLogs(newLogs);
+      });
+  }, [proposalId, !!publicClient]);
 
   return proposalLogs;
 }

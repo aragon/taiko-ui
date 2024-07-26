@@ -1,19 +1,18 @@
 import { useEffect } from "react";
-import { usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { useProposal } from "./useProposal";
 import { useProposalVetoes } from "@/plugins/optimistic-proposals/hooks/useProposalVetoes";
 import { useUserCanVeto } from "@/plugins/optimistic-proposals/hooks/useUserCanVeto";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/optimistic-proposals/artifacts/OptimisticTokenVotingPlugin.sol";
 import { useAlerts, type AlertContextProps } from "@/context/Alerts";
-import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
+import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 import { useProposalId } from "./useProposalId";
 
 export function useProposalVeto(index: number) {
-  const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
   const { proposalId } = useProposalId(index);
 
   const { proposal, status: proposalFetchStatus, refetch: refetchProposal } = useProposal(proposalId, true);
-  const vetoes = useProposalVetoes(publicClient!, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, proposalId);
+  const vetoes = useProposalVetoes(proposalId);
 
   const { addAlert } = useAlerts() as AlertContextProps;
   const { writeContract: vetoWrite, data: vetoTxHash, error: vetoingError, status: vetoingStatus } = useWriteContract();
