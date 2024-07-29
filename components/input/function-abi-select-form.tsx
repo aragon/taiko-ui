@@ -143,33 +143,25 @@ const FunctionSelect = ({
     <InputContainer id="func-abi-select" label="Select the function to call" className="my-4">
       <dl className="w-full divide-y divide-neutral-100">
         {functionAbiList.map((func, idx) => (
-          <If not={["pure", "view"].includes(func.stateMutability)} key={idx}>
-            <Then>
-              <div
-                onClick={() => onSelect(func)}
-                className="flex cursor-pointer flex-col items-baseline gap-y-2 py-3 hover:bg-neutral-50 lg:gap-x-6 lg:py-4"
-              >
-                <dd className="size-full px-3 text-base leading-tight text-neutral-500">
-                  {decodeCamelCase(func.name)}
-                </dd>
-              </div>
-            </Then>
-            <ElseIf condition={showReadOnly}>
-              <div
-                className="flex cursor-pointer flex-col items-baseline gap-y-2 py-3 hover:bg-neutral-50 lg:gap-x-6 lg:py-4"
-                onClick={() => onSelect(func)}
-              >
-                <dd className="size-full px-3 text-base leading-tight text-neutral-500">
-                  {decodeCamelCase(func.name)} <span className="text-xs text-neutral-300">(read only)</span>
-                </dd>
-              </div>
-            </ElseIf>
+          <If condition={!["pure", "view"].includes(func.stateMutability) || showReadOnly} key={idx}>
+            <div
+              onClick={() => onSelect(func)}
+              className="flex cursor-pointer flex-col items-baseline gap-y-2 py-3 first:rounded-t-xl last:rounded-b-xl hover:bg-neutral-50 lg:gap-x-6 lg:py-4"
+            >
+              <dd className="size-full px-3 text-base leading-tight text-neutral-500">
+                {decodeCamelCase(func.name)}
+                <If condition={["pure", "view"].includes(func.stateMutability)}>
+                  {" "}
+                  <span className="text-xs text-neutral-300">(read only)</span>
+                </If>
+              </dd>
+            </div>
           </If>
         ))}
         <If condition={!showReadOnly && readonlyCount > 0}>
           <div
             onClick={() => setShowReadOnly(true)}
-            className=" flex cursor-pointer flex-col items-baseline gap-y-2 py-3 hover:bg-neutral-50 lg:gap-x-6 lg:py-4"
+            className="flex cursor-pointer flex-col items-baseline gap-y-2 py-3 first:rounded-t-xl last:rounded-b-xl hover:bg-neutral-50 lg:gap-x-6 lg:py-4"
           >
             <dd className="size-full px-3 text-base text-sm leading-tight text-neutral-300">
               Show read only methods ({readonlyCount})
