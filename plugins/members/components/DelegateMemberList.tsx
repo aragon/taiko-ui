@@ -3,7 +3,7 @@ import { DataList, IllustrationHuman } from "@aragon/ods";
 import { DelegateListItem } from "./DelegateListItem";
 import { equalAddresses } from "@/utils/evm";
 import { useDelegates } from "../hooks/useDelegates";
-import { useGovernanceToken } from "../hooks/useGovernanceToken";
+import { useTokenVotes } from "../../../hooks/useTokenVotes";
 import { useAccount } from "wagmi";
 import VerifiedDelegates from "../../../verified-delegates.json";
 import { PleaseWaitSpinner } from "@/components/please-wait";
@@ -20,7 +20,7 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifie
   const [searchValue, setSearchValue] = useState<string>();
   //   const [activeSort, setActiveSort] = useState<string>();
   const { delegates: fetchedDelegates, status: loadingStatus } = useDelegates();
-  const { delegatesTo } = useGovernanceToken(address);
+  const { delegatesTo } = useTokenVotes(address);
   const delegates = (fetchedDelegates || []).filter((item) => {
     if (!verifiedOnly) return true;
     return VerifiedDelegates.findIndex((d) => equalAddresses(d.address, item)) >= 0;

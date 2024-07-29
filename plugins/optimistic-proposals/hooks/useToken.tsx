@@ -2,7 +2,7 @@ import { erc20Abi } from "viem";
 import { useReadContract } from "wagmi";
 import { PUB_TOKEN_ADDRESS } from "@/constants";
 
-export function useVotingToken() {
+export function useToken() {
   const {
     data: tokenSupply,
     isError: isError1,

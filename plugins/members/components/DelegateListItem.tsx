@@ -3,7 +3,7 @@ import { formatHexString, equalAddresses } from "@/utils/evm";
 import { type IDataListItemProps, DataList, MemberAvatar, Tag } from "@aragon/ods";
 import { useAccount } from "wagmi";
 import { Address, formatEther } from "viem";
-import { useGovernanceToken } from "../hooks/useGovernanceToken";
+import { useTokenVotes } from "../../../hooks/useTokenVotes";
 import VerifiedDelegates from "../../../verified-delegates.json";
 import { useDelegateAnnounce } from "../hooks/useDelegateAnnounce";
 
@@ -20,7 +20,7 @@ export const DelegateListItem: React.FC<IDelegateListItemProps> = (props) => {
   const { isMyDelegate, avatarSrc, address, ...otherProps } = props;
   const { address: currentUserAddress, isConnected } = useAccount();
   const isCurrentUser = isConnected && address && equalAddresses(currentUserAddress, address);
-  const { votingPower } = useGovernanceToken(address);
+  const { votingPower } = useTokenVotes(address);
   const isVerified = VerifiedDelegates.findIndex((d) => equalAddresses(d.address, address)) >= 0;
   const { announce } = useDelegateAnnounce(address);
 

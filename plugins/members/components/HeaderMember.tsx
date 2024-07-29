@@ -13,7 +13,7 @@ import {
 import { formatEther, type Address } from "viem";
 import { mainnet } from "viem/chains";
 import { useAccount, useEnsName } from "wagmi";
-import { useGovernanceToken } from "../hooks/useGovernanceToken";
+import { useTokenVotes } from "../../../hooks/useTokenVotes";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useDelegateVotingPower } from "../hooks/useDelegateVotingPower";
@@ -31,8 +31,8 @@ export const HeaderMember: React.FC<IHeaderMemberProps> = (props) => {
   const { open } = useWeb3Modal();
   const { address: myAddress, isConnected } = useAccount();
   const { data: ensName } = useEnsName({ chainId: mainnet.id, address: delegateAddress });
-  const { votingPower, balance: delegateTokenBalance, refetch } = useGovernanceToken(delegateAddress);
-  const { delegatesTo } = useGovernanceToken(myAddress);
+  const { votingPower, balance: delegateTokenBalance, refetch } = useTokenVotes(delegateAddress);
+  const { delegatesTo } = useTokenVotes(myAddress);
   const { delegateVotingPower, isLoading: isConfirming } = useDelegateVotingPower(delegateAddress, refetch);
   const formattedAddress = formatHexString(delegateAddress);
   const isVerified = VerifiedDelegates.findIndex((d) => equalAddresses(d.address, delegateAddress)) >= 0;
