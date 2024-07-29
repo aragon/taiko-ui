@@ -136,6 +136,9 @@ const FunctionSelect = ({
   functionAbiList: AbiFunction[];
   onSelect: (f: AbiFunction) => any;
 }) => {
+  const [showReadOnly, setShowReadOnly] = useState(false);
+  const readonlyCount = functionAbiList.filter((f) => ["pure", "view"].includes(f.stateMutability)).length;
+
   return (
     <InputContainer id="func-abi-select" label="Select the function to call" className="my-4">
       <dl className="w-full divide-y divide-neutral-100">
@@ -144,22 +147,35 @@ const FunctionSelect = ({
             <Then>
               <div
                 onClick={() => onSelect(func)}
-                className=" flex cursor-pointer flex-col items-baseline gap-y-2 py-3 hover:bg-neutral-50 lg:gap-x-6 lg:py-4"
+                className="flex cursor-pointer flex-col items-baseline gap-y-2 py-3 hover:bg-neutral-50 lg:gap-x-6 lg:py-4"
               >
                 <dd className="size-full px-3 text-base leading-tight text-neutral-500">
                   {decodeCamelCase(func.name)}
                 </dd>
               </div>
             </Then>
-            <Else>
-              <div className="flex flex-col items-baseline gap-y-2 py-3 lg:gap-x-6 lg:py-4">
+            <ElseIf condition={showReadOnly}>
+              <div
+                className="flex cursor-pointer flex-col items-baseline gap-y-2 py-3 hover:bg-neutral-50 lg:gap-x-6 lg:py-4"
+                onClick={() => onSelect(func)}
+              >
                 <dd className="size-full px-3 text-base leading-tight text-neutral-500">
                   {decodeCamelCase(func.name)} <span className="text-xs text-neutral-300">(read only)</span>
                 </dd>
               </div>
-            </Else>
+            </ElseIf>
           </If>
         ))}
+        <If condition={!showReadOnly && readonlyCount > 0}>
+          <div
+            onClick={() => setShowReadOnly(true)}
+            className=" flex cursor-pointer flex-col items-baseline gap-y-2 py-3 hover:bg-neutral-50 lg:gap-x-6 lg:py-4"
+          >
+            <dd className="size-full px-3 text-base text-sm leading-tight text-neutral-300">
+              Show read only methods ({readonlyCount})
+            </dd>
+          </div>
+        </If>
       </dl>
     </InputContainer>
   );

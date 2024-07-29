@@ -77,14 +77,6 @@ export const FunctionParamsForm = ({
           <p className="text-md font-semibold text-neutral-800">Parameters</p>
         </div>
       </If>
-      <If condition={["pure", "view"].includes(functionAbi?.stateMutability ?? "")}>
-        <div className="">
-          <AlertInline
-            message="This function is marked as read only. An action sent to it will have no impact"
-            variant="warning"
-          />
-        </div>
-      </If>
       {functionAbi?.inputs.map((paramAbi, i) => (
         <div key={i} className=" my-3">
           <InputParameter abi={paramAbi} idx={i} onChange={onParameterChange} />
@@ -98,6 +90,14 @@ export const FunctionParamsForm = ({
             min={0}
             onChange={(val: string) => setValue(parseEther(val).toString())}
             onKeyDown={(e) => (e.key === "Enter" ? onSubmit?.() : null)}
+          />
+        </div>
+      </If>
+      <If condition={["pure", "view"].includes(functionAbi?.stateMutability ?? "")}>
+        <div className="mt-2">
+          <AlertInline
+            message="This method is marked as read only. An action calling it should have no impact."
+            variant="warning"
           />
         </div>
       </If>
