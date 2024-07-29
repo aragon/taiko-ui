@@ -77,9 +77,7 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
   const { fields, append, remove } = useFieldArray({ name: DELEGATE_RESOURCES, control });
 
   const onSuccessfulAnnouncement = () => {
-    setTimeout(() => {
-      router.push("#/delegates/" + address!);
-    }, 2000);
+    router.push("#/delegates/" + address!);
   };
   const { isConfirming, status, announceDelegation } = useAnnounceDelegation(onSuccessfulAnnouncement);
 

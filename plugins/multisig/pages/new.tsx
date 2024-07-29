@@ -47,6 +47,10 @@ export default function Create() {
     setActions(actions.concat(newAction));
     setAddActionType("");
   };
+  const onRemoveAction = (idx: number) => {
+    actions.splice(idx, 1);
+    setActions([].concat(actions as any));
+  };
   const removeResource = (idx: number) => {
     resources.splice(idx, 1);
     setResources([].concat(resources as any));
@@ -63,7 +67,9 @@ export default function Create() {
   return (
     <MainSection narrow>
       <div className="w-full justify-between">
-        <h1 className="mb-10 text-3xl font-semibold text-neutral-900">Create Proposal</h1>
+        <h1 className="mb-8 line-clamp-1 flex flex-1 shrink-0 text-2xl font-normal leading-tight text-neutral-800 md:text-3xl">
+          Create Proposal
+        </h1>
 
         <PlaceHolderOr selfAddress={selfAddress} canCreate={canCreate} isConnected={isConnected}>
           <div className="mb-6">
@@ -150,6 +156,7 @@ export default function Create() {
                 variant="tertiary"
                 size="lg"
                 iconLeft={IconType.PLUS}
+                disabled={isCreating}
                 onClick={() => {
                   setResources(resources.concat({ url: "", name: "" }));
                 }}
@@ -164,17 +171,20 @@ export default function Create() {
           <ProposalActions
             actions={actions}
             emptyListDescription="The proposal has no actions defined yet. Select a type of action to add to the proposal."
+            onRemove={(idx) => onRemoveAction(idx)}
           />
 
           <div className="mt-8 grid w-full grid-cols-2 gap-4 md:grid-cols-4">
             <AddActionCard
               title="Add a payment"
               icon={IconType.WITHDRAW}
+              disabled={isCreating}
               onClick={() => setAddActionType("withdrawal")}
             />
             <AddActionCard
               title="Select a function"
               icon={IconType.BLOCKCHAIN_BLOCKCHAIN}
+              disabled={isCreating}
               onClick={() => setAddActionType("select-abi-function")}
             />
             <AddActionCard
@@ -186,6 +196,7 @@ export default function Create() {
             <AddActionCard
               title="Copy the calldata"
               icon={IconType.COPY}
+              disabled={isCreating}
               onClick={() => setAddActionType("calldata")}
             />
           </div>

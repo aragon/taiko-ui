@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { uint8ArrayToHex } from "@/utils/hex";
 import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
 import { useAlerts } from "@/context/Alerts";
+import { debounce } from "@/utils/debounce";
 
 export function usePublicKeyRegistry() {
   const config = useConfig();
@@ -71,6 +72,9 @@ export function usePublicKeyRegistry() {
   useEffect(() => {
     if (registrationStatus === "idle" || registrationStatus === "pending") return;
     else if (registrationStatus === "error") {
+      // Refetch the status, just in case
+      debounce(() => refetch(), 800);
+
       if (error?.message?.startsWith("User rejected the request")) {
         addAlert("Transaction rejected by the user", {
           timeout: 4 * 1000,
