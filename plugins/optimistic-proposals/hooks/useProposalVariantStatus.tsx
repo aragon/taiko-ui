@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { OptimisticProposal } from "@/plugins/optimistic-proposals/utils/types";
 import { ProposalStatus } from "@aragon/ods";
-import { useVotingToken } from "./useVotingToken";
+import { useToken } from "./useToken";
 import { PUB_TAIKO_BRIDGE_ADDRESS } from "@/constants";
-import { useVotingTokenBalance } from "./useVotingTokenBalance";
+import { useTokenPastVotes } from "./useTokenPastVotes";
 
 export const useProposalVariantStatus = (proposal: OptimisticProposal) => {
   const [status, setStatus] = useState({ variant: "", label: "" });
-  const { tokenSupply: totalSupply } = useVotingToken();
-  const { balance: bridgedBalance } = useVotingTokenBalance(
+  const { tokenSupply: totalSupply } = useToken();
+  const { votes: bridgedBalance } = useTokenPastVotes(
     PUB_TAIKO_BRIDGE_ADDRESS,
     proposal?.parameters.snapshotTimestamp || BigInt(0)
   );
@@ -42,8 +42,8 @@ export const useProposalVariantStatus = (proposal: OptimisticProposal) => {
 
 export const useProposalStatus = (proposal: OptimisticProposal) => {
   const [status, setStatus] = useState<ProposalStatus>();
-  const { tokenSupply: totalSupply } = useVotingToken();
-  const { balance: bridgedBalance } = useVotingTokenBalance(
+  const { tokenSupply: totalSupply } = useToken();
+  const { votes: bridgedBalance } = useTokenPastVotes(
     PUB_TAIKO_BRIDGE_ADDRESS,
     proposal?.parameters.snapshotTimestamp || BigInt(0)
   );

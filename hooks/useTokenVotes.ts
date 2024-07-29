@@ -1,10 +1,10 @@
-import { iVotesAbi } from "../artifacts/iVotes.sol";
+import { iVotesAbi } from "../plugins/members/artifacts/iVotes.sol";
 import { PUB_CHAIN, PUB_TOKEN_ADDRESS } from "@/constants";
 import { type Address } from "viem";
 import { useReadContracts } from "wagmi";
 
 /** Returns the delegate (if any) for the given address */
-export const useGovernanceToken = (address?: Address) => {
+export const useTokenVotes = (address?: Address) => {
   const { data, isLoading, isError, refetch } = useReadContracts({
     contracts: [
       {

@@ -6,6 +6,7 @@ import {
   AccordionItemContent,
   AccordionItemHeader,
   AvatarIcon,
+  Button,
   IconType,
   InputText,
 } from "@aragon/ods";
@@ -26,10 +27,11 @@ interface IProposalActionsProps {
   description?: string;
   emptyListDescription?: string;
   actions?: RawAction[];
+  onRemove?: (index: number) => any;
 }
 
 export const ProposalActions: React.FC<IProposalActionsProps> = (props) => {
-  const { actions, description, emptyListDescription } = props;
+  const { actions, description, emptyListDescription, onRemove } = props;
 
   let message: string;
   if (actions?.length) {
@@ -51,14 +53,21 @@ export const ProposalActions: React.FC<IProposalActionsProps> = (props) => {
       {/* Content */}
       <If condition={actions?.length}>
         <AccordionContainer isMulti={true} className="border-t border-t-neutral-100">
-          {actions?.map((action, index) => <ActionItem key={index} index={index} rawAction={action} />)}
+          {actions?.map((action, index) => (
+            <ActionItem
+              key={index}
+              index={index}
+              rawAction={action}
+              onRemove={onRemove ? () => onRemove?.(index) : undefined}
+            />
+          ))}
         </AccordionContainer>
       </If>
     </div>
   );
 };
 
-const ActionItem = ({ index, rawAction }: { index: number; rawAction: RawAction }) => {
+const ActionItem = ({ index, rawAction, onRemove }: { index: number; rawAction: RawAction; onRemove?: () => any }) => {
   const action = useAction(rawAction);
   const title = `Action ${index + 1}`;
   const coinName = PUB_CHAIN.nativeCurrency.symbol;
@@ -128,6 +137,13 @@ const ActionItem = ({ index, rawAction }: { index: number; rawAction: RawAction 
                 />
               </If>
             </Else>
+          </If>
+          <If condition={!!onRemove}>
+            <div className="mt-2">
+              <Button variant="tertiary" size="sm" iconLeft={IconType.CLOSE} onClick={onRemove}>
+                Remove action
+              </Button>
+            </div>
           </If>
         </div>
       </AccordionItemContent>

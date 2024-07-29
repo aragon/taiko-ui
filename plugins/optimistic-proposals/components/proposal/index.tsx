@@ -7,7 +7,7 @@ import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
 import { useAccount } from "wagmi";
 import { formatEther } from "viem";
 import { usePastSupply } from "../../hooks/usePastSupply";
-import { useVotingToken } from "../../hooks/useVotingToken";
+import { useToken } from "../../hooks/useToken";
 
 const DEFAULT_PROPOSAL_METADATA_TITLE = "(No proposal title)";
 const DEFAULT_PROPOSAL_METADATA_SUMMARY = "(The metadata of the proposal is not available)";
@@ -20,7 +20,7 @@ export default function ProposalCard(props: ProposalInputs) {
   const { address } = useAccount();
   const { proposal, proposalFetchStatus, vetoes } = useProposalVeto(props.proposalIndex);
   const pastSupply = usePastSupply(proposal);
-  const { symbol: tokenSymbol } = useVotingToken();
+  const { symbol: tokenSymbol } = useToken();
 
   const proposalStatus = useProposalStatus(proposal!);
   const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);

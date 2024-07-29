@@ -37,7 +37,7 @@ export const VotingStageStatus: React.FC<IVotingStageStatus> = (props) => {
           <AvatarIcon size="sm" variant="success" icon={IconType.CHECKMARK} className="shrink-0" />
         </>
       )}
-      {status === "rejected" && (
+      {["rejected", "vetoed"].includes(status) && (
         <>
           <div className="flex flex-grow items-center gap-x-0.5">
             <span className="shrink-0 text-neutral-500">The proposal has been</span>

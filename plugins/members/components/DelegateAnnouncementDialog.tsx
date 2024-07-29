@@ -77,9 +77,7 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
   const { fields, append, remove } = useFieldArray({ name: DELEGATE_RESOURCES, control });
 
   const onSuccessfulAnnouncement = () => {
-    setTimeout(() => {
-      router.push("#/delegates/" + address!);
-    }, 2000);
+    router.push("#/delegates/" + address!);
   };
   const { isConfirming, status, announceDelegation } = useAnnounceDelegation(onSuccessfulAnnouncement);
 
@@ -212,6 +210,9 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
           </span>
         </div>
         <div className="mt-4 flex justify-between">
+          <Button variant="secondary" size="lg" onClick={onClose} disabled={isConfirming || status === "pending"}>
+            Cancel
+          </Button>
           <Button
             variant="primary"
             size="lg"
@@ -219,9 +220,6 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
             onClick={handleSubmit(handleAnnouncement)}
           >
             {ctaLabel}
-          </Button>
-          <Button variant="secondary" size="lg" onClick={onClose} disabled={isConfirming || status === "pending"}>
-            Cancel
           </Button>
         </div>
       </DialogContent>
