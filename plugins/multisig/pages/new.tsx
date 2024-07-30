@@ -1,4 +1,4 @@
-import { Button, Dropdown, IconType, InputText, Tag, TextAreaRichText } from "@aragon/ods";
+import { Button, IconType, InputText, Tag, TextAreaRichText } from "@aragon/ods";
 import React, { ReactNode, useState } from "react";
 import { RawAction } from "@/utils/types";
 import { Else, ElseIf, If, Then } from "@/components/if";
@@ -8,10 +8,11 @@ import { useAccount } from "wagmi";
 import { useCanCreateProposal } from "../hooks/useCanCreateProposal";
 import { MissingContentView } from "@/components/MissingContentView";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { Address } from "viem";
+import { Address, toHex } from "viem";
 import { NewActionDialog, NewActionType } from "@/components/dialogs/NewActionDialog";
 import { AddActionCard } from "@/components/cards/AddActionCard";
 import { ProposalActions } from "@/components/proposalActions/proposalActions";
+import { downloadAsFile } from "@/utils/download-as-file";
 
 export default function Create() {
   const { address: selfAddress, isConnected } = useAccount();
@@ -38,7 +39,7 @@ export default function Create() {
   const handleSummaryInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSummary(event?.target?.value);
   };
-  const handleNewActionDialogClose = (newAction: RawAction | null) => {
+  const handleNewActionDialogClose = (newAction: RawAction[] | null) => {
     if (!newAction) {
       setAddActionType("");
       return;
@@ -62,6 +63,20 @@ export default function Create() {
   const onResourceUrlChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number) => {
     resources[idx].url = event.target.value;
     setResources([].concat(resources as any));
+  };
+
+  const exportAsJson = () => {
+    if (!actions.length) return;
+
+    const result = actions.map((item) => {
+      return {
+        to: item.to,
+        data: item.data,
+        value: toHex(item.value),
+      };
+    });
+
+    downloadAsFile("actions.json", JSON.stringify(result), "text/json");
   };
 
   return (
@@ -174,6 +189,18 @@ export default function Create() {
             onRemove={(idx) => onRemoveAction(idx)}
           />
 
+          <If condition={actions?.length}>
+            <Button
+              className="mt-6"
+              iconLeft={IconType.RICHTEXT_LIST_UNORDERED}
+              size="lg"
+              variant="tertiary"
+              onClick={() => exportAsJson()}
+            >
+              Export actions as JSON
+            </Button>
+          </If>
+
           <div className="mt-8 grid w-full grid-cols-2 gap-4 md:grid-cols-4">
             <AddActionCard
               title="Add a payment"
@@ -182,22 +209,22 @@ export default function Create() {
               onClick={() => setAddActionType("withdrawal")}
             />
             <AddActionCard
-              title="Select a function"
+              title="Add a function call"
               icon={IconType.BLOCKCHAIN_BLOCKCHAIN}
               disabled={isCreating}
               onClick={() => setAddActionType("select-abi-function")}
             />
             <AddActionCard
-              title="Enter the function ABI"
-              disabled
-              icon={IconType.RICHTEXT_LIST_UNORDERED}
-              onClick={() => setAddActionType("custom-abi")}
-            />
-            <AddActionCard
-              title="Copy the calldata"
+              title="Add raw calldata"
               icon={IconType.COPY}
               disabled={isCreating}
               onClick={() => setAddActionType("calldata")}
+            />
+            <AddActionCard
+              title="Import JSON actions"
+              disabled={isCreating}
+              icon={IconType.RICHTEXT_LIST_UNORDERED}
+              onClick={() => setAddActionType("import-json")}
             />
           </div>
 
@@ -205,7 +232,7 @@ export default function Create() {
 
           <NewActionDialog
             newActionType={addActionType}
-            onClose={(newAction) => handleNewActionDialogClose(newAction)}
+            onClose={(newActions) => handleNewActionDialogClose(newActions)}
           />
 
           {/* Submit */}
