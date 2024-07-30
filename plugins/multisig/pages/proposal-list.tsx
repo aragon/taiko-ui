@@ -69,15 +69,15 @@ export default function Proposals() {
       <If condition={!isConnected}>
         <Then>
           <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
-            Please, connect your Ethereum wallet to access the proposals section.
+            Please connect your wallet to access the proposals section.
           </MissingContentView>
         </Then>
         <ElseIf condition={!proposalCount}>
           <MissingContentView>
             No proposals have been created yet. <br />
-            Here you will see the proposals created by the Security Council before they can be submitted to the{" "}
+            Here you will see the proposals created by the Taiko Council before they can be submitted to the{" "}
             <Link href="/plugins/community-proposals/#/" className="underline">
-              community voting stage
+              community veto stage
             </Link>
             . <If condition={canCreate}>Create your first proposal.</If>
           </MissingContentView>

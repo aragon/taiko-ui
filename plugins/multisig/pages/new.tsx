@@ -98,11 +98,11 @@ export default function Create() {
           </div>
           <div className="mb-6">
             <TextAreaRichText
-              label="Description"
+              label="Body"
               className="pt-2"
               value={description}
               onChange={setDescription}
-              placeholder="A description for what the proposal is all about"
+              placeholder="A description of what the proposal is all about"
             />
           </div>
 
@@ -247,7 +247,7 @@ const PlaceHolderOr = ({
       <Then>
         {/* Not connected */}
         <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
-          Please, connect your Ethereum wallet to continue.
+          Please connect your wallet to continue.
         </MissingContentView>
       </Then>
       <ElseIf condition={!canCreate}>

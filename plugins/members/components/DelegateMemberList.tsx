@@ -98,17 +98,18 @@ function NoDelegatesView({ verified, filtered }: { verified?: boolean; filtered?
   if (filtered) {
     if (verified) {
       message =
-        "There are no verified candidates matching the current filter. Please, try entering a different search term.";
+        "There are no verified delegate profiles matching the current filter. Please try entering a different search term.";
     } else {
-      message = "There are no candidates matching the current filter. Please, try entering a different search term.";
+      message =
+        "There are no delegate profiles matching the current filter. Please try entering a different search term.";
     }
   } else {
     if (verified) {
       message =
-        "There are no verified candidates with a public an announcement yet. Here you will see the addresses of members who have posted their candidacy. Be the first to post an announcement.";
+        "There are no verified delegate profiles with a public an announcement yet. Here you will see the addresses of members who have posted their candidacy. Be the first to post an announcement.";
     } else {
       message =
-        "No candidates posted an announcement yet. Here you will see the addresses of members who have posted their candidacy. Be the first to post an announcement.";
+        "No delegate profiles posted an announcement yet. Here you will see the addresses of members who have posted their candidacy. Be the first to post an announcement.";
     }
   }
 

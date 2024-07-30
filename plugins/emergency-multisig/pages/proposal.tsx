@@ -91,14 +91,14 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         <Then>
           <div className="mt-12">
             <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
-              Please, connect your Ethereum wallet to access the emergency proposals section.
+              Please connect your wallet to access the emergency proposals section.
             </MissingContentView>
           </div>
         </Then>
         <ElseIf condition={!publicKey}>
           <div className="mt-12">
             <MissingContentView callToAction="Sign in to continue" onClick={() => requestSignature()}>
-              Please, sign in with your Ethereum wallet to decrypt the private proposal data.
+              Please sign in with your wallet to decrypt the private proposal data.
             </MissingContentView>
           </div>
         </ElseIf>
@@ -109,7 +109,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
                 <BodySection body={proposal.description || "No description was provided"} />
                 <ProposalVoting
                   stages={proposalStage}
-                  description="The on-chain emergency multisig flow allows its members to create proposals that, if approved by a super majority, will be executed directly on the DAO."
+                  description="The onchain emergency multisig flow allows its members to create proposals that, if approved by a super majority, will be executed directly by the DAO."
                 />
                 <ProposalActions actions={proposal.actions} />
               </div>

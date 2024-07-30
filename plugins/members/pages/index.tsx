@@ -17,7 +17,7 @@ import { useMultisigMembers } from "../hooks/useMultisigMembers";
 const DELEGATION_DESCRIPTION =
   "Proposals submitted to the community can be vetoed by token holders. Additionally, token holders can opt to delegate their voting power to delegates.";
 const SECURITY_COUNCIL_DESCRIPTION =
-  "Proposals are created by the Security Council. When its members approve one, the proposal is forwarded to the Community Vote phase for ratification.";
+  "Proposals are created by the Security Council. When its members approve one, the proposal is forwarded to the community veto phase for ratification.";
 
 export default function MembersList() {
   const { open } = useWeb3Modal();

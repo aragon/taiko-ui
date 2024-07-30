@@ -69,22 +69,19 @@ export default function Proposals() {
       <If condition={!isConnected}>
         <Then>
           <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
-            Please, connect your Ethereum wallet to access the emergency proposals section.
+            Please connect your wallet to access the emergency proposals section.
           </MissingContentView>
         </Then>
         <ElseIf condition={!publicKey}>
           <MissingContentView callToAction="Sign in to continue" onClick={() => requestSignature()}>
-            Please, sign in with your Ethereum wallet to decrypt the private proposal data.
+            Please sign in with your wallet to decrypt the private proposal data.
           </MissingContentView>
         </ElseIf>
         <ElseIf condition={!proposalCount}>
           <MissingContentView>
             No proposals have been created yet. <br />
-            Here you will see the proposals created by the Security Council before they can be submitted to the{" "}
-            <Link href="/plugins/community-proposals/#/" className="underline">
-              community voting stage
-            </Link>
-            . <If condition={canCreate}>Create your first proposal.</If>
+            Here you will see the proposals created by the Security Council before a super majority can enact an
+            emergency execution on the DAO. <If condition={canCreate}>Create your first proposal.</If>
           </MissingContentView>
         </ElseIf>
         <Else>

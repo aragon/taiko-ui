@@ -149,7 +149,7 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
             </If>
             <ProposalVoting
               stages={proposalStage}
-              description="The optimistic voting flow allows token holders to veto proposals to which they object. If not enough voting power has vetoed for a given period of time, the proposal will become executable on the DAO."
+              description="Proposals approved by the Security Council become eventually executable, unless the community reaches the veto threshold during the community veto stage."
             />
             <ProposalActions actions={proposal.actions} />
           </div>
