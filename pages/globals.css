@@ -5,7 +5,7 @@
 @layer base {
   :root {
     --tw-text-opacity: 1;
-    
+
     /* Primary */
     --ods-color-primary-50: 254 241 249;
     --ods-color-primary-100: 252 222 241;
@@ -79,11 +79,44 @@
   }
 }
 
+/* Main font */
+@font-face {
+  font-family: "Public Sans";
+  src:
+    url(/fonts/PublicSans/PublicSans-SemiBold.woff2) format("woff2"),
+    url(/fonts/PublicSans/PublicSans-SemiBold.woff) format("woff"),
+    url(/fonts/PublicSans/PublicSans-SemiBold.ttf) format("truetype");
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: "Public Sans";
+  src:
+    url(/fonts/PublicSans/PublicSans-Regular.woff2) format("woff2"),
+    url(/fonts/PublicSans/PublicSans-Regular.woff) format("woff"),
+    url(/fonts/PublicSans/PublicSans-Regular.ttf) format("truetype");
+  font-weight: 400;
+}
+
+/* Titles font */
+
+@font-face {
+  font-family: "Clash Grotesk";
+  src:
+    url(/fonts/ClashGrotesk/ClashDisplay-Semibold.woff2) format("woff2"),
+    url(/fonts/ClashGrotesk/ClashDisplay-Semibold.woff) format("woff"),
+    url(/fonts/ClashGrotesk/ClashDisplay-Semibold.ttf) format("truetype");
+  font-weight: 600;
+}
+
 body {
   /* Variables imported from layout.tsx > @aragon/ods */
   color: var(--ods-color-neutral-800);
   background-color: var(--ods-color-neutral-50);
-  font-family: var(--ods-font-family);
+
+  /* font-family: var(--ods-font-family); */
+  /* Custom */
+  font-family: "Public Sans";
 }
 
 h1,
@@ -94,6 +127,10 @@ h5,
 h6 {
   /* Variables imported from layout.tsx > @aragon/ods */
   color: var(--ods-color-neutral-800);
+
+  /* Custom */
+  font-family: "Clash Grotesk";
+  font-weight: 600;
 }
 
 p,
