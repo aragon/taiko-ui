@@ -159,7 +159,7 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
                   <div key={field.id} className="flex flex-col gap-y-3 py-3 md:py-4">
                     <div className="flex items-end gap-x-3">
                       <InputText
-                        label="Description"
+                        label="Body"
                         readOnly={isConfirming}
                         placeholder="GitHub, Twitter, etc."
                         {...register(`${DELEGATE_RESOURCES}.${index}.name` as const)}

@@ -20,7 +20,7 @@ import { decodeCamelCase } from "@/utils/case";
 import { formatEther } from "viem";
 
 const DEFAULT_DESCRIPTION =
-  "When the proposal passes the community vote, the following actions will be executable on the DAO.";
+  "When the proposal passes the community vote, the following actions will be executable by the DAO.";
 const DEFAULT_EMPTY_LIST_DESCRIPTION = "The proposal has no actions defined, it will behave as a signaling poll.";
 
 interface IProposalActionsProps {

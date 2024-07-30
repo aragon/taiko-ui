@@ -108,11 +108,11 @@ export default function Create() {
           </div>
           <div className="mb-6">
             <TextAreaRichText
-              label="Description"
+              label="Body"
               className="pt-2"
               value={description}
               onChange={setDescription}
-              placeholder="A description for what the proposal is all about"
+              placeholder="A description of what the proposal is all about"
             />
           </div>
 
@@ -223,7 +223,7 @@ export default function Create() {
           <div className="mt-6 flex w-full flex-col items-center">
             <div>
               <span className="text-md mb-2 block font-normal text-neutral-700 ">
-                {signersWithPubKey || 0} signer(s) registered the public key
+                {signersWithPubKey || 0} signer(s) registered their public key
               </span>
             </div>
             <Button
@@ -279,7 +279,7 @@ const PlaceHolderOr = ({
       <ElseIf condition={!selfAddress || !isConnected}>
         {/* Not connected */}
         <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
-          Please, connect your Ethereum wallet to continue.
+          Please connect your wallet to continue.
         </MissingContentView>
       </ElseIf>
       <ElseIf condition={selfAddress && !hasPubKeyRegistered}>
@@ -297,7 +297,7 @@ const PlaceHolderOr = ({
       <ElseIf condition={!publicKey}>
         {/* Not signed in */}
         <MissingContentView callToAction="Sign in to continue" onClick={() => requestSignature()}>
-          Please, sign in with your Ethereum wallet to decrypt the private proposal data.
+          Please sign in with your wallet to decrypt the private proposal data.
         </MissingContentView>
       </ElseIf>
       <ElseIf condition={!canCreate}>

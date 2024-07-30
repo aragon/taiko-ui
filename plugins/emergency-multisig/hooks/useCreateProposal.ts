@@ -74,14 +74,14 @@ export function useCreateProposal() {
     // Check metadata
     if (!title.trim()) {
       return addAlert("Invalid proposal details", {
-        description: "Please, enter a title",
+        description: "Please enter a title",
         type: "error",
       });
     }
 
     if (!summary.trim()) {
       return addAlert("Invalid proposal details", {
-        description: "Please, enter a summary of what the proposal is about",
+        description: "Please enter a summary of what the proposal is about",
         type: "error",
       });
     }
@@ -89,12 +89,12 @@ export function useCreateProposal() {
     for (const item of resources) {
       if (!item.name.trim()) {
         return addAlert("Invalid resource name", {
-          description: "Please, enter a name for all the resources",
+          description: "Please enter a name for all the resources",
           type: "error",
         });
       } else if (!UrlRegex.test(item.url.trim())) {
         return addAlert("Invalid resource URL", {
-          description: "Please, enter valid URL for all the resources",
+          description: "Please enter valid URL for all the resources",
           type: "error",
         });
       }

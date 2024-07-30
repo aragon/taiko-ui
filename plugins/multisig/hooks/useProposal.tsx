@@ -33,7 +33,7 @@ export function useProposal(proposalId: string, autoRefresh = false) {
   const [proposalCreationEvent, setProposalCreationEvent] = useState<ProposalCreatedLogResponse["args"]>();
   const { data: blockNumber } = useBlockNumber({ watch: true });
 
-  // Proposal on-chain data
+  // Proposal onchain data
   const {
     data: proposalResult,
     error: proposalError,

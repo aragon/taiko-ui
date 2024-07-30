@@ -59,7 +59,7 @@ export const MultisigMemberList: React.FC<IMultisigMemberListProps> = () => {
 function NoMembersView({ filtered }: { filtered?: boolean }) {
   let message: string;
   if (filtered) {
-    message = "There are no members matching the current filter. Please, try entering a different search term.";
+    message = "There are no members matching the current filter. Please try entering a different search term.";
   } else {
     message = "There are no multisig members yet. Here you will see the addresses of members who can create proposals.";
   }

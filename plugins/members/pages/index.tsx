@@ -17,7 +17,7 @@ import { useMultisigMembers } from "../hooks/useMultisigMembers";
 const DELEGATION_DESCRIPTION =
   "Proposals submitted to the community can be vetoed by token holders. Additionally, token holders can opt to delegate their voting power to delegates.";
 const SECURITY_COUNCIL_DESCRIPTION =
-  "Proposals are created by the Security Council. When its members approve one, the proposal is forwarded to the Community Vote phase for ratification.";
+  "Proposals are created by the Security Council. When its members approve one, the proposal is forwarded to the community veto phase for ratification.";
 
 export default function MembersList() {
   const { open } = useWeb3Modal();
@@ -38,7 +38,7 @@ export default function MembersList() {
     <MainSection>
       <div className="flex w-full max-w-[1280] flex-col gap-x-10 gap-y-8 lg:flex-row">
         <div className="flex flex-1 flex-col gap-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between">
             <If condition={toggleValue === "all" || toggleValue === "verified"}>
               <Then>
                 <Heading size="h1">Delegates</Heading>
@@ -48,10 +48,15 @@ export default function MembersList() {
               </Else>
             </If>
 
-            <ToggleGroup isMultiSelect={false} onChange={onToggleChange} value={toggleValue}>
-              <Toggle value="all" label="Registered" />
-              <Toggle value="verified" label="Verified" />
-              <Toggle value="multisig" label="Security council" />
+            <ToggleGroup
+              isMultiSelect={false}
+              onChange={onToggleChange}
+              value={toggleValue}
+              className="flex justify-end"
+            >
+              <Toggle value="all" label="Registered" className="rounded-lg" />
+              <Toggle value="verified" label="Verified" className="rounded-lg" />
+              <Toggle value="multisig" label="Security council" className="rounded-lg" />
             </ToggleGroup>
           </div>
           <If condition={toggleValue === "all" || toggleValue === "verified"}>
