@@ -119,6 +119,16 @@ body {
   font-family: "Public Sans";
 }
 
+body,
+span,
+p,
+ul,
+ol,
+div {
+  /* Custom */
+  font-family: "Public Sans";
+}
+
 h1,
 h2,
 h3,
