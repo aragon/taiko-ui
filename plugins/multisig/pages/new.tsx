@@ -8,11 +8,12 @@ import { useAccount } from "wagmi";
 import { useCanCreateProposal } from "../hooks/useCanCreateProposal";
 import { MissingContentView } from "@/components/MissingContentView";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { Address, toHex } from "viem";
+import { Address } from "viem";
 import { NewActionDialog, NewActionType } from "@/components/dialogs/NewActionDialog";
 import { AddActionCard } from "@/components/cards/AddActionCard";
 import { ProposalActions } from "@/components/proposalActions/proposalActions";
 import { downloadAsFile } from "@/utils/download-as-file";
+import { encodeActionsAsJson } from "@/utils/json-actions";
 
 export default function Create() {
   const { address: selfAddress, isConnected } = useAccount();
@@ -68,14 +69,7 @@ export default function Create() {
   const exportAsJson = () => {
     if (!actions.length) return;
 
-    const result = actions.map((item) => {
-      return {
-        to: item.to,
-        data: item.data,
-        value: toHex(item.value),
-      };
-    });
-
+    const result = encodeActionsAsJson(actions);
     downloadAsFile("actions.json", JSON.stringify(result), "text/json");
   };
 

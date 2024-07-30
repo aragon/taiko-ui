@@ -1,5 +1,5 @@
 import React, { ReactNode, useState } from "react";
-import { Button, Dropdown, IconType, InputText, Tag, TextAreaRichText } from "@aragon/ods";
+import { Button, IconType, InputText, Tag, TextAreaRichText } from "@aragon/ods";
 import { useAccount } from "wagmi";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
@@ -13,10 +13,11 @@ import { usePublicKeyRegistry } from "../hooks/usePublicKeyRegistry";
 import { useMultisigMembers } from "@/plugins/members/hooks/useMultisigMembers";
 import { RawAction } from "@/utils/types";
 import { NewActionDialog, NewActionType } from "@/components/dialogs/NewActionDialog";
-import { Address, toHex } from "viem";
+import { Address } from "viem";
 import { AddActionCard } from "@/components/cards/AddActionCard";
 import { ProposalActions } from "@/components/proposalActions/proposalActions";
 import { downloadAsFile } from "@/utils/download-as-file";
+import { encodeActionsAsJson } from "@/utils/json-actions";
 
 export default function Create() {
   const { address: selfAddress, isConnected } = useAccount();
@@ -79,14 +80,7 @@ export default function Create() {
   const exportAsJson = () => {
     if (!actions.length) return;
 
-    const result = actions.map((item) => {
-      return {
-        to: item.to,
-        data: item.data,
-        value: toHex(item.value),
-      };
-    });
-
+    const result = encodeActionsAsJson(actions);
     downloadAsFile("actions.json", JSON.stringify(result), "text/json");
   };
 
