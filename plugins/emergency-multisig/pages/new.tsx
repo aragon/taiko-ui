@@ -223,7 +223,7 @@ export default function Create() {
           <div className="mt-6 flex w-full flex-col items-center">
             <div>
               <span className="text-md mb-2 block font-normal text-neutral-700 ">
-                {signersWithPubKey || 0} signer(s) registered the public key
+                {signersWithPubKey || 0} signer(s) registered their public key
               </span>
             </div>
             <Button
