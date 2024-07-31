@@ -7,7 +7,7 @@ import { ElseIf, If, Then } from "../if";
 import { PUB_CHAIN } from "@/constants";
 
 interface IWithdrawalFormProps {
-  onChange: (actions: RawAction) => any;
+  onChange: (action: RawAction) => any;
   onSubmit?: () => any;
 }
 

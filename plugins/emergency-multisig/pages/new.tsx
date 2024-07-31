@@ -1,5 +1,5 @@
 import React, { ReactNode, useState } from "react";
-import { Button, Dropdown, IconType, InputText, Tag, TextAreaRichText } from "@aragon/ods";
+import { Button, IconType, InputText, Tag, TextAreaRichText } from "@aragon/ods";
 import { useAccount } from "wagmi";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
@@ -16,6 +16,8 @@ import { NewActionDialog, NewActionType } from "@/components/dialogs/NewActionDi
 import { Address } from "viem";
 import { AddActionCard } from "@/components/cards/AddActionCard";
 import { ProposalActions } from "@/components/proposalActions/proposalActions";
+import { downloadAsFile } from "@/utils/download-as-file";
+import { encodeActionsAsJson } from "@/utils/json-actions";
 
 export default function Create() {
   const { address: selfAddress, isConnected } = useAccount();
@@ -44,7 +46,7 @@ export default function Create() {
   const handleSummaryInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSummary(event?.target?.value);
   };
-  const handleNewActionDialogClose = (newAction: RawAction | null) => {
+  const handleNewActionDialogClose = (newAction: RawAction[] | null) => {
     if (!newAction) {
       setAddActionType("");
       return;
@@ -74,6 +76,13 @@ export default function Create() {
     return multisigMembers.includes(signer.address);
   });
   const signersWithPubKey = filteredSignerItems.length;
+
+  const exportAsJson = () => {
+    if (!actions.length) return;
+
+    const result = encodeActionsAsJson(actions);
+    downloadAsFile("actions.json", JSON.stringify(result), "text/json");
+  };
 
   return (
     <MainSection narrow>
@@ -184,6 +193,18 @@ export default function Create() {
             onRemove={(idx) => onRemoveAction(idx)}
           />
 
+          <If condition={actions?.length}>
+            <Button
+              className="mt-6"
+              iconLeft={IconType.RICHTEXT_LIST_UNORDERED}
+              size="lg"
+              variant="tertiary"
+              onClick={() => exportAsJson()}
+            >
+              Export actions as JSON
+            </Button>
+          </If>
+
           <div className="mt-8 grid w-full grid-cols-2 gap-4 md:grid-cols-4">
             <AddActionCard
               title="Add a payment"
@@ -192,22 +213,22 @@ export default function Create() {
               onClick={() => setAddActionType("withdrawal")}
             />
             <AddActionCard
-              title="Select a function"
+              title="Add a function call"
               icon={IconType.BLOCKCHAIN_BLOCKCHAIN}
               disabled={isCreating}
               onClick={() => setAddActionType("select-abi-function")}
             />
             <AddActionCard
-              title="Enter the function ABI"
-              disabled
-              icon={IconType.RICHTEXT_LIST_UNORDERED}
-              onClick={() => setAddActionType("custom-abi")}
-            />
-            <AddActionCard
-              title="Copy the calldata"
+              title="Add raw calldata"
               icon={IconType.COPY}
               disabled={isCreating}
               onClick={() => setAddActionType("calldata")}
+            />
+            <AddActionCard
+              title="Import JSON actions"
+              disabled={isCreating}
+              icon={IconType.RICHTEXT_LIST_UNORDERED}
+              onClick={() => setAddActionType("import-json")}
             />
           </div>
 
@@ -215,7 +236,7 @@ export default function Create() {
 
           <NewActionDialog
             newActionType={addActionType}
-            onClose={(newAction) => handleNewActionDialogClose(newAction)}
+            onClose={(newActions) => handleNewActionDialogClose(newActions)}
           />
 
           {/* Submit */}

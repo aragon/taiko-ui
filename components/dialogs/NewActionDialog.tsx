@@ -6,36 +6,37 @@ import { ElseIf, If, Then } from "@/components/if";
 import { useState } from "react";
 import { AbiFunction } from "viem";
 import { CalldataForm } from "../input/calldata-form";
+import { ImportActionsForm } from "../input/import-actions-form";
 
-export type NewActionType = "" | "withdrawal" | "select-abi-function" | "calldata" | "custom-abi";
+export type NewActionType = "" | "withdrawal" | "select-abi-function" | "calldata" | "import-json";
 
 interface INewActionDialogProps extends IDialogRootProps {
-  onClose: (newAction: RawAction | null, abi: AbiFunction | null) => void;
+  onClose: (newAction: RawAction[] | null, abi: AbiFunction | null) => void;
   newActionType: NewActionType;
 }
 
 export const NewActionDialog: React.FC<INewActionDialogProps> = (props) => {
   const { onClose, newActionType } = props;
-  const [stagedAction, setStagedAction] = useState<RawAction | null>(null);
+  const [stagedActions, setStagedActions] = useState<RawAction[] | null>(null);
   const [abi, setAbi] = useState<AbiFunction | null>(null);
 
   const onReceiveAbiAction = (action: RawAction, newAbi: AbiFunction) => {
-    setStagedAction(action);
+    setStagedActions([action]);
     setAbi(newAbi);
   };
   const onActionCleared = () => {
-    setStagedAction(null);
+    setStagedActions(null);
     setAbi(null);
   };
   const handleSubmit = () => {
-    if (!stagedAction) return;
+    if (!stagedActions) return;
 
-    onClose(stagedAction, abi || null);
-    setStagedAction(null);
+    onClose(stagedActions, abi || null);
+    setStagedActions(null);
   };
   const dismiss = () => {
     onClose(null, null);
-    setStagedAction(null);
+    setStagedActions(null);
   };
 
   const show = newActionType !== "";
@@ -46,7 +47,7 @@ export const NewActionDialog: React.FC<INewActionDialogProps> = (props) => {
       <DialogContent className="flex flex-col gap-y-4 md:gap-y-6">
         <If condition={newActionType === "withdrawal"}>
           <Then>
-            <WithdrawalForm onChange={(action) => setStagedAction(action)} onSubmit={() => handleSubmit()} />
+            <WithdrawalForm onChange={(action) => setStagedActions([action])} onSubmit={() => handleSubmit()} />
           </Then>
           <ElseIf condition={newActionType === "select-abi-function"}>
             <FunctionAbiSelectForm
@@ -54,9 +55,11 @@ export const NewActionDialog: React.FC<INewActionDialogProps> = (props) => {
               onActionCleared={onActionCleared}
             />
           </ElseIf>
-          <ElseIf condition={newActionType === "custom-abi"}></ElseIf>
           <ElseIf condition={newActionType === "calldata"}>
-            <CalldataForm onChange={(action) => setStagedAction(action)} onSubmit={() => handleSubmit()} />
+            <CalldataForm onChange={(action) => setStagedActions([action])} onSubmit={() => handleSubmit()} />
+          </ElseIf>
+          <ElseIf condition={newActionType === "import-json"}>
+            <ImportActionsForm onChange={(actions) => setStagedActions(actions)} />
           </ElseIf>
         </If>
 
@@ -64,7 +67,7 @@ export const NewActionDialog: React.FC<INewActionDialogProps> = (props) => {
           <Button variant="secondary" size="lg" onClick={() => dismiss()}>
             Cancel
           </Button>
-          <Button variant="primary" disabled={!stagedAction} size="lg" onClick={() => handleSubmit()}>
+          <Button variant="primary" disabled={!stagedActions} size="lg" onClick={() => handleSubmit()}>
             Add action
           </Button>
         </div>

@@ -20,7 +20,7 @@ import { useAbi } from "@/hooks/useAbi";
 import { CallFunctionSignatureField, CallParamField } from "../proposalActions/callParamField";
 
 interface ICalldataFormProps {
-  onChange: (actions: RawAction) => any;
+  onChange: (action: RawAction) => any;
   onSubmit?: () => any;
 }
 
