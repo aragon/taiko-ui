@@ -62,13 +62,12 @@ export default function ProposalCard(props: ProposalInputs) {
     );
   }
 
-  const vetoPercentage =
-    proposal?.vetoTally && pastSupply && proposal.parameters.minVetoRatio
-      ? Number(
-          (BigInt(100) * proposal.vetoTally) /
-            ((pastSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(1000000))
-        )
-      : 0;
+  let vetoPercentage = 0;
+  if (proposal?.vetoTally && pastSupply && proposal.parameters.minVetoRatio) {
+    vetoPercentage = Number(
+      (BigInt(1000) * proposal.vetoTally) / ((pastSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(10000000))
+    );
+  }
 
   return (
     <ProposalDataListItem.Structure

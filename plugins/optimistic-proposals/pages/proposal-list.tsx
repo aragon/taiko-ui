@@ -1,17 +1,23 @@
-import { useBlockNumber, useReadContract } from "wagmi";
+import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { useEffect } from "react";
 import ProposalCard from "@/plugins/optimistic-proposals/components/proposal";
-import { DataList, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
-import { Else, If, Then } from "@/components/if";
-import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
+import { AlertCard, DataList, Link, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
+import { Else, ElseIf, If, Then } from "@/components/if";
+import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN, PUB_TOKEN_SYMBOL } from "@/constants";
 import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisticTokenVotingPlugin.sol";
 import { MainSection } from "@/components/layout/main-section";
 import { MissingContentView } from "@/components/MissingContentView";
+import { ADDRESS_ZERO } from "@/utils/evm";
+import { useTokenVotes } from "@/hooks/useTokenVotes";
+import { AddressText } from "@/components/text/address";
+import { Address } from "viem";
 
 const DEFAULT_PAGE_SIZE = 6;
 
 export default function Proposals() {
+  const { address } = useAccount();
   const { data: blockNumber } = useBlockNumber({ watch: true });
+  const { balance, delegatesTo } = useTokenVotes(address);
 
   const {
     data: proposalCountResponse,
@@ -42,6 +48,10 @@ export default function Proposals() {
     dataListState = "fetchingNextPage";
   }
 
+  const hasBalance = !!balance && balance > BigInt(0);
+  const delegatingToSomeoneElse = !!delegatesTo && delegatesTo !== address && delegatesTo !== ADDRESS_ZERO;
+  const delegatedToZero = !!delegatesTo && delegatesTo === ADDRESS_ZERO;
+
   return (
     <MainSection narrow>
       <div className="flex w-full flex-row content-center justify-between">
@@ -49,6 +59,14 @@ export default function Proposals() {
           Proposals
         </h1>
       </div>
+      <If condition={hasBalance && (delegatingToSomeoneElse || delegatedToZero)}>
+        <NoVetoPowerWarning
+          delegatingToSomeoneElse={delegatingToSomeoneElse}
+          delegatesTo={delegatesTo}
+          delegatedToZero={delegatedToZero}
+          address={address}
+        />
+      </If>
       <If condition={proposalCount}>
         <Then>
           <DataList.Root
@@ -60,10 +78,7 @@ export default function Proposals() {
             <DataList.Container SkeletonElement={ProposalDataListItemSkeleton}>
               {Array.from(Array(proposalCount || 0)?.keys())
                 .reverse()
-                ?.map((proposalIndex) => (
-                  // TODO: update with router agnostic ODS DataListItem
-                  <ProposalCard key={proposalIndex} proposalIndex={proposalIndex} />
-                ))}
+                ?.map((proposalIndex) => <ProposalCard key={proposalIndex} proposalIndex={proposalIndex} />)}
             </DataList.Container>
             <DataList.Pagination />
           </DataList.Root>
@@ -79,3 +94,43 @@ export default function Proposals() {
     </MainSection>
   );
 }
+
+const NoVetoPowerWarning = ({
+  delegatingToSomeoneElse,
+  delegatesTo,
+  delegatedToZero,
+  address,
+}: {
+  delegatingToSomeoneElse: boolean;
+  delegatesTo: Address | undefined;
+  delegatedToZero: boolean;
+  address: Address | undefined;
+}) => {
+  return (
+    <AlertCard
+      description={
+        <span className="text-sm">
+          <If condition={delegatingToSomeoneElse}>
+            <Then>
+              You are currently delegating your voting power to <AddressText bold={false}>{delegatesTo}</AddressText>.
+              If you wish to participate by yourself in future proposals,
+            </Then>
+            <ElseIf condition={delegatedToZero}>
+              You have not self delegated your voting power to participate in the DAO. If you wish to participate in
+              future proposals,
+            </ElseIf>
+          </If>
+          &nbsp;make sure that{" "}
+          <Link href={"/plugins/members/#/delegates/" + address} className="!text-sm text-primary-400 hover:underline">
+            your voting power is self delegated
+          </Link>
+          .
+        </span>
+      }
+      message={
+        delegatingToSomeoneElse ? "Your voting power is currently delegated" : "You cannot veto on new proposals"
+      }
+      variant="info"
+    />
+  );
+};

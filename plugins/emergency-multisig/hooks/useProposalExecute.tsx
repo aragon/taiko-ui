@@ -74,7 +74,8 @@ export function useProposalExecute(proposalId: string) {
     if (executingStatus === "idle" || executingStatus === "pending") return;
     else if (executingStatus === "error") {
       if (executingError?.message?.startsWith("User rejected the request")) {
-        addAlert("Transaction rejected by the user", {
+        addAlert("The signature was declined", {
+          description: "Nothing has been sent to the network",
           timeout: 4 * 1000,
         });
       } else {

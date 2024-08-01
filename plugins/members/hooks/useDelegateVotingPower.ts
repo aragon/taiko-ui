@@ -15,7 +15,8 @@ export const useDelegateVotingPower = (targetAddress: Address, onSuccess?: () =>
     if (status === "idle" || status === "pending") return;
     else if (status === "error") {
       if (error?.message?.startsWith("User rejected the request")) {
-        addAlert("Transaction rejected by the user", {
+        addAlert("The signature was declined", {
+          description: "Nothing has been sent to the network",
           timeout: 4 * 1000,
         });
       } else {

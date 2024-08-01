@@ -23,7 +23,8 @@ export function useProposalVeto(index: number) {
     if (vetoingStatus === "idle" || vetoingStatus === "pending") return;
     else if (vetoingStatus === "error") {
       if (vetoingError?.message?.startsWith("User rejected the request")) {
-        addAlert("Transaction rejected by the user", {
+        addAlert("The signature was declined", {
+          description: "Nothing has been sent to the network",
           timeout: 4 * 1000,
         });
       } else {
