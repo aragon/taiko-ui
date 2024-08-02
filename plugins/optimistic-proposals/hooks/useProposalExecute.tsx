@@ -50,8 +50,8 @@ export function useProposalExecute(index: number) {
     if (executingStatus === "idle" || executingStatus === "pending") return;
     else if (executingStatus === "error") {
       if (executingError?.message?.startsWith("User rejected the request")) {
-        addAlert("The signature was declined", {
-          description: "Nothing has been sent to the network",
+        addAlert("The transaction signature was declined", {
+          description: "Nothing will be sent to the network",
           timeout: 4 * 1000,
         });
       } else {
