@@ -11,16 +11,16 @@ import { useProposalStatus } from "../hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
 import { ProposalActions } from "@/components/proposalActions/proposalActions";
 import { CardResources } from "@/components/proposal/cardResources";
-import { formatEther } from "viem";
+import { Address, formatEther } from "viem";
 import { useToken } from "../hooks/useToken";
 import { usePastSupply } from "../hooks/usePastSupply";
-import { If } from "@/components/if";
+import { ElseIf, If, Then } from "@/components/if";
 import { AlertCard } from "@aragon/ods";
-import { PUB_TOKEN_SYMBOL } from "@/constants";
 import Link from "next/link";
 import { useAccount } from "wagmi";
-import { useTokenPastVotes } from "../hooks/useTokenPastVotes";
 import { useTokenVotes } from "@/hooks/useTokenVotes";
+import { ADDRESS_ZERO } from "@/utils/evm";
+import { AddressText } from "@/components/text/address";
 
 const ZERO = BigInt(0);
 
@@ -37,7 +37,6 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
   const pastSupply = usePastSupply(proposal);
   const { symbol: tokenSymbol } = useToken();
   const { balance, delegatesTo } = useTokenVotes(address);
-  const { votes: pastVotes } = useTokenPastVotes(address, proposal?.parameters.snapshotTimestamp);
 
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalIdx);
 
@@ -46,13 +45,12 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const proposalStatus = useProposalStatus(proposal!);
-  const vetoPercentage =
-    proposal?.vetoTally && pastSupply && proposal.parameters.minVetoRatio
-      ? Number(
-          (BigInt(100) * proposal.vetoTally) /
-            ((pastSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(1000000))
-        )
-      : 0;
+  let vetoPercentage = 0;
+  if (proposal?.vetoTally && pastSupply && proposal.parameters.minVetoRatio) {
+    vetoPercentage = Number(
+      (BigInt(1000) * proposal.vetoTally) / ((pastSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(10000000))
+    );
+  }
 
   let cta: IBreakdownMajorityVotingResult["cta"];
   if (proposal?.executed) {
@@ -109,10 +107,9 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
     },
   ];
 
-  let showReclaimVotingPower = false;
-  if (pastVotes === ZERO && !!balance && balance > ZERO && delegatesTo !== address) {
-    showReclaimVotingPower = true;
-  }
+  const hasBalance = !!balance && balance > ZERO;
+  const delegatingToSomeoneElse = !!delegatesTo && delegatesTo !== address && delegatesTo !== ADDRESS_ZERO;
+  const delegatedToZero = !!delegatesTo && delegatesTo === ADDRESS_ZERO;
 
   if (!proposal || showProposalLoading) {
     return (
@@ -130,21 +127,13 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
         <div className="flex w-full flex-col gap-x-12 gap-y-6 md:flex-row">
           <div className="flex flex-col gap-y-6 md:w-[63%] md:shrink-0">
             <BodySection body={proposal.description || "No description was provided"} />
-            <If condition={showReclaimVotingPower}>
-              <AlertCard
-                description={
-                  <span>
-                    This can happen because your voting power was delegated to another address when the proposal was
-                    created or because you didn&apos;t hold any {PUB_TOKEN_SYMBOL} at the time. If you want to act by
-                    yourself in future proposals, make sure that you hold tokens and that{" "}
-                    <Link href={"/plugins/members/#/delegates/" + address} className="font-semibold hover:underline">
-                      your voting power is self delegated
-                    </Link>
-                    .
-                  </span>
-                }
-                message="Veto unavailable"
-                variant="warning"
+            <If condition={hasBalance && (delegatingToSomeoneElse || delegatedToZero)}>
+              <NoVetoPowerWarning
+                delegatingToSomeoneElse={delegatingToSomeoneElse}
+                delegatesTo={delegatesTo}
+                delegatedToZero={delegatedToZero}
+                address={address}
+                canVeto={canVeto}
               />
             </If>
             <ProposalVoting
@@ -161,6 +150,52 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
     </section>
   );
 }
+
+const NoVetoPowerWarning = ({
+  delegatingToSomeoneElse,
+  delegatesTo,
+  delegatedToZero,
+  address,
+  canVeto,
+}: {
+  delegatingToSomeoneElse: boolean;
+  delegatesTo: Address | undefined;
+  delegatedToZero: boolean;
+  address: Address | undefined;
+  canVeto: boolean;
+}) => {
+  return (
+    <AlertCard
+      description={
+        <span className="text-sm">
+          <If condition={delegatingToSomeoneElse}>
+            <Then>
+              You are currently delegating your voting power to <AddressText bold={false}>{delegatesTo}</AddressText>.
+              If you wish to participate by yourself in future proposals,
+            </Then>
+            <ElseIf condition={delegatedToZero}>
+              You have not self delegated your voting power to participate in the DAO. If you wish to participate in
+              future proposals,
+            </ElseIf>
+          </If>
+          &nbsp;make sure that{" "}
+          <Link href={"/plugins/members/#/delegates/" + address} className="!text-sm text-primary-400 hover:underline">
+            your voting power is self delegated
+          </Link>
+          .
+        </span>
+      }
+      message={
+        delegatingToSomeoneElse
+          ? "Your voting power is currently delegated"
+          : canVeto
+            ? "You cannot veto on new proposals"
+            : "You cannot veto"
+      }
+      variant="info"
+    />
+  );
+};
 
 function getShowProposalLoading(
   proposal: ReturnType<typeof useProposal>["proposal"],

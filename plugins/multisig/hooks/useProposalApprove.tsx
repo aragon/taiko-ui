@@ -29,7 +29,8 @@ export function useProposalApprove(proposalId: string) {
     if (approveStatus === "idle" || approveStatus === "pending") return;
     else if (approveStatus === "error") {
       if (approveError?.message?.startsWith("User rejected the request")) {
-        addAlert("Transaction rejected by the user", {
+        addAlert("The signature was declined", {
+          description: "Nothing has been sent to the network",
           timeout: 4 * 1000,
         });
       } else {

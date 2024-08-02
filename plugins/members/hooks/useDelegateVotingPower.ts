@@ -2,12 +2,13 @@ import { iVotesAbi } from "../artifacts/iVotes.sol";
 import { PUB_TOKEN_ADDRESS } from "@/constants";
 import { useAlerts } from "@/context/Alerts";
 import { logger } from "@/services/logger";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { type Address } from "viem";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
 export const useDelegateVotingPower = (targetAddress: Address, onSuccess?: () => void) => {
   const { addAlert } = useAlerts();
+  const [isConfirming, setIsConfirming] = useState(false);
   const { writeContract, data: hash, error, status } = useWriteContract();
   const { isLoading, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
 
@@ -15,13 +16,15 @@ export const useDelegateVotingPower = (targetAddress: Address, onSuccess?: () =>
     if (status === "idle" || status === "pending") return;
     else if (status === "error") {
       if (error?.message?.startsWith("User rejected the request")) {
-        addAlert("Transaction rejected by the user", {
+        addAlert("The signature was declined", {
+          description: "Nothing has been sent to the network",
           timeout: 4 * 1000,
         });
       } else {
         logger.error(`Could not delegate`, error);
         addAlert(`Could not delegate`, { type: "error" });
       }
+      setIsConfirming(false);
       return;
     }
 
@@ -32,6 +35,7 @@ export const useDelegateVotingPower = (targetAddress: Address, onSuccess?: () =>
         description: "Waiting for the transaction to be validated",
         txHash: hash,
       });
+      setIsConfirming(false);
       return;
     } else if (!isConfirmed) return;
 
@@ -45,6 +49,8 @@ export const useDelegateVotingPower = (targetAddress: Address, onSuccess?: () =>
   }, [status, hash, isLoading, isConfirmed]);
 
   const delegateVotingPower = () => {
+    setIsConfirming(true);
+
     writeContract({
       abi: iVotesAbi,
       address: PUB_TOKEN_ADDRESS,
@@ -56,7 +62,7 @@ export const useDelegateVotingPower = (targetAddress: Address, onSuccess?: () =>
   return {
     delegateVotingPower,
     isConfirmed,
-    isLoading,
+    isLoading: isConfirming || isLoading,
     status,
   };
 };
