@@ -1,10 +1,8 @@
-# Aragonette 🚀
-
-Welcome to **Aragonette**, the sleek and snappy UI template designed for lightning-fast prototyping with Aragon DAOs and plugins! Built with the power of Next.js and the speed of Bun.js, Aragonette is your go-to toolkit for bringing your Aragon DAO visions to life with style and efficiency. 🎨✨
+# Taiko DAO UI
 
 ## Overview
 
-The UI is the combination of a host UI with common tools and services, featuring 4 UI modules:
+This project is the combination of a host UI including common tools and services, which features 4 UI modules:
 
 ### Proposal section
 
