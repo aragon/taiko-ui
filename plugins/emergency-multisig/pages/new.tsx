@@ -80,8 +80,8 @@ export default function Create() {
   const exportAsJson = () => {
     if (!actions.length) return;
 
-    const result = encodeActionsAsJson(actions);
-    downloadAsFile("actions.json", JSON.stringify(result), "text/json");
+    const strResult = encodeActionsAsJson(actions);
+    downloadAsFile("actions.json", strResult, "text/json");
   };
 
   return (
