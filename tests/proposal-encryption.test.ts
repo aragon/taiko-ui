@@ -96,9 +96,12 @@ describe("Proposal data encryption", () => {
     }).not.toThrow();
 
     for (const otherKey of otherKeys) {
-      expect(() => {
+      try {
         decryptProposal(data, otherKey);
-      }).toThrow();
+        throw new Error("Should have thrown but didn't");
+      } catch (err: any) {
+        expect(err.message).toBe("wrong secret key for the given ciphertext");
+      }
     }
   });
 });
@@ -150,9 +153,12 @@ describe("Symmetric key encryption across members", () => {
     );
 
     for (let i = 0; i < encryptedItems.length; i++) {
-      expect(() => {
+      try {
         decryptSymmetricKey(encryptedItems, intruders[i]);
-      }).toThrow();
+        throw new Error("Should have thrown but didn't");
+      } catch (err: any) {
+        expect(err.message).toBe("The given keypair cannot decrypt any of the ciphertext's");
+      }
     }
 
     for (let i = 0; i < encryptedItems.length; i++) {
