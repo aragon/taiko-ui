@@ -72,7 +72,7 @@ export default function ProposalCard(props: ProposalInputs) {
         approvalAmount: proposal.approvals,
         approvalThreshold: proposal.parameters.minApprovals,
       }}
-      publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
+      publisher={{ address: proposal.creator }}
       status={proposalStatus!}
       type={"approvalThreshold"}
     />

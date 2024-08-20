@@ -77,10 +77,8 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     publicClient
       .getLogs({
         address: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
-        event: ProposalCreatedEvent as any,
-        args: {
-          proposalId,
-        } as any,
+        event: ProposalCreatedEvent,
+        args: { proposalId: BigInt(proposalId) },
         fromBlock: proposalData.parameters.snapshotBlock,
         toBlock: "latest",
       })

@@ -85,7 +85,7 @@ export default function ProposalCard(props: ProposalInputs) {
         voteAmount: formatEther(proposal.vetoTally) + " " + (tokenSymbol || "TKO"),
         votePercentage: vetoPercentage,
       }}
-      publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
+      publisher={{ address: proposal.creator }}
       status={proposalStatus!}
       type={"majorityVoting"}
     />
