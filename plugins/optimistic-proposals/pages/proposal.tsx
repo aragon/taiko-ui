@@ -60,9 +60,9 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
     };
   } else if (proposalStatus === ProposalStatus.ACCEPTED) {
     cta = {
-      disabled: !canExecute,
+      disabled: !canExecute || !proposal?.actions.length,
       isLoading: isConfirmingExecution,
-      label: "Execute",
+      label: proposal?.actions.length ? "Execute" : "No actions to execute",
       onClick: executeProposal,
     };
   } else if (proposalStatus === ProposalStatus.ACTIVE) {
