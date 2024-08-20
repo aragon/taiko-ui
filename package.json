@@ -22,7 +22,7 @@
     ]
   },
   "dependencies": {
-    "@aragon/ods": "1.0.40",
+    "@aragon/ods": "1.0.42",
     "@hookform/resolvers": "^3.9.0",
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@shazow/whatsabi": "^0.13.2",
@@ -43,7 +43,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.52.1",
     "tailwindcss-fluid-type": "^2.0.6",
-    "viem": "2.17.0",
+    "viem": "2.19.8",
     "wagmi": "2.10.9"
   },
   "devDependencies": {

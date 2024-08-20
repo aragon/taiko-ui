@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useProposalApprove } from "@/plugins/multisig/hooks/useProposalApprove";
-import { Card } from "@aragon/ods";
+import { Card, ProposalStatus } from "@aragon/ods";
 import { ProposalDataListItem } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
@@ -64,7 +64,7 @@ export default function ProposalCard(props: ProposalInputs) {
       href={`#/proposals/${props.proposalId}`}
       voted={hasApproved}
       date={
-        ["active", "accepted"].includes(proposalStatus!) && proposal.parameters.expirationDate
+        [ProposalStatus.ACTIVE, ProposalStatus.ACCEPTED].includes(proposalStatus!) && proposal.parameters.expirationDate
           ? Number(proposal.parameters.expirationDate) * 1000
           : undefined
       }

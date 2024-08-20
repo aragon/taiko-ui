@@ -1,4 +1,4 @@
-import { AvatarIcon, Breadcrumbs, Button, Heading, IBreadcrumbsLink, IconType, Tag, TagVariant } from "@aragon/ods";
+import { AvatarIcon, Breadcrumbs, Heading, IBreadcrumbsLink, IconType, ProposalStatus, TagVariant } from "@aragon/ods";
 import { useProposalStatus } from "@/plugins/emergency-multisig/hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
 import { Publisher } from "@/components/publisher";
@@ -49,7 +49,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalId, proposal })
           <div className="flex items-center gap-x-2">
             <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
             <div className="flex gap-x-1 text-base leading-tight ">
-              <If condition={proposalStatus == "executed"}>
+              <If condition={proposalStatus == ProposalStatus.EXECUTED}>
                 <Then>
                   <span className="text-neutral-500">The proposal was sent to the community stage</span>
                 </Then>

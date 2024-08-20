@@ -1,4 +1,13 @@
-import { AvatarIcon, Breadcrumbs, Button, Heading, IBreadcrumbsLink, IconType, Tag, TagVariant } from "@aragon/ods";
+import {
+  AvatarIcon,
+  Breadcrumbs,
+  Heading,
+  IBreadcrumbsLink,
+  IconType,
+  ProposalStatus,
+  Tag,
+  TagVariant,
+} from "@aragon/ods";
 import { Publisher } from "@/components/publisher";
 import { OptimisticProposal } from "@/plugins/optimistic-proposals/utils/types";
 import { useProposalStatus } from "@/plugins/optimistic-proposals/hooks/useProposalVariantStatus";
@@ -64,7 +73,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalIdx, proposal }
           <div className="flex items-center gap-x-2">
             <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
             <div className="flex gap-x-1 text-base leading-tight ">
-              <If condition={status == "vetoed"}>
+              <If condition={status == ProposalStatus.VETOED}>
                 <Then>
                   <span className="text-neutral-500">The proposal has been defeated</span>
                 </Then>

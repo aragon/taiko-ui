@@ -15,7 +15,7 @@ import { Address, formatEther } from "viem";
 import { useToken } from "../hooks/useToken";
 import { usePastSupply } from "../hooks/usePastSupply";
 import { ElseIf, If, Then } from "@/components/if";
-import { AlertCard } from "@aragon/ods";
+import { AlertCard, ProposalStatus } from "@aragon/ods";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 import { useTokenVotes } from "@/hooks/useTokenVotes";
@@ -58,14 +58,14 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
       disabled: true,
       label: "Executed",
     };
-  } else if (proposalStatus === "accepted") {
+  } else if (proposalStatus === ProposalStatus.ACCEPTED) {
     cta = {
       disabled: !canExecute,
       isLoading: isConfirmingExecution,
       label: "Execute",
       onClick: executeProposal,
     };
-  } else if (proposalStatus === "active") {
+  } else if (proposalStatus === ProposalStatus.ACTIVE) {
     cta = {
       disabled: !canVeto,
       isLoading: isConfirmingVeto,
