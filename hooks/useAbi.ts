@@ -16,7 +16,7 @@ export const useAbi = (contractAddress: Address) => {
   const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
 
   const { data: implementationAddress, isLoading: isLoadingImpl } = useQuery<Address | null>({
-    queryKey: ["proxy-check", contractAddress, !!publicClient],
+    queryKey: ["proxy-check", contractAddress, publicClient?.chain.id],
     queryFn: () => {
       if (!contractAddress || !publicClient) return null;
       else if (!isAddress(contractAddress) || !publicClient) {
@@ -35,7 +35,7 @@ export const useAbi = (contractAddress: Address) => {
     refetchOnMount: false,
     refetchOnReconnect: false,
     retryOnMount: true,
-    staleTime: Infinity,
+    staleTime: 1000 * 60 * 60 * 24 * 7,
   });
 
   const resolvedAddress = isAddress(implementationAddress) ? (implementationAddress as Address) : contractAddress;
@@ -45,7 +45,7 @@ export const useAbi = (contractAddress: Address) => {
     isLoading,
     error,
   } = useQuery<AbiFunction[], Error>({
-    queryKey: ["abi", resolvedAddress || "", !!publicClient],
+    queryKey: ["abi", resolvedAddress || "", publicClient?.chain.id],
     queryFn: async () => {
       if (!resolvedAddress || !isAddress(resolvedAddress) || !publicClient) {
         return [];
