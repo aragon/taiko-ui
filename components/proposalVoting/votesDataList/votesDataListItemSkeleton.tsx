@@ -1,8 +1,6 @@
 import { DataListItem, StateSkeletonBar, StateSkeletonCircular } from "@aragon/ods";
 
-export interface IVotesDataListItemSkeletonProps {}
-
-export const VotesDataListItemSkeleton: React.FC<IVotesDataListItemSkeletonProps> = () => {
+export const VotesDataListItemSkeleton: React.FC = () => {
   return (
     <DataListItem className="flex flex-col gap-y-3 py-3 md:py-4">
       <div className="flex w-full items-center gap-x-3 md:gap-x-4">
