@@ -77,7 +77,6 @@
     --ods-dialog-alert-content-z-index: 30;
     --ods-dropdown-container-content-z-index: 40;
     --ods-text-area-rich-text-expanded-z-index: 50;
-    --ods---ods-text-area-rich-text-expanded-z-index: 50; /* TODO: remove when ODS is patched */
   }
 }
 
