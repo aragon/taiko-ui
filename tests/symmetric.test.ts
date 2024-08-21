@@ -51,7 +51,18 @@ describe("Symmetric encryption", () => {
     expect(() => decryptBytes(encryptedPayload1, symKey)).not.toThrow();
     expect(() => decryptString(encryptedPayload2, symKey)).not.toThrow();
 
-    expect(() => decryptBytes(encryptedPayload1, wrongKey)).toThrow();
-    expect(() => decryptString(encryptedPayload2, wrongKey)).toThrow();
+    try {
+      decryptBytes(encryptedPayload1, wrongKey);
+      throw new Error("Should have thrown but didn't");
+    } catch (err: any) {
+      expect(err.message).toBe("wrong secret key for the given ciphertext");
+    }
+
+    try {
+      decryptString(encryptedPayload2, wrongKey);
+      throw new Error("Should have thrown but didn't");
+    } catch (err: any) {
+      expect(err.message).toBe("wrong secret key for the given ciphertext");
+    }
   });
 });

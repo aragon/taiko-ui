@@ -67,10 +67,23 @@ describe("Symmetric encryption", () => {
     const ciphertext1 = encrypt(bytes, bob.publicKey);
     const ciphertext2 = encrypt("Hello world", bob.publicKey);
 
+    // ok
     expect(() => decryptBytes(ciphertext1, bob)).not.toThrow();
     expect(() => decryptString(ciphertext2, bob)).not.toThrow();
 
-    expect(() => decryptBytes(ciphertext1, cindy)).toThrow();
-    expect(() => decryptString(ciphertext2, cindy)).toThrow();
+    // ko
+    try {
+      decryptBytes(ciphertext1, cindy);
+      throw new Error("Should have thrown but didn't");
+    } catch (err: any) {
+      expect(err.message).toBe("incorrect key pair for the given ciphertext");
+    }
+
+    try {
+      decryptString(ciphertext2, cindy);
+      throw new Error("Should have thrown but didn't");
+    } catch (err: any) {
+      expect(err.message).toBe("incorrect key pair for the given ciphertext");
+    }
   });
 });
