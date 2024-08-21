@@ -30,11 +30,11 @@ export const useProposalStatus = (proposal: MultisigProposal) => {
     setStatus(
       proposal?.approvals >= proposal?.parameters?.minApprovals
         ? proposal?.executed
-          ? "executed"
-          : "accepted"
+          ? ProposalStatus.EXECUTED
+          : ProposalStatus.ACCEPTED
         : dayjs().isAfter(dayjs(Number(proposal?.parameters.expirationDate) * 1000))
-          ? "failed"
-          : "active"
+          ? ProposalStatus.FAILED
+          : ProposalStatus.ACTIVE
     );
   }, [proposal, proposal?.approvals, proposal?.executed, proposal?.parameters?.minApprovals]);
 

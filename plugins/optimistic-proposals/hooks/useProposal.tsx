@@ -61,8 +61,10 @@ export function useProposal(proposalId?: bigint, autoRefresh = false) {
     publicClient
       .getLogs({
         address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-        event: ProposalCreatedEvent as any,
-        // args: {},
+        event: ProposalCreatedEvent,
+        args: {
+          proposalId,
+        },
         fromBlock: BigInt(0),
         toBlock: "latest",
       })

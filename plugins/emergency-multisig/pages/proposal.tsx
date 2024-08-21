@@ -31,7 +31,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const { publicKey, requestSignature } = useDerivedWallet();
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
-  const proposalVariant = useProposalStatus(proposal!);
+  const proposalStatus = useProposalStatus(proposal!);
 
   const proposalStage: ITransformedStage[] = [
     {
@@ -39,7 +39,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       type: ProposalStages.MULTISIG_APPROVAL,
       variant: "approvalThreshold",
       title: "Onchain multisig",
-      status: proposalVariant!,
+      status: proposalStatus!,
       disabled: false,
       proposalId: proposalId,
       providerId: "1",

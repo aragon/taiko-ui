@@ -1,4 +1,4 @@
-import { AvatarIcon, Breadcrumbs, Button, Heading, IBreadcrumbsLink, IconType, Tag, TagVariant } from "@aragon/ods";
+import { AvatarIcon, Breadcrumbs, Heading, IBreadcrumbsLink, IconType, ProposalStatus, TagVariant } from "@aragon/ods";
 import { MultisigProposal } from "@/plugins/multisig/utils/types";
 import { useProposalStatus } from "@/plugins/multisig/hooks/useProposalVariantStatus";
 import dayjs from "dayjs";
@@ -6,6 +6,8 @@ import { HeaderSection } from "@/components/layout/header-section";
 import { Publisher } from "@/components/publisher";
 import { getSimpleRelativeTimeFromDate } from "@/utils/dates";
 import { Else, ElseIf, If, Then } from "@/components/if";
+import { getTagVariantFromStatus } from "@/utils/ui-variants";
+import { capitalizeFirstLetter } from "@/utils/text";
 
 interface ProposalHeaderProps {
   proposalId: string;
@@ -26,8 +28,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalId, proposal })
           links={breadcrumbs}
           tag={
             proposalStatus && {
-              label: proposalStatus,
-              className: "capitalize",
+              label: capitalizeFirstLetter(proposalStatus),
               variant: tagVariant,
             }
           }
@@ -49,7 +50,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalId, proposal })
           <div className="flex items-center gap-x-2">
             <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
             <div className="flex gap-x-1 text-base leading-tight ">
-              <If condition={proposalStatus == "executed"}>
+              <If condition={proposalStatus == ProposalStatus.EXECUTED}>
                 <Then>
                   <span className="text-neutral-500">The proposal was sent to the community stage</span>
                 </Then>
@@ -72,34 +73,3 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalId, proposal })
 };
 
 export default ProposalHeader;
-
-const getTagVariantFromStatus = (status: string | undefined): TagVariant => {
-  switch (status) {
-    case "accepted":
-      return "success";
-    case "active":
-      return "info";
-    case "challenged":
-      return "warning";
-    case "draft":
-      return "neutral";
-    case "executed":
-      return "success";
-    case "expired":
-      return "critical";
-    case "failed":
-      return "critical";
-    case "partiallyExecuted":
-      return "warning";
-    case "pending":
-      return "neutral";
-    case "queued":
-      return "success";
-    case "rejected":
-      return "critical";
-    case "vetoed":
-      return "warning";
-    default:
-      return "neutral";
-  }
-};

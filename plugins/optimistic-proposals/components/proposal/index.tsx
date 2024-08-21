@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useProposalVeto } from "@/plugins/optimistic-proposals/hooks/useProposalVeto";
-import { Card } from "@aragon/ods";
+import { Card, ProposalStatus } from "@aragon/ods";
 import { ProposalDataListItem } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
@@ -76,7 +76,7 @@ export default function ProposalCard(props: ProposalInputs) {
       href={`#/proposals/${props.proposalIndex}`}
       voted={hasVetoed}
       date={
-        ["active", "accepted"].includes(proposalStatus!) && proposal.parameters.vetoEndDate
+        [ProposalStatus.ACTIVE, ProposalStatus.ACCEPTED].includes(proposalStatus!) && proposal.parameters.vetoEndDate
           ? Number(proposal.parameters.vetoEndDate) * 1000
           : undefined
       }
@@ -85,7 +85,7 @@ export default function ProposalCard(props: ProposalInputs) {
         voteAmount: formatEther(proposal.vetoTally) + " " + (tokenSymbol || "TKO"),
         votePercentage: vetoPercentage,
       }}
-      publisher={[{ address: proposal.creator }]} // Fix: Pass an object of type IPublisher instead of a string
+      publisher={{ address: proposal.creator }}
       status={proposalStatus!}
       type={"majorityVoting"}
     />

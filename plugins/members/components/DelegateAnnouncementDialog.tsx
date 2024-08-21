@@ -104,7 +104,7 @@ export const DelegateAnnouncementDialog: React.FC<IDelegateAnnouncementDialogPro
       : "Create profile";
 
   return (
-    <DialogRoot {...otherProps} containerClassName="!max-w-[520px]">
+    <DialogRoot {...otherProps} containerClassName="!max-w-[520px]" useFocusTrap={false}>
       <DialogHeader title="Create your delegate profile" onCloseClick={onClose} onBackClick={onClose} />
       <DialogContent className="flex flex-col gap-y-4 md:gap-y-6">
         <InputText

@@ -24,7 +24,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const { executeProposal, canExecute, isConfirming: isConfirmingExecution } = useProposalExecute(proposalId);
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
-  const proposalVariant = useProposalStatus(proposal!);
+  const proposalStatus = useProposalStatus(proposal!);
 
   // TODO: This is not revelant anymore
   const proposalStage: ITransformedStage[] = [
@@ -33,7 +33,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       type: ProposalStages.MULTISIG_APPROVAL,
       variant: "approvalThreshold",
       title: "Onchain multisig",
-      status: proposalVariant!,
+      status: proposalStatus!,
       disabled: false,
       proposalId: proposalId,
       providerId: "1",

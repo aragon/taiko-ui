@@ -56,12 +56,12 @@ export const useProposalStatus = (proposal: OptimisticProposal) => {
 
     setStatus(
       proposal?.vetoTally >= minVetoVotingPower
-        ? "vetoed"
+        ? ProposalStatus.VETOED
         : proposal?.active
-          ? "active"
+          ? ProposalStatus.ACTIVE
           : proposal?.executed
-            ? "executed"
-            : "accepted"
+            ? ProposalStatus.EXECUTED
+            : ProposalStatus.ACCEPTED
     );
   }, [
     proposal?.vetoTally,
