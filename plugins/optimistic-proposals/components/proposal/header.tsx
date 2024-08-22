@@ -65,7 +65,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalIdx, proposal }
           <div className="flex items-center gap-x-2">
             <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
             <div className="flex gap-x-1 text-base leading-tight ">
-              <If condition={status == ProposalStatus.VETOED}>
+              <If condition={proposalStatus == ProposalStatus.VETOED}>
                 <Then>
                   <span className="text-neutral-500">The proposal has been defeated</span>
                 </Then>
