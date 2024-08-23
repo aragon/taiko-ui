@@ -1,16 +1,17 @@
 import { DelegateAnnouncerAbi } from "../artifacts/DelegationWall.sol";
 import { PUB_DELEGATION_WALL_CONTRACT_ADDRESS } from "@/constants";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { toHex } from "viem";
 import { useAlerts } from "@/context/Alerts";
-import { logger } from "@/services/logger";
 import { uploadToPinata } from "@/utils/ipfs";
 import { useCallback, useEffect, useState } from "react";
-import { toHex } from "viem";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { type IAnnouncementMetadata } from "../utils/types";
+import { useDelegates } from "./useDelegates";
 
 export function useAnnounceDelegation(onSuccess?: () => void) {
   const { addAlert } = useAlerts();
   const { writeContract, data: hash, error, status } = useWriteContract();
+  const { refetch } = useDelegates();
   const [uploading, setUploading] = useState(false);
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
 
@@ -23,7 +24,7 @@ export function useAnnounceDelegation(onSuccess?: () => void) {
           timeout: 4 * 1000,
         });
       } else {
-        logger.error("Could not create delegate profile", error);
+        console.error("Could not create delegate profile", error);
         addAlert("Could not create your delegate profile", { type: "error" });
       }
       return;
@@ -44,6 +45,9 @@ export function useAnnounceDelegation(onSuccess?: () => void) {
       type: "success",
       txHash: hash,
     });
+
+    // Force a refresh of the delegates list
+    refetch();
 
     onSuccess?.();
   }, [status, hash, isConfirming, isConfirmed]);
@@ -74,7 +78,7 @@ export function useAnnounceDelegation(onSuccess?: () => void) {
           type: "error",
         });
 
-        logger.error("Could not upload delegate profile metadata to IPFS", error);
+        console.error("Could not upload delegate profile metadata to IPFS", error);
       }
     },
     [writeContract]
