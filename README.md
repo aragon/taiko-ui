@@ -32,7 +32,7 @@ The data that we need to encrypt includes:
 - **Human readable data**, explaining why the proposal should be approved
 - The **actions to execute** if the proposal passes
 
-### Decryption steps
+### Encryption steps
 
 1. A user signs a static payload using his/her wallet. The resulting hash is used as a 256-bit private key to generate an ephemeral, in-memory key pair
 2. One of the multisig members generates a random symmetric key and uses it to encrypt the metadata and the actions
@@ -47,7 +47,7 @@ The data that we need to encrypt includes:
 
 ![](./readme-encryption-flow.png)
 
-### Encryption steps
+### Decryption steps
 
 1. One of the multisig members fetches the proposal, along with the pinned IPFS metadata
 2. The member signs the same predefined payload to generate the in-memory key pair
