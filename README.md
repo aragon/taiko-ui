@@ -37,7 +37,7 @@ The data that we need to encrypt includes:
 1. A user signs a static payload using his/her wallet. The resulting hash is used as a 256-bit private key to generate an ephemeral, in-memory key pair
 2. One of the multisig members generates a random symmetric key and uses it to encrypt the metadata and the actions
 3. The member fetches the public keys corresponding to the current Security Council members
-4. For each member's public key, he uses it to encrypt the key from step (2)
+4. For each member's public key, he uses it to encrypt the symmetric key from step (2)
 5. This generates a payload with:
   - The (symmetrically) encrypted metadata and proposals
   - The (asymmetrically) encrypted keys that only each member can recover
