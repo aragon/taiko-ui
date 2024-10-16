@@ -9,7 +9,7 @@ import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
 import { MainSection } from "@/components/layout/main-section";
 import { useCreateProposal } from "../hooks/useCreateProposal";
 import { useCanCreateProposal } from "../hooks/useCanCreateProposal";
-import { usePublicKeyRegistry } from "../hooks/usePublicKeyRegistry";
+import { useEncryptionRegistry } from "../hooks/useEncryptionRegistry";
 import { useMultisigMembers } from "@/plugins/members/hooks/useMultisigMembers";
 import { RawAction } from "@/utils/types";
 import { NewActionDialog, NewActionType } from "@/components/dialogs/NewActionDialog";
@@ -18,12 +18,13 @@ import { AddActionCard } from "@/components/cards/AddActionCard";
 import { ProposalActions } from "@/components/proposalActions/proposalActions";
 import { downloadAsFile } from "@/utils/download-as-file";
 import { encodeActionsAsJson } from "@/utils/json-actions";
+import { ADDRESS_ZERO } from "@/utils/evm";
 
 export default function Create() {
   const { address: selfAddress, isConnected } = useAccount();
   const { canCreate } = useCanCreateProposal();
   const [addActionType, setAddActionType] = useState<NewActionType>("");
-  const { data: registeredSigners } = usePublicKeyRegistry();
+  const { data: encryptionRegMembers } = useEncryptionRegistry();
   const {
     title,
     summary,
@@ -72,10 +73,12 @@ export default function Create() {
     setResources([].concat(resources as any));
   };
 
-  const filteredSignerItems = registeredSigners.filter((signer) => {
-    return multisigMembers.includes(signer.address);
+  const filteredEncryptionRecipients = encryptionRegMembers.filter((member) => {
+    // If the appointed address is 0x0, use the own address
+    const addr = member.appointedWallet === ADDRESS_ZERO ? member.address : member.appointedWallet;
+    return multisigMembers.includes(addr);
   });
-  const signersWithPubKey = filteredSignerItems.length;
+  const signersWithPubKey = filteredEncryptionRecipients.length;
 
   const exportAsJson = () => {
     if (!actions.length) return;
@@ -282,12 +285,12 @@ const PlaceHolderOr = ({
   const { open } = useWeb3Modal();
   const { publicKey, requestSignature } = useDerivedWallet();
   const {
-    data: registeredSigners,
+    data: encryptionRegMembers,
     registerPublicKey,
     isLoading: isLoadingPubKeys,
     isConfirming: isRegisteringPublicKey,
-  } = usePublicKeyRegistry();
-  const hasPubKeyRegistered = registeredSigners.some((item) => item.address === selfAddress);
+  } = useEncryptionRegistry();
+  const hasPubKeyRegistered = encryptionRegMembers.some((item) => item.address === selfAddress);
 
   return (
     <If condition={isLoadingPubKeys}>

@@ -2,14 +2,15 @@ import { encodeAbiParameters, keccak256, toHex } from "viem";
 import { EncryptedProposalMetadata } from "../utils/types";
 import { hexToUint8Array } from "@/utils/hex";
 import { encryptProposal, encryptSymmetricKey } from "@/utils/encryption";
-import { ProposalMetadata, RawAction } from "@/utils/types";
-import { usePublicKeyRegistry } from "./usePublicKeyRegistry";
+import type { ProposalMetadata, RawAction } from "@/utils/types";
+import { useEncryptionRegistry } from "./useEncryptionRegistry";
 import { RawActionListAbi } from "../artifacts/RawActionListAbi";
 import { getContentCid } from "@/utils/ipfs";
 import { useMultisigMembers } from "@/plugins/members/hooks/useMultisigMembers";
+import { ADDRESS_ZERO } from "@/utils/evm";
 
 export function useEncryptedData() {
-  const { data: pubKeyItems, isLoading: isLoadingPubKeys } = usePublicKeyRegistry();
+  const { data: encryptionRegMembers, isLoading: isLoadingPubKeys } = useEncryptionRegistry();
   const { members: signers, isLoading: isLoadingMultisig, error: multisigMembersError } = useMultisigMembers();
 
   const encryptProposalData = async (privateMetadata: ProposalMetadata, actions: RawAction[]) => {
@@ -17,17 +18,19 @@ export function useEncryptedData() {
     if (isLoadingPubKeys || isLoadingMultisig) throw new Error("The multisig members are not available yet");
     else if (multisigMembersError) throw multisigMembersError;
 
-    // Encrypt data
+    // Encrypt data and generate an ephemeral symkey
     const strMetadata = JSON.stringify(privateMetadata);
     const { encrypted: cipherData, symmetricKey } = encryptProposal(strMetadata, hexToUint8Array(actionsBytes));
 
     // Only for those who are on the multisig
-    const filteredSignerItems = pubKeyItems.filter((item) => {
-      return signers.includes(item.address);
+    const filteredEncryptionRecipients = encryptionRegMembers.filter((member) => {
+      // If the appointed address is 0x0, use the own address
+      const addr = member.appointedWallet === ADDRESS_ZERO ? member.address : member.appointedWallet;
+      return signers.includes(addr);
     });
     const encryptedSymKeys = encryptSymmetricKey(
       symmetricKey,
-      filteredSignerItems.map((item) => hexToUint8Array(item.publicKey))
+      filteredEncryptionRecipients.map((item) => hexToUint8Array(item.publicKey))
     );
 
     // Hash the raw actions
