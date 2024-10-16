@@ -11,7 +11,7 @@ import { debounce } from "@/utils/debounce";
 import { useTransactionManager } from "@/hooks/useTransactionManager";
 import { Address } from "viem";
 
-export function useEncryptionRegistry() {
+export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?: () => any } = {}) {
   const config = useConfig();
   const { address } = useAccount();
   const { addAlert } = useAlerts();
@@ -76,6 +76,7 @@ export function useEncryptionRegistry() {
     onSuccess() {
       setTimeout(() => refetch(), 1000 * 2);
       setIsWaiting(false);
+      onAppointSuccess?.();
     },
     // Err
     onErrorMessage: "Could not appoint the wallet",

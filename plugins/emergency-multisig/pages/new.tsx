@@ -13,18 +13,17 @@ import { useEncryptionRegistry } from "../hooks/useEncryptionRegistry";
 import { useMultisigMembers } from "@/plugins/members/hooks/useMultisigMembers";
 import { RawAction } from "@/utils/types";
 import { NewActionDialog, NewActionType } from "@/components/dialogs/NewActionDialog";
-import { Address } from "viem";
 import { AddActionCard } from "@/components/cards/AddActionCard";
 import { ProposalActions } from "@/components/proposalActions/proposalActions";
 import { downloadAsFile } from "@/utils/download-as-file";
 import { encodeActionsAsJson } from "@/utils/json-actions";
 import { ADDRESS_ZERO } from "@/utils/evm";
+import { AddressText } from "@/components/text/address";
+import { AppointDialog } from "@/components/dialogs/AppointDialog";
+import { AccountEncryptionStatus, useAccountEncryptionStatus } from "../hooks/useAccountEncryptionStatus";
 
 export default function Create() {
-  const { address: selfAddress, isConnected } = useAccount();
-  const { canCreate } = useCanCreateProposal();
   const [addActionType, setAddActionType] = useState<NewActionType>("");
-  const { data: encryptionRegMembers } = useEncryptionRegistry();
   const {
     title,
     summary,
@@ -39,6 +38,7 @@ export default function Create() {
     isCreating,
     submitProposal,
   } = useCreateProposal();
+  const { data: encryptionRegMembers } = useEncryptionRegistry();
   const { members: multisigMembers } = useMultisigMembers();
 
   const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,12 +73,12 @@ export default function Create() {
     setResources([].concat(resources as any));
   };
 
-  const filteredEncryptionRecipients = encryptionRegMembers.filter((member) => {
+  const filteredEncryptionMembers = encryptionRegMembers.filter((member) => {
     // If the appointed address is 0x0, use the own address
     const addr = member.appointedWallet === ADDRESS_ZERO ? member.address : member.appointedWallet;
     return multisigMembers.includes(addr);
   });
-  const signersWithPubKey = filteredEncryptionRecipients.length;
+  const signersWithPubKey = filteredEncryptionMembers.length;
 
   const exportAsJson = () => {
     if (!actions.length) return;
@@ -93,7 +93,7 @@ export default function Create() {
         <h1 className="mb-8 line-clamp-1 flex flex-1 shrink-0 text-2xl font-normal leading-tight text-neutral-800 md:text-3xl">
           Create Proposal
         </h1>
-        <PlaceHolderOr selfAddress={selfAddress} canCreate={canCreate} isConnected={isConnected}>
+        <PlaceHolderOrChildren>
           <div className="mb-6">
             <InputText
               className=""
@@ -263,7 +263,7 @@ export default function Create() {
               </If>
             </Button>
           </div>
-        </PlaceHolderOr>
+        </PlaceHolderOrChildren>
       </div>
     </MainSection>
   );
@@ -271,66 +271,95 @@ export default function Create() {
 
 // HELPERS
 
-const PlaceHolderOr = ({
-  selfAddress,
-  isConnected,
-  canCreate,
-  children,
-}: {
-  selfAddress: Address | undefined;
-  isConnected: boolean;
-  canCreate: boolean | undefined;
-  children: ReactNode;
-}) => {
+const PlaceHolderOrChildren = ({ children }: { children: ReactNode }) => {
   const { open } = useWeb3Modal();
-  const { publicKey, requestSignature } = useDerivedWallet();
-  const {
-    data: encryptionRegMembers,
-    registerPublicKey,
-    isLoading: isLoadingPubKeys,
-    isConfirming: isRegisteringPublicKey,
-  } = useEncryptionRegistry();
-  const hasPubKeyRegistered = encryptionRegMembers.some((item) => item.address === selfAddress);
+  const { requestSignature } = useDerivedWallet();
+  const { address: selfAddress } = useAccount();
+  const [showAppointModal, setShowAppointModal] = useState(false);
+  const { appointWallet, registerPublicKey, isConfirming } = useEncryptionRegistry();
+  const { status, appointedWallet } = useAccountEncryptionStatus();
 
   return (
-    <If condition={isLoadingPubKeys}>
-      <Then>
-        {/* No public keys yet */}
-        <div>
-          <PleaseWaitSpinner fullMessage="Loading the signer public keys..." />
-        </div>
-      </Then>
-      <ElseIf condition={!selfAddress || !isConnected}>
-        {/* Not connected */}
-        <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
-          Please connect your wallet to continue.
-        </MissingContentView>
-      </ElseIf>
-      <ElseIf condition={selfAddress && !hasPubKeyRegistered}>
-        {/* Public key not registered yet */}
-        <MissingContentView
-          callToAction="Register your public key"
-          onClick={() => registerPublicKey()}
-          isLoading={isRegisteringPublicKey}
-        >
-          You haven&apos;t registered a public key yet. A public key is necessary in order for proposals to have private
-          data that only members can decrypt. You will sign a deterministic text, which will be used to generate an
-          encryption key only for this DAO.
-        </MissingContentView>
-      </ElseIf>
-      <ElseIf condition={!publicKey}>
-        {/* Not signed in */}
-        <MissingContentView callToAction="Sign in to continue" onClick={() => requestSignature()}>
-          Please sign in with your wallet to decrypt the private proposal data.
-        </MissingContentView>
-      </ElseIf>
-      <ElseIf condition={!canCreate}>
-        {/* Not a member */}
-        <MissingContentView>
-          You cannot create proposals on the multisig because you are not currently defined as a member.
-        </MissingContentView>
-      </ElseIf>
-      <Else>{children}</Else>
-    </If>
+    <>
+      <If condition={status === AccountEncryptionStatus.LOADING_ENCRYPTION_MEMBERS}>
+        <Then>
+          {/* Loading encryption members */}
+          <div>
+            <PleaseWaitSpinner fullMessage="Loading the signer public keys..." />
+          </div>
+        </Then>
+        <ElseIf condition={status === AccountEncryptionStatus.NOT_CONNECTED}>
+          {/* Not connected */}
+          <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
+            Please connect your wallet to continue.
+          </MissingContentView>
+        </ElseIf>
+        <ElseIf condition={status === AccountEncryptionStatus.NOT_A_MULTISIG_MEMBER}>
+          <MissingContentView>You are not currently registered as a multisig member.</MissingContentView>
+        </ElseIf>
+        <ElseIf condition={status === AccountEncryptionStatus.CANNOT_CREATE}>
+          <MissingContentView>You cannot currently create proposals on the emergency multisig.</MissingContentView>
+        </ElseIf>
+        <ElseIf condition={status === AccountEncryptionStatus.MUST_APPOINT}>
+          {/* Smart contracts should appoint a wallet */}
+          <MissingContentView
+            callToAction="Appoint a decryption wallet"
+            onClick={() => setShowAppointModal(true)}
+            isLoading={isConfirming}
+          >
+            Emergency multisig members need to register a public key in order for proposals to have private data that
+            only members can decrypt. However, addresses behing a smart contract cannot cryptographically sign or
+            decrypt.
+            <br />
+            You need to appoint an externally owned address that can work with cryptographic primitives, so that this
+            wallet can access and approve emergency proposals.
+          </MissingContentView>
+        </ElseIf>
+        <ElseIf condition={status === AccountEncryptionStatus.SMART_CONTRACTS_CANNOT_DECRYPT}>
+          <MissingContentView>
+            Smart wallets have no means of engaging in proposals with private metadata. Your account has appointed{" "}
+            <AddressText>{appointedWallet}</AddressText> as the externally owned wallet that can decrypt and eventually
+            execute private proposals.
+          </MissingContentView>
+        </ElseIf>
+        <ElseIf condition={status === AccountEncryptionStatus.PUB_KEY_NOT_SET}>
+          {/* Public key not registered yet */}
+          <MissingContentView
+            callToAction="Register your public key"
+            onClick={() => registerPublicKey()}
+            isLoading={isConfirming}
+          >
+            You haven&apos;t registered a public key yet. A public key is necessary in order for proposals to have
+            private data that only members can decrypt. You will sign a deterministic text, which will be used to
+            generate an encryption key only for this DAO.
+          </MissingContentView>
+        </ElseIf>
+        <ElseIf condition={status === AccountEncryptionStatus.NOT_APPOINTED}>
+          {/* Appointed someone else */}
+          <MissingContentView
+            callToAction={selfAddress ? "Appoint yourself" : undefined}
+            onClick={() => (selfAddress ? appointWallet(selfAddress) : null)}
+            isLoading={isConfirming}
+          >
+            Your account has appointed <AddressText>{appointedWallet}</AddressText> as the externally owned wallet that
+            can create, decrypt and eventually execute private proposals on your behalf.
+            <br />
+            In order to engage in private proposals by yourself, you can appoint your own address so that you can
+            participate again. Note that you will not be able to access any encrypted data generated before the change.
+          </MissingContentView>
+        </ElseIf>
+        <ElseIf condition={status === AccountEncryptionStatus.NOT_SIGNED_IN}>
+          <MissingContentView callToAction="Sign in to continue" onClick={() => requestSignature()}>
+            Please sign in with your wallet to decrypt the private proposal data.
+          </MissingContentView>
+        </ElseIf>
+        <Else>{children}</Else>
+      </If>
+
+      {/* Modal */}
+      <If condition={showAppointModal}>
+        <AppointDialog onClose={() => setShowAppointModal(false)} />
+      </If>
+    </>
   );
 };
