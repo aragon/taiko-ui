@@ -1,6 +1,6 @@
 import { useAccount, useReadContract } from "wagmi";
-import { PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
-import { MultisigPluginAbi } from "../artifacts/MultisigPlugin";
+import { PUB_SIGNER_LIST_CONTRACT_ADDRESS } from "@/constants";
+import { SignerListAbi } from "@/plugins/members/artifacts/SignerList";
 
 export function useCanCreateProposal() {
   const { address } = useAccount();
@@ -10,9 +10,9 @@ export function useCanCreateProposal() {
     error,
     refetch,
   } = useReadContract({
-    abi: MultisigPluginAbi,
-    address: PUB_MULTISIG_PLUGIN_ADDRESS,
-    functionName: "isMember",
+    abi: SignerListAbi,
+    address: PUB_SIGNER_LIST_CONTRACT_ADDRESS,
+    functionName: "isListedOrAppointedByListed",
     args: [address!],
 
     query: {

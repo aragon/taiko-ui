@@ -3,7 +3,7 @@ export const EncryptionRegistryAbi = [
     type: "constructor",
     inputs: [
       {
-        name: "_addresslistSource",
+        name: "_addresslist",
         type: "address",
         internalType: "contract Addresslist",
       },
@@ -12,46 +12,7 @@ export const EncryptionRegistryAbi = [
   },
   {
     type: "function",
-    name: "appointWallet",
-    inputs: [
-      {
-        name: "_newAddress",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "getRegisteredAddresses",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "address[]",
-        internalType: "address[]",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "getRegisteredAddressesLength",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "members",
+    name: "accounts",
     inputs: [
       {
         name: "",
@@ -75,7 +36,71 @@ export const EncryptionRegistryAbi = [
   },
   {
     type: "function",
-    name: "registeredAddresses",
+    name: "appointWallet",
+    inputs: [
+      {
+        name: "_newWallet",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "appointedBy",
+    inputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getAppointedWallet",
+    inputs: [
+      {
+        name: "_member",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getRegisteredAccounts",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address[]",
+        internalType: "address[]",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "registeredAccounts",
     inputs: [
       {
         name: "",
@@ -110,7 +135,7 @@ export const EncryptionRegistryAbi = [
     name: "setPublicKey",
     inputs: [
       {
-        name: "_memberAddress",
+        name: "_accountOwner",
         type: "address",
         internalType: "address",
       },
@@ -124,11 +149,30 @@ export const EncryptionRegistryAbi = [
     stateMutability: "nonpayable",
   },
   {
+    type: "function",
+    name: "supportsInterface",
+    inputs: [
+      {
+        name: "_interfaceId",
+        type: "bytes4",
+        internalType: "bytes4",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
     type: "event",
     name: "PublicKeySet",
     inputs: [
       {
-        name: "member",
+        name: "account",
         type: "address",
         indexed: false,
         internalType: "address",
@@ -147,7 +191,7 @@ export const EncryptionRegistryAbi = [
     name: "WalletAppointed",
     inputs: [
       {
-        name: "member",
+        name: "account",
         type: "address",
         indexed: false,
         internalType: "address",
@@ -163,6 +207,11 @@ export const EncryptionRegistryAbi = [
   },
   {
     type: "error",
+    name: "AlreadyAppointed",
+    inputs: [],
+  },
+  {
+    type: "error",
     name: "CannotAppointContracts",
     inputs: [],
   },
@@ -173,17 +222,17 @@ export const EncryptionRegistryAbi = [
   },
   {
     type: "error",
-    name: "NotAppointed",
+    name: "MustBeAppointed",
     inputs: [],
   },
   {
     type: "error",
-    name: "OwnerNotAppointed",
+    name: "MustBeListed",
     inputs: [],
   },
   {
     type: "error",
-    name: "RegistrationForbidden",
+    name: "MustResetAppointment",
     inputs: [],
   },
 ] as const;

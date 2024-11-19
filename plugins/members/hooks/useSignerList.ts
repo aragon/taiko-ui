@@ -1,19 +1,21 @@
-import { usePublicClient } from "wagmi";
-import { MultisigPluginAbi } from "@/plugins/members/artifacts/MultisigPlugin.sol";
-import { PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
+import { useConfig, usePublicClient } from "wagmi";
+import { SignerListAbi } from "../artifacts/SignerList";
+import { PUB_SIGNER_LIST_CONTRACT_ADDRESS } from "@/constants";
 import { Address, PublicClient, getAbiItem } from "viem";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { readContract } from "@wagmi/core";
 
-const MembersAddedEvent = getAbiItem({
-  abi: MultisigPluginAbi,
-  name: "MembersAdded",
+const SignersAddedEvent = getAbiItem({
+  abi: SignerListAbi,
+  name: "SignersAdded",
 });
-const MembersRemovedEvent = getAbiItem({
-  abi: MultisigPluginAbi,
-  name: "MembersRemoved",
+const SignersRemovedEvent = getAbiItem({
+  abi: SignerListAbi,
+  name: "SignersRemoved",
 });
 
-export function useMultisigMembers() {
+export function useSignerList() {
   const publicClient = usePublicClient();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -44,27 +46,44 @@ export function useMultisigMembers() {
       .catch((err: any) => {
         console.error(err);
         setIsLoading(false);
-        setError(err);
+        setError(new Error("Error: Could not retrieve the list of members"));
       });
   };
 
-  // return { members, status, refetch };
-
   return {
-    members: signers,
+    signers,
     isLoading,
     error,
     refetch: loadSigners,
   };
 }
 
+export function useEncryptionRecipients() {
+  const config = useConfig();
+
+  return useQuery({
+    queryKey: ["encryption-registry-recipients-fetch", PUB_SIGNER_LIST_CONTRACT_ADDRESS],
+    queryFn: () =>
+      readContract(config, {
+        abi: SignerListAbi,
+        address: PUB_SIGNER_LIST_CONTRACT_ADDRESS,
+        functionName: "getEncryptionRecipients",
+      }),
+    retry: true,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    retryOnMount: true,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
 // Helpers
 
-function fetchAddedMembers(publicClient: PublicClient): Promise<MemberAddRemoveItem[]> {
+function fetchAddedMembers(publicClient: PublicClient): Promise<SignerAddRemoveItem[]> {
   return publicClient
     .getLogs({
-      address: PUB_MULTISIG_PLUGIN_ADDRESS,
-      event: MembersAddedEvent,
+      address: PUB_SIGNER_LIST_CONTRACT_ADDRESS,
+      event: SignersAddedEvent,
       // args: {},
       fromBlock: BigInt(0),
       toBlock: "latest",
@@ -75,18 +94,18 @@ function fetchAddedMembers(publicClient: PublicClient): Promise<MemberAddRemoveI
       return logs.map((item) => {
         return {
           blockNumber: item.blockNumber,
-          added: item.args.members || ([] as any),
+          added: item.args.signers || ([] as any),
           removed: [],
         };
       });
     });
 }
 
-function fetchRemovedMembers(publicClient: PublicClient): Promise<MemberAddRemoveItem[]> {
+function fetchRemovedMembers(publicClient: PublicClient): Promise<SignerAddRemoveItem[]> {
   return publicClient
     .getLogs({
-      address: PUB_MULTISIG_PLUGIN_ADDRESS,
-      event: MembersRemovedEvent,
+      address: PUB_SIGNER_LIST_CONTRACT_ADDRESS,
+      event: SignersRemovedEvent,
       // args: {},
       fromBlock: BigInt(0),
       toBlock: "latest",
@@ -98,19 +117,19 @@ function fetchRemovedMembers(publicClient: PublicClient): Promise<MemberAddRemov
         return {
           blockNumber: item.blockNumber,
           added: [],
-          removed: item.args.members || ([] as any),
+          removed: item.args.signers || ([] as any),
         };
       });
     });
 }
 
-type MemberAddRemoveItem = {
+type SignerAddRemoveItem = {
   blockNumber: bigint;
   added: Address[];
   removed: Address[];
 };
 
-function computeFinalList(added: MemberAddRemoveItem[], removed: MemberAddRemoveItem[]) {
+function computeFinalList(added: SignerAddRemoveItem[], removed: SignerAddRemoveItem[]) {
   const merged = added.concat(removed);
   const result = [] as Address[];
 

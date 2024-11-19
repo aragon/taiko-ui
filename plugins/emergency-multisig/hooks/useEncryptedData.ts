@@ -6,32 +6,37 @@ import type { ProposalMetadata, RawAction } from "@/utils/types";
 import { useEncryptionRegistry } from "./useEncryptionRegistry";
 import { RawActionListAbi } from "../artifacts/RawActionListAbi";
 import { getContentCid } from "@/utils/ipfs";
-import { useMultisigMembers } from "@/plugins/members/hooks/useMultisigMembers";
-import { ADDRESS_ZERO } from "@/utils/evm";
+import { useEncryptionRecipients } from "@/plugins/members/hooks/useSignerList";
 
 export function useEncryptedData() {
-  const { data: encryptionRegMembers, isLoading: isLoadingPubKeys } = useEncryptionRegistry();
-  const { members: signers, isLoading: isLoadingMultisig, error: multisigMembersError } = useMultisigMembers();
+  const {
+    data: encryptionRecipients, // Filtering out former members
+    isLoading: isLoadingSigners,
+    error: signerListError,
+  } = useEncryptionRecipients();
+  const { data: encryptionAccounts, isLoading: isLoadingPubKeys } = useEncryptionRegistry();
 
   const encryptProposalData = async (privateMetadata: ProposalMetadata, actions: RawAction[]) => {
     const actionsBytes = encodeAbiParameters(RawActionListAbi, [actions]);
-    if (isLoadingPubKeys || isLoadingMultisig) throw new Error("The multisig members are not available yet");
-    else if (multisigMembersError) throw multisigMembersError;
+    if (isLoadingPubKeys || isLoadingSigners || !encryptionRecipients)
+      throw new Error("The list of signers is not available yet");
+    else if (signerListError) throw signerListError;
 
     // Encrypt data and generate an ephemeral symkey
     const strMetadata = JSON.stringify(privateMetadata);
     const { encrypted: cipherData, symmetricKey } = encryptProposal(strMetadata, hexToUint8Array(actionsBytes));
 
-    // Only for those who are on the multisig
-    const filteredEncryptionRecipients = encryptionRegMembers.filter((member) => {
-      // If the appointed address is 0x0, use the own address
-      const addr = member.appointedWallet === ADDRESS_ZERO ? member.address : member.appointedWallet;
-      return signers.includes(addr);
-    });
-    const encryptedSymKeys = encryptSymmetricKey(
-      symmetricKey,
-      filteredEncryptionRecipients.map((item) => hexToUint8Array(item.publicKey))
-    );
+    // Only those who are on the signerList (encryptionRecipients)
+    const encryptionPubKeys: Uint8Array[] = [];
+    for (const recipient of encryptionRecipients) {
+      const account = encryptionAccounts.find((a) => a.owner === recipient || a.appointedWallet === recipient);
+      if (!account) continue;
+
+      encryptionPubKeys.push(hexToUint8Array(account.publicKey));
+    }
+
+    // Encrypting the symmetric key so that each individual member can recover it
+    const encryptedSymKeys = encryptSymmetricKey(symmetricKey, encryptionPubKeys);
 
     // Hash the raw actions
     const hashedActions = keccak256(actionsBytes);

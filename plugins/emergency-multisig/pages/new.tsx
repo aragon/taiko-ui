@@ -8,9 +8,8 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
 import { MainSection } from "@/components/layout/main-section";
 import { useCreateProposal } from "../hooks/useCreateProposal";
-import { useCanCreateProposal } from "../hooks/useCanCreateProposal";
 import { useEncryptionRegistry } from "../hooks/useEncryptionRegistry";
-import { useMultisigMembers } from "@/plugins/members/hooks/useMultisigMembers";
+import { useEncryptionRecipients } from "@/plugins/members/hooks/useSignerList";
 import { RawAction } from "@/utils/types";
 import { NewActionDialog, NewActionType } from "@/components/dialogs/NewActionDialog";
 import { AddActionCard } from "@/components/cards/AddActionCard";
@@ -38,8 +37,12 @@ export default function Create() {
     isCreating,
     submitProposal,
   } = useCreateProposal();
-  const { data: encryptionRegMembers } = useEncryptionRegistry();
-  const { members: multisigMembers } = useMultisigMembers();
+  const {
+    data: encryptionRecipients, // Filtering out former members
+    isLoading: isLoadingSigners,
+    error: signerListError,
+  } = useEncryptionRecipients();
+  const { data: encryptionAccounts, isLoading: isLoadingPubKeys } = useEncryptionRegistry();
 
   const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event?.target?.value);
@@ -73,12 +76,13 @@ export default function Create() {
     setResources([].concat(resources as any));
   };
 
-  const filteredEncryptionMembers = encryptionRegMembers.filter((member) => {
-    // If the appointed address is 0x0, use the own address
-    const addr = member.appointedWallet === ADDRESS_ZERO ? member.address : member.appointedWallet;
-    return multisigMembers.includes(addr);
-  });
-  const signersWithPubKey = filteredEncryptionMembers.length;
+  let signersWithPubKey = 0;
+  for (const recipient of encryptionRecipients || []) {
+    const account = encryptionAccounts.find((a) => a.owner === recipient || a.appointedWallet === recipient);
+    if (!account) continue;
+
+    signersWithPubKey++;
+  }
 
   const exportAsJson = () => {
     if (!actions.length) return;

@@ -1,4 +1,4 @@
-export const EmergencyMultisigPluginAbi = [
+export const MultisigPluginAbi = [
   {
     type: "function",
     name: "UPDATE_MULTISIG_SETTINGS_PERMISSION_ID",
@@ -33,6 +33,11 @@ export const EmergencyMultisigPluginAbi = [
         name: "_proposalId",
         type: "uint256",
         internalType: "uint256",
+      },
+      {
+        name: "_tryExecution",
+        type: "bool",
+        internalType: "bool",
       },
     ],
     outputs: [],
@@ -86,19 +91,31 @@ export const EmergencyMultisigPluginAbi = [
     name: "createProposal",
     inputs: [
       {
-        name: "_encryptedPayloadURI",
+        name: "_metadataURI",
         type: "bytes",
         internalType: "bytes",
       },
       {
-        name: "_publicMetadataUriHash",
-        type: "bytes32",
-        internalType: "bytes32",
-      },
-      {
-        name: "_destinationActionsHash",
-        type: "bytes32",
-        internalType: "bytes32",
+        name: "_destinationActions",
+        type: "tuple[]",
+        internalType: "struct IDAO.Action[]",
+        components: [
+          {
+            name: "to",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "value",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "data",
+            type: "bytes",
+            internalType: "bytes",
+          },
+        ],
       },
       {
         name: "_destinationPlugin",
@@ -142,33 +159,6 @@ export const EmergencyMultisigPluginAbi = [
         type: "uint256",
         internalType: "uint256",
       },
-      {
-        name: "_metadataUri",
-        type: "bytes",
-        internalType: "bytes",
-      },
-      {
-        name: "_actions",
-        type: "tuple[]",
-        internalType: "struct IDAO.Action[]",
-        components: [
-          {
-            name: "to",
-            type: "address",
-            internalType: "address",
-          },
-          {
-            name: "value",
-            type: "uint256",
-            internalType: "uint256",
-          },
-          {
-            name: "data",
-            type: "bytes",
-            internalType: "bytes",
-          },
-        ],
-      },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -197,7 +187,7 @@ export const EmergencyMultisigPluginAbi = [
       {
         name: "parameters",
         type: "tuple",
-        internalType: "struct EmergencyMultisig.ProposalParameters",
+        internalType: "struct Multisig.ProposalParameters",
         components: [
           {
             name: "minApprovals",
@@ -217,19 +207,31 @@ export const EmergencyMultisigPluginAbi = [
         ],
       },
       {
-        name: "encryptedPayloadURI",
+        name: "metadataURI",
         type: "bytes",
         internalType: "bytes",
       },
       {
-        name: "publicMetadataUriHash",
-        type: "bytes32",
-        internalType: "bytes32",
-      },
-      {
-        name: "destinationActionsHash",
-        type: "bytes32",
-        internalType: "bytes32",
+        name: "destinationActions",
+        type: "tuple[]",
+        internalType: "struct IDAO.Action[]",
+        components: [
+          {
+            name: "to",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "value",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "data",
+            type: "bytes",
+            internalType: "bytes",
+          },
+        ],
       },
       {
         name: "destinationPlugin",
@@ -265,42 +267,6 @@ export const EmergencyMultisigPluginAbi = [
   },
   {
     type: "function",
-    name: "hashActions",
-    inputs: [
-      {
-        name: "_actions",
-        type: "tuple[]",
-        internalType: "struct IDAO.Action[]",
-        components: [
-          {
-            name: "to",
-            type: "address",
-            internalType: "address",
-          },
-          {
-            name: "value",
-            type: "uint256",
-            internalType: "uint256",
-          },
-          {
-            name: "data",
-            type: "bytes",
-            internalType: "bytes",
-          },
-        ],
-      },
-    ],
-    outputs: [
-      {
-        name: "actionsHash",
-        type: "bytes32",
-        internalType: "bytes32",
-      },
-    ],
-    stateMutability: "pure",
-  },
-  {
-    type: "function",
     name: "implementation",
     inputs: [],
     outputs: [
@@ -324,7 +290,7 @@ export const EmergencyMultisigPluginAbi = [
       {
         name: "_multisigSettings",
         type: "tuple",
-        internalType: "struct EmergencyMultisig.MultisigSettings",
+        internalType: "struct Multisig.MultisigSettings",
         components: [
           {
             name: "onlyListed",
@@ -335,6 +301,11 @@ export const EmergencyMultisigPluginAbi = [
             name: "minApprovals",
             type: "uint16",
             internalType: "uint16",
+          },
+          {
+            name: "destinationProposalDuration",
+            type: "uint64",
+            internalType: "uint64",
           },
           {
             name: "signerList",
@@ -379,6 +350,11 @@ export const EmergencyMultisigPluginAbi = [
         name: "minApprovals",
         type: "uint16",
         internalType: "uint16",
+      },
+      {
+        name: "destinationProposalDuration",
+        type: "uint64",
+        internalType: "uint64",
       },
       {
         name: "signerList",
@@ -458,7 +434,7 @@ export const EmergencyMultisigPluginAbi = [
       {
         name: "_multisigSettings",
         type: "tuple",
-        internalType: "struct EmergencyMultisig.MultisigSettings",
+        internalType: "struct Multisig.MultisigSettings",
         components: [
           {
             name: "onlyListed",
@@ -469,6 +445,11 @@ export const EmergencyMultisigPluginAbi = [
             name: "minApprovals",
             type: "uint16",
             internalType: "uint16",
+          },
+          {
+            name: "destinationProposalDuration",
+            type: "uint64",
+            internalType: "uint64",
           },
           {
             name: "signerList",
@@ -570,31 +551,6 @@ export const EmergencyMultisigPluginAbi = [
   },
   {
     type: "event",
-    name: "EmergencyProposalCreated",
-    inputs: [
-      {
-        name: "proposalId",
-        type: "uint256",
-        indexed: true,
-        internalType: "uint256",
-      },
-      {
-        name: "creator",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "encryptedPayloadURI",
-        type: "bytes",
-        indexed: false,
-        internalType: "bytes",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
     name: "Executed",
     inputs: [
       {
@@ -634,6 +590,12 @@ export const EmergencyMultisigPluginAbi = [
         type: "uint16",
         indexed: true,
         internalType: "uint16",
+      },
+      {
+        name: "destinationProposalDuration",
+        type: "uint64",
+        indexed: false,
+        internalType: "uint64",
       },
       {
         name: "signerList",
@@ -786,23 +748,12 @@ export const EmergencyMultisigPluginAbi = [
   },
   {
     type: "error",
-    name: "InvalidActions",
+    name: "InvalidAddressListSource",
     inputs: [
       {
-        name: "proposalId",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-  },
-  {
-    type: "error",
-    name: "InvalidMetadataUri",
-    inputs: [
-      {
-        name: "proposalId",
-        type: "uint256",
-        internalType: "uint256",
+        name: "givenContract",
+        type: "address",
+        internalType: "address",
       },
     ],
   },

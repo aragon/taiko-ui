@@ -12,46 +12,11 @@ import { useTransactionManager } from "@/hooks/useTransactionManager";
 import { Address } from "viem";
 
 export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?: () => any } = {}) {
-  const config = useConfig();
   const { address } = useAccount();
   const { addAlert } = useAlerts();
   const [isWaiting, setIsWaiting] = useState(false);
   const { publicKey, requestSignature } = useDerivedWallet();
-  const {
-    data: members,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ["public-key-registry-items-fetching", PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS],
-    queryFn: () => {
-      return readContract(config, {
-        abi: EncryptionRegistryAbi,
-        address: PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS,
-        functionName: "getRegisteredAddresses",
-      }).then((addresses) => {
-        return Promise.all(
-          addresses.map((address) => {
-            return readContract(config, {
-              abi: EncryptionRegistryAbi,
-              address: PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS,
-              functionName: "members",
-              args: [address],
-            }).then((result) => {
-              // zip values
-              const [appointedWallet, publicKey] = result;
-              return { address, appointedWallet, publicKey };
-            });
-          })
-        );
-      });
-    },
-    retry: true,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    retryOnMount: true,
-    staleTime: 1000 * 60 * 5,
-  });
+  const { data: accounts, isLoading, error, refetch } = useEncryptionRegistryAccounts();
 
   // Set public key transaction
   const { writeContract: setPubKeyWrite, isConfirming: isConfirmingPubK } = useTransactionManager({
@@ -87,8 +52,8 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
   });
 
   const registerPublicKey = async () => {
-    const member = members?.find((m) => m.address === address || m.appointedWallet === address);
-    if (!member) {
+    const account = accounts?.find((m) => m.owner === address || m.appointedWallet === address);
+    if (!account) {
       addAlert("You are not currently a registered signer or appointed member", { type: "error" });
       return;
     }
@@ -102,7 +67,7 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
         pubK = keys.publicKey;
       }
 
-      if (member.address === address) {
+      if (account.owner === address) {
         setPubKeyWrite({
           abi: EncryptionRegistryAbi,
           address: PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS,
@@ -114,7 +79,7 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
           abi: EncryptionRegistryAbi,
           address: PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS,
           functionName: "setPublicKey",
-          args: [member.address, uint8ArrayToHex(pubK)],
+          args: [account.owner, uint8ArrayToHex(pubK)],
         });
       }
     } catch (err) {
@@ -123,8 +88,8 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
   };
 
   const appointWallet = (appointedWallet: Address) => {
-    const member = members?.find((m) => m.address === address);
-    if (!member) {
+    const account = accounts?.find((m) => m.owner === address);
+    if (!account) {
       addAlert("You are not currently registered on the Encryption Registry", { type: "error" });
       return;
     }
@@ -140,11 +105,46 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
   };
 
   return {
-    data: members ?? [],
+    data: accounts ?? [],
     appointWallet,
     registerPublicKey,
     isLoading,
     isConfirming: isWaiting || isConfirmingPubK || isConfirmingAppoint,
     error,
   };
+}
+
+function useEncryptionRegistryAccounts() {
+  const config = useConfig();
+
+  return useQuery({
+    queryKey: ["encryption-registry-members-fetch", PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS],
+    queryFn: () => {
+      return readContract(config, {
+        abi: EncryptionRegistryAbi,
+        address: PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS,
+        functionName: "getRegisteredAccounts",
+      }).then((accounts) => {
+        return Promise.all(
+          accounts.map((accountAddress) =>
+            readContract(config, {
+              abi: EncryptionRegistryAbi,
+              address: PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS,
+              functionName: "accounts",
+              args: [accountAddress],
+            }).then((result) => {
+              // zip values
+              const [appointedWallet, publicKey] = result;
+              return { owner: accountAddress, appointedWallet, publicKey };
+            })
+          )
+        );
+      });
+    },
+    retry: true,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    retryOnMount: true,
+    staleTime: 1000 * 60 * 5,
+  });
 }

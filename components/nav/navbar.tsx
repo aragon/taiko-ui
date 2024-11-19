@@ -8,13 +8,13 @@ import { NavLink, type INavLink } from "./navLink";
 import { AvatarIcon, IconType } from "@aragon/ods";
 import { PUB_APP_NAME, PUB_PROJECT_LOGO } from "@/constants";
 import { useAccount } from "wagmi";
-import { useMultisigMembers } from "@/plugins/members/hooks/useMultisigMembers";
+import { useSignerList } from "@/plugins/members/hooks/useSignerList";
 
 export const Navbar: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
   const { address } = useAccount();
-  const { members } = useMultisigMembers();
-  const showAllLinks = address && members.includes(address);
+  const { signers } = useSignerList();
+  const showAllLinks = address && signers.includes(address);
 
   const navLinks: INavLink[] = [
     // { path: "/", id: "dashboard", name: "Dashboard" /*, icon: IconType.APP_DASHBOARD*/ },
