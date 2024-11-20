@@ -8,8 +8,8 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
 import { MainSection } from "@/components/layout/main-section";
 import { useCreateProposal } from "../hooks/useCreateProposal";
-import { useEncryptionRegistry } from "../hooks/useEncryptionRegistry";
-import { useEncryptionRecipients } from "@/plugins/members/hooks/useSignerList";
+import { useEncryptionRegistry } from "../../encryption/hooks/useEncryptionRegistry";
+import { useApproverWalletList } from "@/plugins/members/hooks/useSignerList";
 import { RawAction } from "@/utils/types";
 import { NewActionDialog, NewActionType } from "@/components/dialogs/NewActionDialog";
 import { AddActionCard } from "@/components/cards/AddActionCard";
@@ -19,7 +19,7 @@ import { encodeActionsAsJson } from "@/utils/json-actions";
 import { ADDRESS_ZERO } from "@/utils/evm";
 import { AddressText } from "@/components/text/address";
 import { AppointDialog } from "@/components/dialogs/AppointDialog";
-import { AccountEncryptionStatus, useAccountEncryptionStatus } from "../hooks/useAccountEncryptionStatus";
+import { AccountEncryptionStatus, useAccountEncryptionStatus } from "../../encryption/hooks/useAccountEncryptionStatus";
 
 export default function Create() {
   const [addActionType, setAddActionType] = useState<NewActionType>("");
@@ -39,9 +39,7 @@ export default function Create() {
   } = useCreateProposal();
   const {
     data: encryptionRecipients, // Filtering out former members
-    isLoading: isLoadingSigners,
-    error: signerListError,
-  } = useEncryptionRecipients();
+  } = useApproverWalletList();
   const { data: encryptionAccounts, isLoading: isLoadingPubKeys } = useEncryptionRegistry();
 
   const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {

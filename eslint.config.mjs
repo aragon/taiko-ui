@@ -1,10 +1,10 @@
 /* eslint-env node */
-module.exports = {
+export default {
   extends: ["next/core-web-vitals", "eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     project: "./tsconfig.json",
-    tsconfigRootDir: __dirname,
+    tsconfigRootDir: import.meta.dir,
     ecmaFeatures: {
       jsx: true,
     },

@@ -3,17 +3,17 @@ import { EncryptedProposalMetadata } from "../utils/types";
 import { hexToUint8Array } from "@/utils/hex";
 import { encryptProposal, encryptSymmetricKey } from "@/utils/encryption";
 import type { ProposalMetadata, RawAction } from "@/utils/types";
-import { useEncryptionRegistry } from "./useEncryptionRegistry";
+import { useEncryptionRegistry } from "../../encryption/hooks/useEncryptionRegistry";
 import { RawActionListAbi } from "../artifacts/RawActionListAbi";
 import { getContentCid } from "@/utils/ipfs";
-import { useEncryptionRecipients } from "@/plugins/members/hooks/useSignerList";
+import { useApproverWalletList } from "@/plugins/members/hooks/useSignerList";
 
 export function useEncryptedData() {
   const {
     data: encryptionRecipients, // Filtering out former members
     isLoading: isLoadingSigners,
     error: signerListError,
-  } = useEncryptionRecipients();
+  } = useApproverWalletList();
   const { data: encryptionAccounts, isLoading: isLoadingPubKeys } = useEncryptionRegistry();
 
   const encryptProposalData = async (privateMetadata: ProposalMetadata, actions: RawAction[]) => {

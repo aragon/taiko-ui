@@ -1,10 +1,11 @@
 import { useConfig, usePublicClient } from "wagmi";
 import { SignerListAbi } from "../artifacts/SignerList";
 import { PUB_SIGNER_LIST_CONTRACT_ADDRESS } from "@/constants";
-import { Address, PublicClient, getAbiItem } from "viem";
+import { Address, getAbiItem, GetLogsReturnType } from "viem";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { readContract } from "@wagmi/core";
+import { getLogsUntilNow } from "@/utils/evm";
 
 const SignersAddedEvent = getAbiItem({
   abi: SignerListAbi,
@@ -35,9 +36,12 @@ export function useSignerList() {
     }
     setIsLoading(true);
 
-    Promise.all([fetchAddedMembers(publicClient), fetchRemovedMembers(publicClient)])
-      .then(([added, removed]) => {
-        const result = computeFinalList(added, removed);
+    const addedProm = getLogsUntilNow(PUB_SIGNER_LIST_CONTRACT_ADDRESS, SignersAddedEvent, publicClient);
+    const removedProm = getLogsUntilNow(PUB_SIGNER_LIST_CONTRACT_ADDRESS, SignersRemovedEvent, publicClient);
+
+    Promise.all([addedProm, removedProm])
+      .then(([addedLogs, removedLogs]) => {
+        const result = computeCurrentSignerList(addedLogs, removedLogs);
 
         setSigners(result);
         setIsLoading(false);
@@ -58,7 +62,7 @@ export function useSignerList() {
   };
 }
 
-export function useEncryptionRecipients() {
+export function useApproverWalletList() {
   const config = useConfig();
 
   return useQuery({
@@ -77,60 +81,30 @@ export function useEncryptionRecipients() {
   });
 }
 
-// Helpers
-
-function fetchAddedMembers(publicClient: PublicClient): Promise<SignerAddRemoveItem[]> {
-  return publicClient
-    .getLogs({
-      address: PUB_SIGNER_LIST_CONTRACT_ADDRESS,
-      event: SignersAddedEvent,
-      // args: {},
-      fromBlock: BigInt(0),
-      toBlock: "latest",
-    })
-    .then((logs) => {
-      if (!logs) throw new Error("Empty response");
-
-      return logs.map((item) => {
-        return {
-          blockNumber: item.blockNumber,
-          added: item.args.signers || ([] as any),
-          removed: [],
-        };
-      });
-    });
-}
-
-function fetchRemovedMembers(publicClient: PublicClient): Promise<SignerAddRemoveItem[]> {
-  return publicClient
-    .getLogs({
-      address: PUB_SIGNER_LIST_CONTRACT_ADDRESS,
-      event: SignersRemovedEvent,
-      // args: {},
-      fromBlock: BigInt(0),
-      toBlock: "latest",
-    })
-    .then((logs) => {
-      if (!logs) throw new Error("Empty response");
-
-      return logs.map((item) => {
-        return {
-          blockNumber: item.blockNumber,
-          added: [],
-          removed: item.args.signers || ([] as any),
-        };
-      });
-    });
-}
-
 type SignerAddRemoveItem = {
   blockNumber: bigint;
   added: Address[];
   removed: Address[];
 };
 
-function computeFinalList(added: SignerAddRemoveItem[], removed: SignerAddRemoveItem[]) {
-  const merged = added.concat(removed);
+function computeCurrentSignerList(
+  addedLogs: GetLogsReturnType<typeof SignersAddedEvent>,
+  removedLogs: GetLogsReturnType<typeof SignersRemovedEvent>
+) {
+  const merged: Array<SignerAddRemoveItem> = addedLogs
+    .map((item) => ({
+      blockNumber: item.blockNumber,
+      added: item.args.signers || ([] as any),
+      removed: [],
+    }))
+    .concat(
+      removedLogs.map((item) => ({
+        blockNumber: item.blockNumber,
+        added: [],
+        removed: item.args.signers || ([] as any),
+      }))
+    );
+
   const result = [] as Address[];
 
   merged.sort((a, b) => {

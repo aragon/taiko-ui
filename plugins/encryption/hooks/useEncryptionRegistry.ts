@@ -1,15 +1,14 @@
 import { useState } from "react";
+import { useAccount } from "wagmi";
+import { Address } from "viem";
 import { EncryptionRegistryAbi } from "../artifacts/EncryptionRegistry";
-import { useConfig, useAccount } from "wagmi";
-import { readContract } from "@wagmi/core";
 import { PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS } from "@/constants";
-import { useQuery } from "@tanstack/react-query";
 import { uint8ArrayToHex } from "@/utils/hex";
-import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
+import { useDerivedWallet } from "@/hooks/useDerivedWallet";
 import { useAlerts } from "@/context/Alerts";
 import { debounce } from "@/utils/debounce";
 import { useTransactionManager } from "@/hooks/useTransactionManager";
-import { Address } from "viem";
+import { useEncryptionRegistryAccounts } from "./useEncryptionRegistryAccounts";
 
 export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?: () => any } = {}) {
   const { address } = useAccount();
@@ -112,39 +111,4 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
     isConfirming: isWaiting || isConfirmingPubK || isConfirmingAppoint,
     error,
   };
-}
-
-function useEncryptionRegistryAccounts() {
-  const config = useConfig();
-
-  return useQuery({
-    queryKey: ["encryption-registry-members-fetch", PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS],
-    queryFn: () => {
-      return readContract(config, {
-        abi: EncryptionRegistryAbi,
-        address: PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS,
-        functionName: "getRegisteredAccounts",
-      }).then((accounts) => {
-        return Promise.all(
-          accounts.map((accountAddress) =>
-            readContract(config, {
-              abi: EncryptionRegistryAbi,
-              address: PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS,
-              functionName: "accounts",
-              args: [accountAddress],
-            }).then((result) => {
-              // zip values
-              const [appointedWallet, publicKey] = result;
-              return { owner: accountAddress, appointedWallet, publicKey };
-            })
-          )
-        );
-      });
-    },
-    retry: true,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    retryOnMount: true,
-    staleTime: 1000 * 60 * 5,
-  });
 }

@@ -1,4 +1,7 @@
-import { Address, PublicClient } from "viem";
+import { PUB_DEPLOYMENT_BLOCK } from "@/constants";
+import { AbiEvent, Address, PublicClient } from "viem";
+
+const GET_LOGS_BLOCK_COUNT = 100_000;
 
 export const isAddress = (maybeAddress: any) => {
   if (!maybeAddress || typeof maybeAddress !== "string") return false;
@@ -27,6 +30,40 @@ export function isContract(address: Address, publicClient: PublicClient) {
   return publicClient.getCode({ address }).then((bytecode) => {
     return bytecode !== undefined && bytecode !== "0x";
   });
+}
+
+/**
+ *
+ * @param targetContract
+ * @param event
+ * @param publicClient
+ * @param fromBlock
+ * @returns
+ */
+export async function getLogsUntilNow<T extends AbiEvent>(
+  targetContract: Address,
+  event: T,
+  publicClient: PublicClient,
+  fromBlock = PUB_DEPLOYMENT_BLOCK
+) {
+  let result: Awaited<ReturnType<typeof publicClient.getLogs<T>>> = [];
+  const currentBlock = await publicClient.getBlockNumber();
+
+  do {
+    const logs = await publicClient.getLogs({
+      address: targetContract,
+      event,
+      // args: {},
+      fromBlock,
+      toBlock: fromBlock + BigInt(GET_LOGS_BLOCK_COUNT),
+    });
+
+    result = result.concat(logs);
+
+    fromBlock += BigInt(GET_LOGS_BLOCK_COUNT);
+  } while (fromBlock < currentBlock);
+
+  return result;
 }
 
 export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";

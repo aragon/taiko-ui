@@ -11,7 +11,7 @@ import { useState } from "react";
 import { Address } from "viem";
 import { AddressInput } from "@aragon/ods";
 import { isAddress } from "@/utils/evm";
-import { useEncryptionRegistry } from "@/plugins/emergency-multisig/hooks/useEncryptionRegistry";
+import { useEncryptionRegistry } from "@/plugins/encryption/hooks/useEncryptionRegistry";
 
 interface IAppointDialogProps extends IDialogRootProps {
   onClose: () => void;

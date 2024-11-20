@@ -1,7 +1,7 @@
 import { Dialog, type IDialogRootProps } from "@aragon/ods";
 import Link from "next/link";
 import { NavLink, type INavLink } from "./navLink";
-import { useSignerList } from "@/plugins/members/hooks/useSignerList";
+import { useApproverWalletList, useSignerList } from "@/plugins/members/hooks/useSignerList";
 import { useAccount } from "wagmi";
 
 interface IMobileNavDialogProps extends IDialogRootProps {
@@ -11,8 +11,10 @@ interface IMobileNavDialogProps extends IDialogRootProps {
 export const MobileNavDialog: React.FC<IMobileNavDialogProps> = (props) => {
   const { navLinks, ...dialogRootProps } = props;
   const { address } = useAccount();
-  const { signers } = useSignerList();
-  const showAllLinks = address && signers.includes(address);
+  const { signers: listedSigners } = useSignerList();
+  const { data: listedOrAppointedSigners } = useApproverWalletList();
+  // If the address is a listed signer (by being an owner or by being appointed by an owner)
+  const showAllLinks = address && (listedSigners.includes(address) || listedOrAppointedSigners?.includes(address));
 
   return (
     <Dialog.Root {...dialogRootProps}>

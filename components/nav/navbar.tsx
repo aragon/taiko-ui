@@ -8,13 +8,15 @@ import { NavLink, type INavLink } from "./navLink";
 import { AvatarIcon, IconType } from "@aragon/ods";
 import { PUB_APP_NAME, PUB_PROJECT_LOGO } from "@/constants";
 import { useAccount } from "wagmi";
-import { useSignerList } from "@/plugins/members/hooks/useSignerList";
+import { useSignerList, useApproverWalletList } from "@/plugins/members/hooks/useSignerList";
 
 export const Navbar: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
   const { address } = useAccount();
-  const { signers } = useSignerList();
-  const showAllLinks = address && signers.includes(address);
+  const { signers: listedSigners } = useSignerList();
+  const { data: listedOrAppointedSigners } = useApproverWalletList();
+  // If the address is a listed signer (by being an owner or by being appointed by an owner)
+  const showAllLinks = address && (listedSigners.includes(address) || listedOrAppointedSigners?.includes(address));
 
   const navLinks: INavLink[] = [
     // { path: "/", id: "dashboard", name: "Dashboard" /*, icon: IconType.APP_DASHBOARD*/ },

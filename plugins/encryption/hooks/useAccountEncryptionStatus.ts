@@ -5,7 +5,7 @@ import { useSignerList } from "@/plugins/members/hooks/useSignerList";
 import { Address } from "viem";
 import { ADDRESS_ZERO, BYTES32_ZERO } from "@/utils/evm";
 import { useAccount } from "wagmi";
-import { useCanCreateProposal } from "./useCanCreateProposal";
+import { useCanCreateProposal } from "../../emergency-multisig/hooks/useCanCreateProposal";
 
 export enum AccountEncryptionStatus {
   LOADING_ENCRYPTION_MEMBERS,
