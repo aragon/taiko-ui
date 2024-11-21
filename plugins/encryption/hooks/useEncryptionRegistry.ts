@@ -8,14 +8,17 @@ import { useDerivedWallet } from "@/hooks/useDerivedWallet";
 import { useAlerts } from "@/context/Alerts";
 import { debounce } from "@/utils/debounce";
 import { useTransactionManager } from "@/hooks/useTransactionManager";
-import { useEncryptionRegistryAccounts } from "./useEncryptionRegistryAccounts";
+import { useEncryptionAccounts } from "./useEncryptionAccounts";
 
+/**
+ * Returns methods to interact with the Encryption Registry smart contract
+ */
 export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?: () => any } = {}) {
   const { address } = useAccount();
   const { addAlert } = useAlerts();
   const [isWaiting, setIsWaiting] = useState(false);
   const { publicKey, requestSignature } = useDerivedWallet();
-  const { data: accounts, isLoading, error, refetch } = useEncryptionRegistryAccounts();
+  const { data: accounts, refetch } = useEncryptionAccounts();
 
   // Set public key transaction
   const { writeContract: setPubKeyWrite, isConfirming: isConfirmingPubK } = useTransactionManager({
@@ -104,11 +107,8 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
   };
 
   return {
-    data: accounts ?? [],
     appointWallet,
     registerPublicKey,
-    isLoading,
     isConfirming: isWaiting || isConfirmingPubK || isConfirmingAppoint,
-    error,
   };
 }

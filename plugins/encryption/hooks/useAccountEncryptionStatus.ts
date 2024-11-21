@@ -1,66 +1,135 @@
-import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
 import { useIsContract } from "@/hooks/useIsContract";
-import { useEncryptionRegistry } from "./useEncryptionRegistry";
 import { useSignerList } from "@/plugins/members/hooks/useSignerList";
-import { Address } from "viem";
+import { useEncryptionAccounts } from "./useEncryptionAccounts";
+import { Address, Hex } from "viem";
 import { ADDRESS_ZERO, BYTES32_ZERO } from "@/utils/evm";
 import { useAccount } from "wagmi";
-import { useCanCreateProposal } from "../../emergency-multisig/hooks/useCanCreateProposal";
 
 export enum AccountEncryptionStatus {
-  LOADING_ENCRYPTION_MEMBERS,
-  NOT_CONNECTED,
-  NOT_A_MULTISIG_MEMBER,
-  CANNOT_CREATE,
-  MUST_APPOINT,
-  PUB_KEY_NOT_SET,
-  SMART_CONTRACTS_CANNOT_DECRYPT,
-  NOT_APPOINTED,
-  NOT_SIGNED_IN,
-  READY,
+  LOADING_ENCRYPTION_STATUS,
+  ERR_COULD_NOT_LOAD,
+  ERR_NOT_LISTED_OR_APPOINTED,
+  ERR_SMART_WALLETS_CANNOT_REGISTER_PUB_KEY,
+  WARN_APPOINTED_MUST_REGISTER_PUB_KEY,
+  CTA_APPOINTED_MUST_REGISTER_PUB_KEY,
+  CTA_OWNER_MUST_APPOINT,
+  CTA_OWNER_MUST_APPOINT_OR_REGISTER_PUB_KEY,
+  READY_CAN_CREATE,
+  READY_ALL,
 }
 
-type HookProps = {};
 type HookResult = {
   status: AccountEncryptionStatus;
   owner: Address | undefined;
   appointedWallet: Address | undefined;
+  publicKey: Hex | undefined;
 };
 
-export function useAccountEncryptionStatus({}: HookProps = {}): HookResult {
-  const { publicKey: derivedPubKey } = useDerivedWallet();
-  const { address: selfAddress, isConnected } = useAccount();
-  const { canCreate } = useCanCreateProposal();
-  const { isContract } = useIsContract(selfAddress);
-  const { data: encryptionAccounts, isLoading: isLoadingPubKeys } = useEncryptionRegistry();
+export function useAccountEncryptionStatus(targetAddress?: Address | undefined): HookResult {
+  const { address: selfAddress } = useAccount();
+  if (!targetAddress) targetAddress = selfAddress;
 
-  const { signers } = useSignerList();
-  const encryptionAccount = encryptionAccounts.find(
-    (item) => item.owner === selfAddress || item.appointedWallet === selfAddress
+  const { data: encryptionAccounts, isLoading: isLoadingEncryptionAccounts, error: error1 } = useEncryptionAccounts();
+  const { signers, isLoading: isLoadingSigners, error: error2 } = useSignerList();
+  const { isContract } = useIsContract(targetAddress);
+
+  const encryptionAccount = (encryptionAccounts || []).find(
+    (item) => item.owner === targetAddress || item.appointedWallet === targetAddress
   );
-  const isListedOrAppointed = signers.includes(selfAddress!) || encryptionAccount?.appointedWallet == selfAddress;
-
-  let status: AccountEncryptionStatus;
-
   const owner = encryptionAccount?.owner;
+  const registeredPublicKey = encryptionAccount?.publicKey;
+  const isListed = signers.includes(targetAddress!);
+  const isAppointed = (encryptionAccounts || []).findIndex((acc) => acc.appointedWallet === targetAddress) >= 0;
+
   let appointedWallet: Address | undefined;
   if (encryptionAccount?.appointedWallet && encryptionAccount.appointedWallet !== ADDRESS_ZERO) {
     appointedWallet = encryptionAccount.appointedWallet;
   }
+  let status: AccountEncryptionStatus;
 
-  if (!selfAddress || !isConnected) status = AccountEncryptionStatus.NOT_CONNECTED;
-  else if (isLoadingPubKeys) status = AccountEncryptionStatus.LOADING_ENCRYPTION_MEMBERS;
-  else if (!isListedOrAppointed || !encryptionAccount || !owner) status = AccountEncryptionStatus.NOT_A_MULTISIG_MEMBER;
-  else if (!canCreate) status = AccountEncryptionStatus.CANNOT_CREATE;
-  // We are a contract: limited
-  else if (isContract) {
-    if (!encryptionAccount || !appointedWallet) status = AccountEncryptionStatus.MUST_APPOINT;
-    else status = AccountEncryptionStatus.SMART_CONTRACTS_CANNOT_DECRYPT;
+  if (isLoadingEncryptionAccounts || isLoadingSigners) {
+    // Loading
+    status = AccountEncryptionStatus.LOADING_ENCRYPTION_STATUS;
+  } else if (error1 || error2) {
+    // Err
+    status = AccountEncryptionStatus.ERR_COULD_NOT_LOAD;
+  } else if (!isListed) {
+    // Address not listed
+    if (!isAppointed) {
+      // Err: Not listed or appointed
+      status = AccountEncryptionStatus.ERR_NOT_LISTED_OR_APPOINTED;
+    } else {
+      // Address is appointed (should not be possible)
+
+      // Defined public key?
+      if (registeredPublicKey && registeredPublicKey !== BYTES32_ZERO) {
+        // OK: Can do all
+        status = AccountEncryptionStatus.READY_ALL;
+      } else {
+        if (isContract) {
+          // Error: smart wallets cannot register a public key
+          status = AccountEncryptionStatus.ERR_SMART_WALLETS_CANNOT_REGISTER_PUB_KEY;
+        } else {
+          // CTA: Appointed must register pubkey
+          status = AccountEncryptionStatus.CTA_APPOINTED_MUST_REGISTER_PUB_KEY;
+        }
+      }
+    }
+  } else {
+    // Address is a listed signer
+    if (isContract) {
+      // Address is a smart wallet
+
+      // Is there an appointed wallet?
+      if (!appointedWallet || appointedWallet === ADDRESS_ZERO) {
+        // CTA: Owner must appoint
+        status = AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT;
+      } else {
+        // There's an appointed wallet
+
+        // Defined public key?
+        if (!registeredPublicKey || registeredPublicKey === BYTES32_ZERO) {
+          // Warning: Appointed must register pubkey
+          status = AccountEncryptionStatus.WARN_APPOINTED_MUST_REGISTER_PUB_KEY;
+        } else {
+          // OK: Can create
+          status = AccountEncryptionStatus.READY_CAN_CREATE;
+        }
+      }
+    } else {
+      // Address is an EOA
+
+      // Is there an appointed wallet?
+      if (!appointedWallet || appointedWallet === ADDRESS_ZERO) {
+        // No appointed wallet
+
+        if (!registeredPublicKey || registeredPublicKey === BYTES32_ZERO) {
+          // CTA: Owner must appoint
+          // CTA: Owner must define a public key
+          status = AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT_OR_REGISTER_PUB_KEY;
+        } else {
+          // OK: can do all
+          status = AccountEncryptionStatus.READY_ALL;
+        }
+      } else {
+        // A wallet is appointed
+
+        // Defined public key?
+        if (!registeredPublicKey || registeredPublicKey === BYTES32_ZERO) {
+          // Warning: Appointed must register a public key
+          status = AccountEncryptionStatus.WARN_APPOINTED_MUST_REGISTER_PUB_KEY;
+        } else {
+          // OK: Can create
+          status = AccountEncryptionStatus.READY_CAN_CREATE;
+        }
+      }
+    }
   }
-  // We are a wallet
-  else if (encryptionAccount.publicKey === BYTES32_ZERO) status = AccountEncryptionStatus.PUB_KEY_NOT_SET;
-  else if (!derivedPubKey) status = AccountEncryptionStatus.NOT_SIGNED_IN;
-  else status = AccountEncryptionStatus.READY;
 
-  return { status, owner, appointedWallet };
+  return {
+    status,
+    owner,
+    appointedWallet,
+    publicKey: registeredPublicKey,
+  };
 }

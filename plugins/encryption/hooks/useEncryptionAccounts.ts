@@ -4,11 +4,14 @@ import { readContract } from "@wagmi/core";
 import { PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS } from "@/constants";
 import { useQuery } from "@tanstack/react-query";
 
-export function useEncryptionRegistryAccounts() {
+/**
+ * Returns the list of accounts that have been registered on the encryption registry.
+ */
+export function useEncryptionAccounts() {
   const config = useConfig();
 
   return useQuery({
-    queryKey: ["encryption-registry-members-fetch", PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS],
+    queryKey: ["encryption-registry-accounts-fetch", PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS],
     queryFn: () => {
       return readContract(config, {
         abi: EncryptionRegistryAbi,

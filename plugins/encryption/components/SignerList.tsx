@@ -4,14 +4,14 @@ import { SignerListItem } from "./SignerListItem";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { PUB_CHAIN } from "@/constants";
 import { useSignerList } from "@/plugins/members/hooks/useSignerList";
-import { useEncryptionRegistryAccounts } from "../hooks/useEncryptionRegistryAccounts";
+import { useEncryptionAccounts } from "../hooks/useEncryptionAccounts";
 
 interface ISignerListProps {}
 
 export const SignerList: React.FC<ISignerListProps> = () => {
   const [searchValue, setSearchValue] = useState<string>();
   const { signers } = useSignerList();
-  const { data: accounts, isLoading, error } = useEncryptionRegistryAccounts();
+  const { data: accounts, isLoading, error } = useEncryptionAccounts();
 
   if (!accounts || (accounts.length === 0 && isLoading)) {
     return <PleaseWaitSpinner fullMessage="Please wait, loading accounts" />;

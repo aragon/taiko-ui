@@ -1,19 +1,20 @@
 import { MainSection } from "@/components/layout/main-section";
-import { AlertCard, Button, Heading, Toggle, ToggleGroup } from "@aragon/ods";
+import { AlertCard, AlertVariant, Button, Heading, IAlertCardProps, Toggle, ToggleGroup } from "@aragon/ods";
 import { useState } from "react";
 import { AddressText } from "@/components/text/address";
 import { Else, If, Then } from "@/components/if";
 import { SignerList } from "../components/SignerList";
-import { useEncryptionRegistryAccounts } from "../hooks/useEncryptionRegistryAccounts";
+import { useEncryptionAccounts } from "../hooks/useEncryptionAccounts";
 import { useAccount } from "wagmi";
 import { ADDRESS_ZERO, BYTES32_ZERO } from "@/utils/evm";
 import { useIsContract } from "@/hooks/useIsContract";
 import { PleaseWaitSpinner } from "@/components/please-wait";
+import { AccountEncryptionStatus, useAccountEncryptionStatus } from "../hooks/useAccountEncryptionStatus";
 
 export default function EncryptionPage() {
-  const [toggleValue, setToggleValue] = useState<"active" | "pending" | "appointed">("active");
+  const [toggleValue, setToggleValue] = useState<"ready" | "pending" | "appointed">("ready");
   const onToggleChange = (value: string | undefined) => {
-    if (value) setToggleValue(value as "active" | "pending" | "appointed");
+    if (value) setToggleValue(value as "ready" | "pending" | "appointed");
   };
 
   return (
@@ -29,7 +30,7 @@ export default function EncryptionPage() {
               value={toggleValue}
               className="flex justify-end"
             >
-              <Toggle value="active" label="Active" className="rounded-lg" />
+              <Toggle value="ready" label="Ready" className="rounded-lg" />
               <Toggle value="appointed" label="Appointed" className="rounded-lg" />
               <Toggle value="pending" label="Pending" className="rounded-lg" />
             </ToggleGroup>
@@ -69,89 +70,116 @@ function AsideSection() {
 }
 
 function AccountStatus() {
-  const { address } = useAccount();
-  const { data: accounts, isLoading: isLoading1 } = useEncryptionRegistryAccounts();
-  const { isContract, isLoading: isLoading2 } = useIsContract(address);
+  let variant: AlertVariant = "warning";
+  let title = "";
+  let description = "";
+  let actions: JSX.Element[] = [];
+  const { isConnected } = useAccount();
+  const { status, owner, appointedWallet, publicKey } = useAccountEncryptionStatus();
 
-  const account = accounts?.find((acc) => acc.owner === address || acc.appointedWallet === address);
-
-  if (isLoading1 || isLoading2) {
+  if (!isConnected) {
+    return <p>Connect your wallet to display the status</p>;
+  } else if (status === AccountEncryptionStatus.LOADING_ENCRYPTION_STATUS) {
     return <PleaseWaitSpinner />;
-  } else if (!account) {
-    let message = "You have not defined a public key or appointed an externally owned wallet";
-    let actions: JSX.Element[] = [
+  } else if (status === AccountEncryptionStatus.ERR_COULD_NOT_LOAD) {
+    variant = "critical";
+    title = "Error";
+    description = "Could not load the account encryption status.";
+  } else if (status === AccountEncryptionStatus.ERR_NOT_LISTED_OR_APPOINTED) {
+    variant = "critical";
+    title = "Not a member";
+    description = "You are not listed as a signer or appointed by a signer.";
+  } else if (status === AccountEncryptionStatus.ERR_SMART_WALLETS_CANNOT_REGISTER_PUB_KEY) {
+    variant = "critical";
+    title = "Error";
+    description = "You are appointed by a listed signer but smart wallets cannot register public keys.";
+  } else if (status === AccountEncryptionStatus.WARN_APPOINTED_MUST_REGISTER_PUB_KEY) {
+    title = "Warning";
+    description = "The wallet you appointed needs to define a public key.";
+  } else if (status === AccountEncryptionStatus.CTA_APPOINTED_MUST_REGISTER_PUB_KEY) {
+    title = "Warning";
+    description = "You are appointed by a signer but you have not defined your public key yet.";
+    actions = [<Button size="md">Define public key</Button>];
+  } else if (status === AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT) {
+    title = "Warning";
+    description =
+      "You are listed as a signer but you have not appointed an Externally Owned Account for decryption yet.";
+    actions = [<Button size="md">Appoint wallet</Button>];
+  } else if (status === AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT_OR_REGISTER_PUB_KEY) {
+    title = "Warning";
+    description = "You are listed as a signer but you have not appointed a wallet or defined your public key yet.";
+    actions = [
       <Button size="md">Define public key</Button>,
       <Button size="md" variant="secondary">
         Appoint wallet
       </Button>,
     ];
+  }
 
-    if (isContract) {
-      message = "You have not appointed an externally owned wallet";
-      actions = [
-        <Button size="md" variant="secondary">
-          Appoint wallet
-        </Button>,
-      ];
-    }
-
+  if (title && description) {
+    // Show an error, warning or call to action
     return (
       <>
-        <AlertCard description={message} message="Not registered" variant="critical" />
-        {actions}
-      </>
-    );
-  } else if (!account.publicKey || account.publicKey === BYTES32_ZERO) {
-    let message = "You have not defined a public key to access emergency proposals";
-    let actions: JSX.Element[] = [
-      <Button size="md">Define public key</Button>,
-      <Button size="md" variant="secondary">
-        Appoint wallet
-      </Button>,
-    ];
-
-    return (
-      <>
-        <AlertCard description={message} message="Not registered" variant="critical" />
+        <AlertCard message={title} description={description} variant={variant} />
         {actions}
       </>
     );
   }
 
+  if (status === AccountEncryptionStatus.READY_CAN_CREATE) {
+    actions = [
+      <Button size="md">Update public key</Button>,
+      <Button size="md" variant="secondary">
+        Appoint another wallet
+      </Button>,
+    ];
+  } else if (status === AccountEncryptionStatus.READY_ALL) {
+    actions = [
+      <Button size="md">Update public key</Button>,
+      <Button size="md" variant="secondary">
+        Appoint another wallet
+      </Button>,
+    ];
+  }
+
+  // Show status
   return (
-    <dl className="divide-y divide-neutral-100">
-      <div className="flex flex-col items-baseline gap-y-2 py-3 lg:gap-x-6 lg:py-4">
-        <dt className="line-clamp-1 shrink-0 text-lg leading-tight text-neutral-800 lg:line-clamp-6 lg:w-40">
-          Account owner
-        </dt>
-        <dd className="size-full text-base leading-tight text-neutral-500">
-          <AddressText>{account?.owner}</AddressText>
-        </dd>
-      </div>
-      <div className="flex flex-col items-baseline gap-y-2 py-3 lg:gap-x-6 lg:py-4">
-        <dt className="line-clamp-1 shrink-0 text-lg leading-tight text-neutral-800 lg:line-clamp-6 lg:w-40">
-          Appointed wallet
-        </dt>
-        <dd className="size-full text-base leading-tight text-neutral-500">
-          <If condition={account?.appointedWallet === ADDRESS_ZERO}>
-            <Then>Acting by itself (no appointed wallet)</Then>
-            <Else>
-              <AddressText>{account?.appointedWallet}</AddressText>
-            </Else>
-          </If>
-        </dd>
-      </div>
-      <div className="flex flex-col items-baseline gap-y-2 py-3 lg:gap-x-6 lg:py-4">
-        <dt className="line-clamp-1 shrink-0 text-lg leading-tight text-neutral-800 lg:line-clamp-6 lg:w-40">
-          Public key
-        </dt>
-        <dd className="size-full text-base leading-tight text-neutral-500">
-          <If condition={!account?.publicKey || account?.publicKey !== BYTES32_ZERO}>
-            <Then>Not registered</Then>
-            <Else>Registered</Else>
-          </If>
-        </dd>
-      </div>
-    </dl>
+    <>
+      <dl className="divide-y divide-neutral-100">
+        <div className="flex flex-col items-baseline gap-y-2 py-3 lg:gap-x-6 lg:py-4">
+          <dt className="line-clamp-1 shrink-0 text-lg leading-tight text-neutral-800 lg:line-clamp-6 lg:w-40">
+            Account owner
+          </dt>
+          <dd className="size-full text-base leading-tight text-neutral-500">
+            <AddressText>{owner}</AddressText>
+          </dd>
+        </div>
+        <div className="flex flex-col items-baseline gap-y-2 py-3 lg:gap-x-6 lg:py-4">
+          <dt className="line-clamp-1 shrink-0 text-lg leading-tight text-neutral-800 lg:line-clamp-6 lg:w-40">
+            Appointed wallet
+          </dt>
+          <dd className="size-full text-base leading-tight text-neutral-500">
+            <If condition={appointedWallet === ADDRESS_ZERO}>
+              <Then>Acting by itself (no appointed wallet)</Then>
+              <Else>
+                <AddressText>{appointedWallet}</AddressText>
+              </Else>
+            </If>
+          </dd>
+        </div>
+        <div className="flex flex-col items-baseline gap-y-2 py-3 lg:gap-x-6 lg:py-4">
+          <dt className="line-clamp-1 shrink-0 text-lg leading-tight text-neutral-800 lg:line-clamp-6 lg:w-40">
+            Public key
+          </dt>
+          <dd className="size-full text-base leading-tight text-neutral-500">
+            <If condition={!publicKey || publicKey !== BYTES32_ZERO}>
+              <Then>Not registered</Then>
+              <Else>Registered</Else>
+            </If>
+          </dd>
+        </div>
+      </dl>
+      <div className="flex flex-col gap-y-3">{actions}</div>
+    </>
   );
 }
