@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { useProposalVeto } from "@/plugins/optimistic-proposals/hooks/useProposalVeto";
-import { Card, ProposalStatus } from "@aragon/ods";
-import { ProposalDataListItem } from "@aragon/ods";
+import { Card, ProposalStatus, ProposalDataListItem } from "@aragon/ods";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useProposalStatus } from "../../hooks/useProposalVariantStatus";
 import { useAccount } from "wagmi";
@@ -14,6 +13,7 @@ const DEFAULT_PROPOSAL_METADATA_SUMMARY = "(The metadata of the proposal is not 
 
 type ProposalInputs = {
   proposalIndex: number;
+  linkPrefix?: string;
 };
 
 export default function ProposalCard(props: ProposalInputs) {
@@ -25,6 +25,7 @@ export default function ProposalCard(props: ProposalInputs) {
   const proposalStatus = useProposalStatus(proposal!);
   const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const hasVetoed = vetoes?.some((veto) => veto.voter === address);
+  const prefix = props.linkPrefix ? props.linkPrefix + "/" : "";
 
   if (!proposal && showLoading) {
     return (
@@ -37,7 +38,7 @@ export default function ProposalCard(props: ProposalInputs) {
   } else if (!proposal?.title && !proposal?.summary) {
     // We have the proposal but no metadata yet
     return (
-      <Link href={`#/proposals/${props.proposalIndex}`} className="w-full">
+      <Link href={`${prefix}#/proposals/${props.proposalIndex}`} className="w-full">
         <Card className="p-6">
           <PleaseWaitSpinner fullMessage="Loading metadata..." />
         </Card>
@@ -45,7 +46,7 @@ export default function ProposalCard(props: ProposalInputs) {
     );
   } else if (proposalFetchStatus.metadataReady && !proposal?.title) {
     return (
-      <Link href={`#/proposals/${props.proposalIndex}`} className="w-full">
+      <Link href={`${prefix}#/proposals/${props.proposalIndex}`} className="w-full">
         <Card className="p-6">
           <div className="xl:4/5 overflow-hidden text-ellipsis text-nowrap pr-4 md:w-7/12 lg:w-3/4">
             <h4 className="mb-1 line-clamp-1 text-lg text-neutral-300">
