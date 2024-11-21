@@ -1,20 +1,24 @@
-import { plugins } from "@/plugins";
+import { DaoResources } from "@/components/dashboard/dao-resources";
+import { HeaderDao } from "@/components/dashboard/header-dao";
 import { MainSection } from "@/components/layout/main-section";
-import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useEffect } from "react";
-import { useRouter } from "next/router";
+import { LatestProposals } from "@/components/dashboard/latest-proposals";
+import { LatestTweets } from "@/components/dashboard/latest-tweets";
 
 export default function Home() {
-  const { replace } = useRouter();
-  useEffect(() => {
-    replace("/plugins/" + plugins[0].id);
-  }, []);
-
   return (
     <MainSection>
-      <div className="flex h-24 w-full items-center justify-center">
-        <PleaseWaitSpinner />
-      </div>
+      <HeaderDao />
+      <main className="mx-auto max-w-screen-xl">
+        <div className="pb-4 pt-4 md:pb-6">
+          <DaoResources />
+        </div>
+        <div className="flex flex-col gap-y-10 px-4 pb-6 pt-10 md:flex-row md:gap-x-12 md:px-6 md:pb-12">
+          <LatestProposals />
+          <section className="flex flex-shrink flex-col gap-y-10 md:max-w-[464px] lg:w-full">
+            <LatestTweets />
+          </section>
+        </div>
+      </main>
     </MainSection>
   );
 }
