@@ -13,7 +13,7 @@ import { AddressInput } from "@aragon/ods";
 import { BYTES32_ZERO, isAddress } from "@/utils/evm";
 import { useEncryptionRegistry } from "@/plugins/encryption/hooks/useEncryptionRegistry";
 import { useIsContract } from "@/hooks/useIsContract";
-import { If } from "@/components/if";
+import { Else, ElseIf, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useAccountEncryptionStatus } from "../hooks/useAccountEncryptionStatus";
 
@@ -52,6 +52,7 @@ export const AppointDialog: React.FC<IAppointDialogProps> = (props) => {
               value={address}
               label="Address of the wallet to appoint"
               alert={addressAlert}
+              placeholder="0x..."
               onChange={(addr: any) => setAddress(addr)}
             />
           </div>
@@ -60,21 +61,29 @@ export const AppointDialog: React.FC<IAppointDialogProps> = (props) => {
               <PleaseWaitSpinner fullMessage="Checking address" />
             </p>
           </If>
-          <If condition={publicKey && publicKey !== BYTES32_ZERO}>
+          <If condition={!!publicKey && publicKey !== BYTES32_ZERO}>
             <p className="pb-2 text-sm text-neutral-400">
               You currently have a public key defined. By appointing an address, the public key will be reset and the
               appointed wallet will need to register the new one.
             </p>
           </If>
           <p className="pb-2 text-sm text-neutral-400">
-            To undo an appointment,{" "}
-            <a
-              className="cursor-pointer underline"
-              onClick={() => setAddress("0x0000000000000000000000000000000000000000")}
-            >
-              click to wipe the appointed address
-            </a>
-            .
+            <If condition={address !== "0x0000000000000000000000000000000000000000"}>
+              <Then>
+                If you wish to undo an appointment,{" "}
+                <a
+                  className="cursor-pointer underline"
+                  onClick={() => setAddress("0x0000000000000000000000000000000000000000")}
+                >
+                  click here to wipe the currently appointed address
+                </a>
+                .
+              </Then>
+              <Else>
+                Setting an empty address will undo the existing appointment and restore your address as the account's
+                agent.
+              </Else>
+            </If>
           </p>
         </div>
 

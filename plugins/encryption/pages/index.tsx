@@ -12,9 +12,9 @@ import { AppointDialog } from "@/plugins/encryption/components/AppointDialog";
 import { useEncryptionRegistry } from "../hooks/useEncryptionRegistry";
 
 export default function EncryptionPage() {
-  const [toggleValue, setToggleValue] = useState<"ready" | "pending" | "appointed">("ready");
+  const [toggleValue, setToggleValue] = useState<"ready" | "pending" | "not-registered">("ready");
   const onToggleChange = (value: string | undefined) => {
-    if (value) setToggleValue(value as "ready" | "pending" | "appointed");
+    if (value) setToggleValue(value as "ready" | "pending" | "not-registered");
   };
 
   return (
@@ -31,8 +31,8 @@ export default function EncryptionPage() {
               className="flex justify-end"
             >
               <Toggle value="ready" label="Ready" className="rounded-lg" />
-              <Toggle value="appointed" label="Appointed" className="rounded-lg" />
               <Toggle value="pending" label="Pending" className="rounded-lg" />
+              <Toggle value="not-registered" label="Not registered" className="rounded-lg" />
             </ToggleGroup>
           </div>
           <SignerList />

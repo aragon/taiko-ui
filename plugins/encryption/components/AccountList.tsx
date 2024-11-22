@@ -16,7 +16,24 @@ export const SignerList: React.FC<ISignerListProps> = () => {
   if (!accounts || (accounts.length === 0 && isLoading)) {
     return <PleaseWaitSpinner fullMessage="Please wait, loading accounts" />;
   } else if (!accounts.length) {
-    return <NoMembersView error={error?.message} />;
+    if (error) return <NoSignersView title="Could not fetch" message={error?.message} />;
+    return (
+      <NoSignersView
+        title="No signers registered"
+        message="There are no signers registered on the Encryption Registry. Be the first one to register a public key or appoint an Externally Owned Wallet."
+      />
+    );
+  }
+
+  const activeAccounts = [];
+  const pendingAccounts = [];
+
+  for (const signer of signers) {
+    if (accounts.some((acc) => acc.owner === signer)) {
+      activeAccounts.push(signer);
+    } else {
+      pendingAccounts.push(signer);
+    }
   }
 
   const showPagination = false;
@@ -62,19 +79,11 @@ export const SignerList: React.FC<ISignerListProps> = () => {
   );
 };
 
-function NoMembersView({ error }: { error?: string }) {
-  let message: string;
-  if (error?.length) {
-    message = error;
-  } else {
-    message =
-      "The list of encryption ready signers is empty. This means that the signers list is empty or that none of them has registered a public key or appointed a wallet.";
-  }
-
+function NoSignersView({ message, title }: { message: string; title: string }) {
   return (
     <CardEmptyState
       description={message}
-      heading="No signers available"
+      heading={title}
       objectIllustration={{
         object: "LABELS",
       }}
