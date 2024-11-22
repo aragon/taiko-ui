@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AlertCard, CardEmptyState, DataList, IllustrationHuman } from "@aragon/ods";
-import { SignerListItem } from "./SignerListItem";
+import { SignerListItem } from "./AccountListItem";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { PUB_CHAIN } from "@/constants";
 import { useSignerList } from "@/plugins/members/hooks/useSignerList";
@@ -45,7 +45,7 @@ export const SignerList: React.FC<ISignerListProps> = () => {
   }
 
   return (
-    <DataList.Root entityLabel={registeredEncryptionAccounts + " signer(s)"} itemsCount={registeredEncryptionAccounts}>
+    <DataList.Root entityLabel={"signer(s)"} itemsCount={registeredEncryptionAccounts}>
       <DataList.Filter onSearchValueChange={setSearchValue} searchValue={searchValue} placeholder="Filter by address" />
       <DataList.Container className="grid grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))] gap-5">
         {accounts.map((account) => (

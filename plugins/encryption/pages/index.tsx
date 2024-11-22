@@ -3,13 +3,13 @@ import { AlertCard, AlertVariant, Button, Heading, IAlertCardProps, Toggle, Togg
 import { useState } from "react";
 import { AddressText } from "@/components/text/address";
 import { Else, If, Then } from "@/components/if";
-import { SignerList } from "../components/SignerList";
-import { useEncryptionAccounts } from "../hooks/useEncryptionAccounts";
+import { SignerList } from "../components/AccountList";
 import { useAccount } from "wagmi";
 import { ADDRESS_ZERO, BYTES32_ZERO } from "@/utils/evm";
-import { useIsContract } from "@/hooks/useIsContract";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { AccountEncryptionStatus, useAccountEncryptionStatus } from "../hooks/useAccountEncryptionStatus";
+import { AppointDialog } from "@/plugins/encryption/components/AppointDialog";
+import { useEncryptionRegistry } from "../hooks/useEncryptionRegistry";
 
 export default function EncryptionPage() {
   const [toggleValue, setToggleValue] = useState<"ready" | "pending" | "appointed">("ready");
@@ -76,6 +76,8 @@ function AccountStatus() {
   let actions: JSX.Element[] = [];
   const { isConnected } = useAccount();
   const { status, owner, appointedWallet, publicKey } = useAccountEncryptionStatus();
+  const { registerPublicKey, isConfirming } = useEncryptionRegistry();
+  const [showAppointModal, setShowAppointModal] = useState(false);
 
   if (!isConnected) {
     return <p>Connect your wallet to display the status</p>;
@@ -96,21 +98,36 @@ function AccountStatus() {
   } else if (status === AccountEncryptionStatus.WARN_APPOINTED_MUST_REGISTER_PUB_KEY) {
     title = "Warning";
     description = "The wallet you appointed needs to define a public key.";
+    actions = [
+      <Button size="md" variant="secondary" onClick={() => setShowAppointModal(true)}>
+        Appoint a different wallet
+      </Button>,
+    ];
   } else if (status === AccountEncryptionStatus.CTA_APPOINTED_MUST_REGISTER_PUB_KEY) {
     title = "Warning";
     description = "You are appointed by a signer but you have not defined your public key yet.";
-    actions = [<Button size="md">Define public key</Button>];
+    actions = [
+      <Button size="md" onClick={registerPublicKey}>
+        Define public key
+      </Button>,
+    ];
   } else if (status === AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT) {
     title = "Warning";
     description =
       "You are listed as a signer but you have not appointed an Externally Owned Account for decryption yet.";
-    actions = [<Button size="md">Appoint wallet</Button>];
+    actions = [
+      <Button size="md" onClick={() => setShowAppointModal(true)}>
+        Appoint wallet
+      </Button>,
+    ];
   } else if (status === AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT_OR_REGISTER_PUB_KEY) {
     title = "Warning";
     description = "You are listed as a signer but you have not appointed a wallet or defined your public key yet.";
     actions = [
-      <Button size="md">Define public key</Button>,
-      <Button size="md" variant="secondary">
+      <Button size="md" onClick={registerPublicKey}>
+        Define public key
+      </Button>,
+      <Button size="md" variant="secondary" onClick={() => setShowAppointModal(true)}>
         Appoint wallet
       </Button>,
     ];
@@ -122,22 +139,29 @@ function AccountStatus() {
       <>
         <AlertCard message={title} description={description} variant={variant} />
         {actions}
+
+        {/* Modal */}
+        <AppointDialog open={showAppointModal} onClose={() => setShowAppointModal(false)} />
       </>
     );
   }
 
   if (status === AccountEncryptionStatus.READY_CAN_CREATE) {
     actions = [
-      <Button size="md">Update public key</Button>,
-      <Button size="md" variant="secondary">
-        Appoint another wallet
+      <Button size="md" onClick={registerPublicKey}>
+        Update public key
+      </Button>,
+      <Button size="md" variant="secondary" onClick={() => setShowAppointModal(true)}>
+        Appoint a different wallet
       </Button>,
     ];
   } else if (status === AccountEncryptionStatus.READY_ALL) {
     actions = [
-      <Button size="md">Update public key</Button>,
-      <Button size="md" variant="secondary">
-        Appoint another wallet
+      <Button size="md" onClick={registerPublicKey}>
+        Update public key
+      </Button>,
+      <Button size="md" variant="secondary" onClick={() => setShowAppointModal(true)}>
+        Appoint a different wallet
       </Button>,
     ];
   }
@@ -180,6 +204,9 @@ function AccountStatus() {
         </div>
       </dl>
       <div className="flex flex-col gap-y-3">{actions}</div>
+
+      {/* Modal */}
+      <AppointDialog open={showAppointModal} onClose={() => setShowAppointModal(false)} />
     </>
   );
 }

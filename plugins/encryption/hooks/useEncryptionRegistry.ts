@@ -9,6 +9,7 @@ import { useAlerts } from "@/context/Alerts";
 import { debounce } from "@/utils/debounce";
 import { useTransactionManager } from "@/hooks/useTransactionManager";
 import { useEncryptionAccounts } from "./useEncryptionAccounts";
+import { useSignerList } from "@/plugins/members/hooks/useSignerList";
 
 /**
  * Returns methods to interact with the Encryption Registry smart contract
@@ -19,6 +20,7 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
   const [isWaiting, setIsWaiting] = useState(false);
   const { publicKey, requestSignature } = useDerivedWallet();
   const { data: accounts, refetch } = useEncryptionAccounts();
+  const { signers, isLoading } = useSignerList();
 
   // Set public key transaction
   const { writeContract: setPubKeyWrite, isConfirming: isConfirmingPubK } = useTransactionManager({
@@ -89,10 +91,12 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
     }
   };
 
-  const appointWallet = (appointedWallet: Address) => {
-    const account = accounts?.find((m) => m.owner === address);
-    if (!account) {
-      addAlert("You are not currently registered on the Encryption Registry", { type: "error" });
+  const appointWallet = (walletToAppoint: Address) => {
+    if (!address || isLoading) {
+      addAlert("Please connect your wallet");
+      return;
+    } else if (!signers?.includes(address)) {
+      addAlert("You are not currently listed as a Security Member signer", { type: "error" });
       return;
     }
 
@@ -102,7 +106,7 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
       abi: EncryptionRegistryAbi,
       address: PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS,
       functionName: "appointWallet",
-      args: [appointedWallet],
+      args: [walletToAppoint],
     });
   };
 
