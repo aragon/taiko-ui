@@ -13,10 +13,10 @@ import { useSignerList, useApproverWalletList } from "@/plugins/members/hooks/us
 export const Navbar: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
   const { address } = useAccount();
-  const { signers: listedSigners } = useSignerList();
+  const { data: listedSigners } = useSignerList();
   const { data: listedOrAppointedSigners } = useApproverWalletList();
   // If the address is a listed signer (by being an owner or by being appointed by an owner)
-  const showAllLinks = address && (listedSigners.includes(address) || listedOrAppointedSigners?.includes(address));
+  const showAllLinks = address && (listedSigners?.includes(address) || listedOrAppointedSigners?.includes(address));
 
   const navLinks: INavLink[] = [
     // { path: "/", id: "dashboard", name: "Dashboard" /*, icon: IconType.APP_DASHBOARD*/ },

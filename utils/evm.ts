@@ -15,7 +15,7 @@ export function equalAddresses(value1?: string, value2?: string): boolean {
   return value1.toLowerCase().trim() === value2.toLocaleLowerCase().trim();
 }
 
-export function formatHexString(address: string): string {
+export function formatHexString(address: string | undefined): string {
   if (!address || address.length < 12) {
     return address || "";
   }

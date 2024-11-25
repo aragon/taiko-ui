@@ -10,10 +10,10 @@ import {
 import { useState } from "react";
 import { Address } from "viem";
 import { AddressInput } from "@aragon/ods";
-import { BYTES32_ZERO, isAddress } from "@/utils/evm";
+import { ADDRESS_ZERO, BYTES32_ZERO, isAddress } from "@/utils/evm";
 import { useEncryptionRegistry } from "@/plugins/encryption/hooks/useEncryptionRegistry";
 import { useIsContract } from "@/hooks/useIsContract";
-import { Else, ElseIf, If, Then } from "@/components/if";
+import { Else, If, Then } from "@/components/if";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { useAccountEncryptionStatus } from "../hooks/useAccountEncryptionStatus";
 
@@ -98,7 +98,10 @@ export const AppointDialog: React.FC<IAppointDialogProps> = (props) => {
             disabled={!validAddress || isContract}
             onClick={() => appointWallet(address!)}
           >
-            Appoint address
+            <If condition={address === ADDRESS_ZERO}>
+              <Then>Clear appointment</Then>
+              <Else>Appoint address</Else>
+            </If>
           </Button>
         </div>
       </DialogContent>

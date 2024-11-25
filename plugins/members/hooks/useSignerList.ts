@@ -2,7 +2,6 @@ import { useConfig, usePublicClient } from "wagmi";
 import { SignerListAbi } from "../artifacts/SignerList";
 import { PUB_SIGNER_LIST_CONTRACT_ADDRESS } from "@/constants";
 import { Address, getAbiItem, GetLogsReturnType } from "viem";
-import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { readContract } from "@wagmi/core";
 import { getLogsUntilNow } from "@/utils/evm";
@@ -18,48 +17,29 @@ const SignersRemovedEvent = getAbiItem({
 
 export function useSignerList() {
   const publicClient = usePublicClient();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const [signers, setSigners] = useState<Address[]>([]);
 
-  // Creation event
-  useEffect(() => {
-    if (!publicClient) return;
-
-    loadSigners();
-  }, [!!publicClient]);
-
-  const loadSigners = () => {
+  const getSigners = () => {
     if (!publicClient) {
-      setError(new Error("No public client available"));
-      return;
+      throw new Error("No public client");
     }
-    setIsLoading(true);
 
     const addedProm = getLogsUntilNow(PUB_SIGNER_LIST_CONTRACT_ADDRESS, SignersAddedEvent, publicClient);
     const removedProm = getLogsUntilNow(PUB_SIGNER_LIST_CONTRACT_ADDRESS, SignersRemovedEvent, publicClient);
 
-    Promise.all([addedProm, removedProm])
-      .then(([addedLogs, removedLogs]) => {
-        const result = computeCurrentSignerList(addedLogs, removedLogs);
-
-        setSigners(result);
-        setIsLoading(false);
-        setError(null);
-      })
-      .catch((err: any) => {
-        console.error(err);
-        setIsLoading(false);
-        setError(new Error("Error: Could not retrieve the list of members"));
-      });
+    return Promise.all([addedProm, removedProm]).then(([addedLogs, removedLogs]) => {
+      return computeCurrentSignerList(addedLogs, removedLogs);
+    });
   };
 
-  return {
-    signers,
-    isLoading,
-    error,
-    refetch: loadSigners,
-  };
+  return useQuery({
+    queryKey: ["signer-list-fetch", PUB_SIGNER_LIST_CONTRACT_ADDRESS],
+    queryFn: () => getSigners(),
+    retry: true,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    retryOnMount: true,
+    staleTime: 1000 * 60 * 5,
+  });
 }
 
 export function useApproverWalletList() {

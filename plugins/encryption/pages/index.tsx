@@ -3,18 +3,19 @@ import { AlertCard, AlertVariant, Button, Heading, IAlertCardProps, Toggle, Togg
 import { useState } from "react";
 import { AddressText } from "@/components/text/address";
 import { Else, If, Then } from "@/components/if";
-import { SignerList } from "../components/AccountList";
+import { AccountList } from "../components/AccountList";
 import { useAccount } from "wagmi";
 import { ADDRESS_ZERO, BYTES32_ZERO } from "@/utils/evm";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 import { AccountEncryptionStatus, useAccountEncryptionStatus } from "../hooks/useAccountEncryptionStatus";
 import { AppointDialog } from "@/plugins/encryption/components/AppointDialog";
 import { useEncryptionRegistry } from "../hooks/useEncryptionRegistry";
+import { useDerivedWallet } from "@/hooks/useDerivedWallet";
 
 export default function EncryptionPage() {
-  const [toggleValue, setToggleValue] = useState<"ready" | "pending" | "not-registered">("ready");
+  const [toggleValue, setToggleValue] = useState<"ready" | "pending">("ready");
   const onToggleChange = (value: string | undefined) => {
-    if (value) setToggleValue(value as "ready" | "pending" | "not-registered");
+    if (value) setToggleValue(value as "ready" | "pending");
   };
 
   return (
@@ -32,10 +33,9 @@ export default function EncryptionPage() {
             >
               <Toggle value="ready" label="Ready" className="rounded-lg" />
               <Toggle value="pending" label="Pending" className="rounded-lg" />
-              <Toggle value="not-registered" label="Not registered" className="rounded-lg" />
             </ToggleGroup>
           </div>
-          <SignerList />
+          <AccountList listType={toggleValue} />
         </div>
         <AsideSection />
       </div>
@@ -74,7 +74,8 @@ function AccountStatus() {
   let title = "";
   let description = "";
   let actions: JSX.Element[] = [];
-  const { isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
+  const { publicKey: derivedPublicKey } = useDerivedWallet();
   const { status, owner, appointedWallet, publicKey } = useAccountEncryptionStatus();
   const { registerPublicKey, isConfirming } = useEncryptionRegistry();
   const [showAppointModal, setShowAppointModal] = useState(false);
@@ -99,7 +100,7 @@ function AccountStatus() {
     title = "Warning";
     description = "The wallet you appointed needs to define a public key.";
     actions = [
-      <Button size="md" variant="secondary" onClick={() => setShowAppointModal(true)}>
+      <Button size="md" isLoading={isConfirming} variant="secondary" onClick={() => setShowAppointModal(true)}>
         Appoint a different wallet
       </Button>,
     ];
@@ -107,7 +108,7 @@ function AccountStatus() {
     title = "Warning";
     description = "You are appointed by a signer but you have not defined your public key yet.";
     actions = [
-      <Button size="md" onClick={registerPublicKey}>
+      <Button size="md" isLoading={isConfirming} onClick={() => registerPublicKey("appointed")}>
         Define public key
       </Button>,
     ];
@@ -116,18 +117,18 @@ function AccountStatus() {
     description =
       "You are listed as a signer but you have not appointed an Externally Owned Account for decryption yet.";
     actions = [
-      <Button size="md" onClick={() => setShowAppointModal(true)}>
+      <Button size="md" isLoading={isConfirming} onClick={() => setShowAppointModal(true)}>
         Appoint wallet
       </Button>,
     ];
   } else if (status === AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT_OR_REGISTER_PUB_KEY) {
     title = "Warning";
-    description = "You are listed as a signer but you have not appointed a wallet or defined your public key yet.";
+    description = "You are listed as a signer but you have not defined your public key or appointed a wallet yet.";
     actions = [
-      <Button size="md" onClick={registerPublicKey}>
+      <Button size="md" isLoading={isConfirming} onClick={() => registerPublicKey("own")}>
         Define public key
       </Button>,
-      <Button size="md" variant="secondary" onClick={() => setShowAppointModal(true)}>
+      <Button size="md" isLoading={isConfirming} variant="secondary" onClick={() => setShowAppointModal(true)}>
         Appoint wallet
       </Button>,
     ];
@@ -146,24 +147,22 @@ function AccountStatus() {
     );
   }
 
-  if (status === AccountEncryptionStatus.READY_CAN_CREATE) {
-    actions = [
-      <Button size="md" onClick={registerPublicKey}>
-        Update public key
-      </Button>,
-      <Button size="md" variant="secondary" onClick={() => setShowAppointModal(true)}>
-        Appoint a different wallet
-      </Button>,
-    ];
-  } else if (status === AccountEncryptionStatus.READY_ALL) {
-    actions = [
-      <Button size="md" onClick={registerPublicKey}>
-        Update public key
-      </Button>,
-      <Button size="md" variant="secondary" onClick={() => setShowAppointModal(true)}>
-        Appoint a different wallet
-      </Button>,
-    ];
+  if (status === AccountEncryptionStatus.READY_CAN_CREATE || status === AccountEncryptionStatus.READY_ALL) {
+    if (derivedPublicKey !== publicKey) {
+      actions.push(
+        <Button size="md" isLoading={isConfirming} variant="secondary" onClick={() => registerPublicKey("own")}>
+          Update public key
+        </Button>
+      );
+    }
+
+    if (owner === address) {
+      actions.push(
+        <Button size="md" isLoading={isConfirming} variant="secondary" onClick={() => setShowAppointModal(true)}>
+          Appoint a wallet
+        </Button>
+      );
+    }
   }
 
   // Show status
@@ -183,7 +182,7 @@ function AccountStatus() {
             Appointed wallet
           </dt>
           <dd className="size-full text-base leading-tight text-neutral-500">
-            <If condition={appointedWallet === ADDRESS_ZERO}>
+            <If condition={!appointedWallet || appointedWallet === ADDRESS_ZERO}>
               <Then>Acting by itself (no appointed wallet)</Then>
               <Else>
                 <AddressText>{appointedWallet}</AddressText>
@@ -196,7 +195,7 @@ function AccountStatus() {
             Public key
           </dt>
           <dd className="size-full text-base leading-tight text-neutral-500">
-            <If condition={!publicKey || publicKey !== BYTES32_ZERO}>
+            <If condition={!publicKey || publicKey === BYTES32_ZERO}>
               <Then>Not registered</Then>
               <Else>Registered</Else>
             </If>

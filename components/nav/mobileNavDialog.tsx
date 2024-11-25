@@ -11,10 +11,10 @@ interface IMobileNavDialogProps extends IDialogRootProps {
 export const MobileNavDialog: React.FC<IMobileNavDialogProps> = (props) => {
   const { navLinks, ...dialogRootProps } = props;
   const { address } = useAccount();
-  const { signers: listedSigners } = useSignerList();
+  const { data: listedSigners } = useSignerList();
   const { data: listedOrAppointedSigners } = useApproverWalletList();
   // If the address is a listed signer (by being an owner or by being appointed by an owner)
-  const showAllLinks = address && (listedSigners.includes(address) || listedOrAppointedSigners?.includes(address));
+  const showAllLinks = address && (listedSigners?.includes(address) || listedOrAppointedSigners?.includes(address));
 
   return (
     <Dialog.Root {...dialogRootProps}>

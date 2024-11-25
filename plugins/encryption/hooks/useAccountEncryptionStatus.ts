@@ -30,7 +30,7 @@ export function useAccountEncryptionStatus(targetAddress?: Address | undefined):
   if (!targetAddress) targetAddress = selfAddress;
 
   const { data: encryptionAccounts, isLoading: isLoadingEncryptionAccounts, error: error1 } = useEncryptionAccounts();
-  const { signers, isLoading: isLoadingSigners, error: error2 } = useSignerList();
+  const { data: signers, isLoading: isLoadingSigners, error: error2 } = useSignerList();
   const { isContract } = useIsContract(targetAddress);
 
   const encryptionAccount = (encryptionAccounts || []).find(
@@ -38,7 +38,7 @@ export function useAccountEncryptionStatus(targetAddress?: Address | undefined):
   );
   const owner = encryptionAccount?.owner;
   const registeredPublicKey = encryptionAccount?.publicKey;
-  const isListed = signers.includes(targetAddress!);
+  const isListed = signers?.includes(targetAddress!);
   const isAppointed = (encryptionAccounts || []).findIndex((acc) => acc.appointedWallet === targetAddress) >= 0;
 
   let appointedWallet: Address | undefined;
