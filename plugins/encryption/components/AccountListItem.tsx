@@ -4,6 +4,7 @@ import { type IDataListItemProps, DataList, MemberAvatar, Tag } from "@aragon/od
 import { useAccount } from "wagmi";
 import { Address, Hex } from "viem";
 import { AccountEncryptionStatus, useAccountEncryptionStatus } from "../hooks/useAccountEncryptionStatus";
+import { AddressText } from "@/components/text/address";
 
 export interface IAccountListItemProps extends IDataListItemProps {
   /** 0x address of the account owner */
@@ -38,9 +39,9 @@ export const AccountListItemReady: React.FC<IAccountListItemProps> = (props) => 
         </div>
 
         <p className="inline-block w-full text-lg text-neutral-800 md:text-xl">{formatHexString(owner)}</p>
-        <p className="inline-block w-full text-sm text-neutral-400">
+        <p className="inline-block w-full text-sm text-success-500">
           <If condition={selfAppointed}>
-            <Then>The owner can decrypt proposals</Then>
+            <Then>The owner can decrypt emergency proposals</Then>
             <Else>Appointed: {appointedWallet === currentUserAddress ? "You" : formatHexString(appointedWallet)}</Else>
           </If>
         </p>
@@ -88,10 +89,10 @@ export const AccountListItemPending: React.FC<IAccountListItemProps> = (props) =
           <MemberAvatar address={owner} avatarSrc={avatarSrc} responsiveSize={{ md: "md" }} />
           <If condition={isCurrentUser}>
             <Then>
-              <Tag variant="success" label="You" />
+              <Tag variant="warning" label="You" />
             </Then>
             <Else>
-              <Tag variant="success" label="Signer" />
+              <Tag variant="warning" label="Signer" />
             </Else>
           </If>
         </div>
@@ -99,11 +100,11 @@ export const AccountListItemPending: React.FC<IAccountListItemProps> = (props) =
         <p className="inline-block w-full text-lg text-neutral-800 md:text-xl">{formatHexString(owner)}</p>
         <If condition={!!appointedWallet && appointedWallet !== ADDRESS_ZERO}>
           <p className="inline-block w-full text-sm text-neutral-400">
-            Appointed: {appointedWallet === currentUserAddress ? "You" : formatHexString(appointedWallet)}
+            Appointed: {appointedWallet === currentUserAddress ? "You" : <AddressText>{appointedWallet}</AddressText>}
           </p>
         </If>
         <If condition={!!comment}>
-          <p className="inline-block w-full text-sm text-neutral-400">{comment}</p>
+          <p className="inline-block w-full text-sm text-primary-300">{comment}</p>
         </If>
       </div>
     </DataList.Item>

@@ -48,19 +48,52 @@ export const AccountList: React.FC<IAccountListProps> = ({ listType }) => {
     }
   }
 
+  if (!accounts?.length) {
+    if (listType === "ready") {
+      return (
+        <NoSignersView
+          title="No active encryption accounts"
+          message="There are no active accounts fully set up on the Encryption Registry. Be the first one to register a public key or appoint an Externally Owned Account."
+        />
+      );
+    } else {
+      return (
+        <NoSignersView
+          title="All encryption accounts are ready"
+          message="No Security Council accounts appear to need additional steps"
+        />
+      );
+    }
+  }
+
   return (
     <DataList.Root
-      entityLabel={listType === "ready" ? "registered account(s)" : "pending account(s)"}
+      entityLabel={listType === "ready" ? "account(s) set up" : "pending account(s)"}
       itemsCount={accounts.length}
     >
       <DataList.Filter onSearchValueChange={setSearchValue} searchValue={searchValue} placeholder="Filter by address" />
       <DataList.Container className="grid grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))] gap-5">
-        {accounts.map((account) => {
-          const eAcc = encryptionAccounts.find((a) => a.owner === account);
+        {accounts
+          .filter((acc) => !searchValue || acc.toLowerCase().includes(searchValue.toLowerCase()))
+          .map((account) => {
+            const eAcc = encryptionAccounts.find((a) => a.owner === account);
 
-          if (listType === "ready") {
+            if (listType === "ready") {
+              return (
+                <AccountListItemReady
+                  key={account}
+                  href={`${PUB_CHAIN.blockExplorers?.default.url}/address/${account}`}
+                  target="_blank"
+                  owner={account}
+                  appointedWallet={eAcc?.appointedWallet}
+                  publicKey={eAcc?.publicKey}
+                />
+              );
+            }
+
+            // pending
             return (
-              <AccountListItemReady
+              <AccountListItemPending
                 key={account}
                 href={`${PUB_CHAIN.blockExplorers?.default.url}/address/${account}`}
                 target="_blank"
@@ -69,20 +102,7 @@ export const AccountList: React.FC<IAccountListProps> = ({ listType }) => {
                 publicKey={eAcc?.publicKey}
               />
             );
-          }
-
-          // pending
-          return (
-            <AccountListItemPending
-              key={account}
-              href={`${PUB_CHAIN.blockExplorers?.default.url}/address/${account}`}
-              target="_blank"
-              owner={account}
-              appointedWallet={eAcc?.appointedWallet}
-              publicKey={eAcc?.publicKey}
-            />
-          );
-        })}
+          })}
       </DataList.Container>
       {/* <DataList.Pagination /> */}
     </DataList.Root>

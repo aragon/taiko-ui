@@ -20,8 +20,8 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
   const { addAlert } = useAlerts();
   const [isWaiting, setIsWaiting] = useState(false);
   const { publicKey: derivedPublicKey, requestSignature } = useDerivedWallet();
-  const { data: accounts, refetch } = useEncryptionAccounts();
-  const { signers, isLoading } = useSignerList();
+  const { refetch } = useEncryptionAccounts();
+  const { data: signers, isLoading } = useSignerList();
   const { owner: accountOwner, appointedWallet, status: accountStatus } = useAccountEncryptionStatus(address);
 
   // Set public key transaction

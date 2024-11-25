@@ -75,7 +75,7 @@ export const AppointDialog: React.FC<IAppointDialogProps> = (props) => {
                   className="cursor-pointer underline"
                   onClick={() => setAddress("0x0000000000000000000000000000000000000000")}
                 >
-                  click here to wipe the currently appointed address
+                  click here to undo the appointment to the current address
                 </a>
                 .
               </Then>
