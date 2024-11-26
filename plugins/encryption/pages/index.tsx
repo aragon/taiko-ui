@@ -11,6 +11,7 @@ import { AccountEncryptionStatus, useAccountEncryptionStatus } from "../hooks/us
 import { AppointDialog } from "@/plugins/encryption/components/AppointDialog";
 import { useEncryptionRegistry } from "../hooks/useEncryptionRegistry";
 import { useDerivedWallet } from "@/hooks/useDerivedWallet";
+import { toHex } from "viem";
 
 export default function EncryptionPage() {
   const [toggleValue, setToggleValue] = useState<"ready" | "pending">("ready");
@@ -109,7 +110,7 @@ function AccountStatus() {
     description = "You are appointed by a signer but you have not defined your public key yet.";
     actions = [
       <Button size="md" isLoading={isConfirming} onClick={() => registerPublicKey("appointed")}>
-        Define public key
+        Define my public key
       </Button>,
     ];
   } else if (status === AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT) {
@@ -118,7 +119,7 @@ function AccountStatus() {
       "You are listed as a signer but you have not appointed an Externally Owned Account for decryption yet.";
     actions = [
       <Button size="md" isLoading={isConfirming} onClick={() => setShowAppointModal(true)}>
-        Appoint wallet
+        Appoint a wallet
       </Button>,
     ];
   } else if (status === AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT_OR_REGISTER_PUB_KEY) {
@@ -126,10 +127,10 @@ function AccountStatus() {
     description = "You are listed as a signer but you have not defined your public key or appointed a wallet yet.";
     actions = [
       <Button size="md" isLoading={isConfirming} onClick={() => registerPublicKey("own")}>
-        Define public key
+        Define my public key
       </Button>,
       <Button size="md" isLoading={isConfirming} variant="secondary" onClick={() => setShowAppointModal(true)}>
-        Appoint wallet
+        Appoint a wallet
       </Button>,
     ];
   }
@@ -148,10 +149,10 @@ function AccountStatus() {
   }
 
   if (status === AccountEncryptionStatus.READY_CAN_CREATE || status === AccountEncryptionStatus.READY_ALL) {
-    if (derivedPublicKey !== publicKey) {
+    if (derivedPublicKey && toHex(derivedPublicKey) !== publicKey) {
       actions.push(
         <Button size="md" isLoading={isConfirming} variant="secondary" onClick={() => registerPublicKey("own")}>
-          Update public key
+          Update my public key
         </Button>
       );
     }

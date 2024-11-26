@@ -25,7 +25,7 @@ export default function MembersList() {
   const { address, isConnected } = useAccount();
   const { delegates } = useDelegates();
   const delegateCount = delegates?.length || 0;
-  const { signers: multisigMembers, isLoading: isLoadingMultisigMembers } = useSignerList();
+  const { data: multisigMembers, isLoading: isLoadingMultisigMembers } = useSignerList();
 
   const [toggleValue, setToggleValue] = useState<"all" | "verified" | "multisig">("all");
   const onToggleChange = (value: string | undefined) => {

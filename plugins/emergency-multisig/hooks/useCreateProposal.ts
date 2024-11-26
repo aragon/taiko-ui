@@ -124,6 +124,11 @@ export function useCreateProposal() {
       });
     } catch (err) {
       setIsCreating(false);
+      console.error(err);
+      addAlert("Could not submit the proposal", {
+        description: "Encountered an error while preparing the proposal",
+        type: "error",
+      });
     }
   };
 

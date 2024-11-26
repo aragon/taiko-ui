@@ -3,10 +3,10 @@ import { EncryptedProposalMetadata } from "../utils/types";
 import { hexToUint8Array } from "@/utils/hex";
 import { encryptProposal, encryptSymmetricKey } from "@/utils/encryption";
 import type { ProposalMetadata, RawAction } from "@/utils/types";
-import { useEncryptionRegistry } from "../../encryption/hooks/useEncryptionRegistry";
 import { RawActionListAbi } from "../artifacts/RawActionListAbi";
 import { getContentCid } from "@/utils/ipfs";
 import { useApproverWalletList } from "@/plugins/members/hooks/useSignerList";
+import { useEncryptionAccounts } from "@/plugins/encryption/hooks/useEncryptionAccounts";
 
 export function useEncryptedData() {
   const {
@@ -14,7 +14,7 @@ export function useEncryptedData() {
     isLoading: isLoadingSigners,
     error: signerListError,
   } = useApproverWalletList();
-  const { data: encryptionAccounts, isLoading: isLoadingPubKeys } = useEncryptionRegistry();
+  const { data: encryptionAccounts, isLoading: isLoadingPubKeys } = useEncryptionAccounts();
 
   const encryptProposalData = async (privateMetadata: ProposalMetadata, actions: RawAction[]) => {
     const actionsBytes = encodeAbiParameters(RawActionListAbi, [actions]);
@@ -28,11 +28,13 @@ export function useEncryptedData() {
 
     // Only those who are on the signerList (encryptionRecipients)
     const encryptionPubKeys: Uint8Array[] = [];
-    for (const recipient of encryptionRecipients) {
-      const account = encryptionAccounts.find((a) => a.owner === recipient || a.appointedWallet === recipient);
-      if (!account) continue;
+    if (encryptionAccounts) {
+      for (const recipient of encryptionRecipients) {
+        const account = encryptionAccounts.find((a) => a.owner === recipient || a.appointedWallet === recipient);
+        if (!account) continue;
 
-      encryptionPubKeys.push(hexToUint8Array(account.publicKey));
+        encryptionPubKeys.push(hexToUint8Array(account.publicKey));
+      }
     }
 
     // Encrypting the symmetric key so that each individual member can recover it

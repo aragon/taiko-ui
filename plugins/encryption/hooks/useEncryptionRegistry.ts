@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { Address } from "viem";
+import { Address, toHex } from "viem";
 import { EncryptionRegistryAbi } from "../artifacts/EncryptionRegistry";
 import { PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS } from "@/constants";
 import { uint8ArrayToHex } from "@/utils/hex";
@@ -9,8 +9,9 @@ import { useAlerts } from "@/context/Alerts";
 import { debounce } from "@/utils/debounce";
 import { useTransactionManager } from "@/hooks/useTransactionManager";
 import { useEncryptionAccounts } from "./useEncryptionAccounts";
-import { useSignerList } from "@/plugins/members/hooks/useSignerList";
+import { useApproverWalletList, useSignerList } from "@/plugins/members/hooks/useSignerList";
 import { AccountEncryptionStatus, useAccountEncryptionStatus } from "./useAccountEncryptionStatus";
+import { ADDRESS_ZERO } from "@/utils/evm";
 
 /**
  * Returns methods to interact with the Encryption Registry smart contract
@@ -20,21 +21,33 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
   const { addAlert } = useAlerts();
   const [isWaiting, setIsWaiting] = useState(false);
   const { publicKey: derivedPublicKey, requestSignature } = useDerivedWallet();
-  const { refetch } = useEncryptionAccounts();
+  const { refetch: refetchAccounts } = useEncryptionAccounts();
+  const { refetch: refetchApprovers } = useApproverWalletList();
   const { data: signers, isLoading } = useSignerList();
-  const { owner: accountOwner, appointedWallet, status: accountStatus } = useAccountEncryptionStatus(address);
+  const {
+    owner: accountOwner,
+    appointedWallet,
+    publicKey: definedPublicKey,
+    status: accountStatus,
+  } = useAccountEncryptionStatus(address);
 
   // Set public key transaction
   const { writeContract: setPubKeyWrite, isConfirming: isConfirmingPubK } = useTransactionManager({
     // OK
     onSuccessMessage: "Public key registered",
     onSuccess() {
-      setTimeout(() => refetch(), 1000 * 2);
+      setTimeout(() => {
+        refetchAccounts();
+        refetchApprovers();
+      }, 1000 * 2);
       setIsWaiting(false);
     }, // Err
     onErrorMessage: "Could not register the public key",
     onError() {
-      debounce(() => refetch(), 800);
+      debounce(() => {
+        refetchAccounts();
+        refetchApprovers();
+      }, 800);
       setIsWaiting(false);
     },
   });
@@ -45,14 +58,20 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
     onSuccessMessage: "The wallet has been appointed",
     onSuccessDescription: "The appointed wallet will be able to decrypt future emergency proposals",
     onSuccess() {
-      setTimeout(() => refetch(), 1000 * 2);
+      setTimeout(() => {
+        refetchAccounts();
+        refetchApprovers();
+      }, 1000 * 2);
       setIsWaiting(false);
       onAppointSuccess?.();
     },
     // Err
     onErrorMessage: "Could not appoint the wallet",
     onError() {
-      debounce(() => refetch(), 800);
+      debounce(() => {
+        refetchAccounts();
+        refetchApprovers();
+      }, 800);
       setIsWaiting(false);
     },
   });
@@ -71,6 +90,11 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
       case AccountEncryptionStatus.ERR_APPOINTED_A_SMART_WALLET_CANNOT_GENERATE_PUBLIC_KEY:
         addAlert("Smart wallets cannot register a public key", { type: "error" });
         return;
+    }
+
+    if (derivedPublicKey && toHex(derivedPublicKey).toLowerCase() === definedPublicKey?.toLowerCase()) {
+      addAlert("The public key is already defined");
+      return;
     }
 
     setIsWaiting(true);
@@ -117,6 +141,9 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
       return;
     } else if (!signers?.includes(address)) {
       addAlert("You are not currently listed as a Security Member signer", { type: "error" });
+      return;
+    } else if (walletToAppoint != ADDRESS_ZERO && walletToAppoint.toLowerCase() === appointedWallet?.toLowerCase()) {
+      addAlert("The wallet is already appointed");
       return;
     }
 

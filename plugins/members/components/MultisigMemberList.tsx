@@ -9,9 +9,9 @@ interface IMultisigMemberListProps {}
 
 export const MultisigMemberList: React.FC<IMultisigMemberListProps> = () => {
   const [searchValue, setSearchValue] = useState<string>();
-  const { signers: members, isLoading, error } = useSignerList();
+  const { data: members, isLoading, error } = useSignerList();
 
-  if (isLoading && !members?.length) {
+  if (isLoading && !members) {
     return <PleaseWaitSpinner fullMessage="Please wait, loading members" />;
   } else if (!members?.length) {
     return <NoMembersView error={error?.message} />;
