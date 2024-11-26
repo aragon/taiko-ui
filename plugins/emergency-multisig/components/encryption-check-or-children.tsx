@@ -9,10 +9,10 @@ import { useRouter } from "next/router";
 
 export const EncryptionPlaceholderOrChildren = ({
   children,
-  isEncrypted,
+  needsPublicKey,
 }: {
   children: ReactNode;
-  isEncrypted?: boolean;
+  needsPublicKey?: boolean;
 }) => {
   const { open } = useWeb3Modal();
   const { push } = useRouter();
@@ -73,22 +73,22 @@ export const EncryptionPlaceholderOrChildren = ({
   } else if (status === AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT) {
     title = "You need to appoint a wallet";
     description =
-      "Security Council members need to register a public key in order to engage with both public and private (emergency) proposals. However, addresses behind a smart contract like yours cannot cryptographically sign or decrypt. You need to appoint an externally owned address that can work with cryptographic primitives, so that it can access and approve all types of proposals.";
+      "Security Council members need to register a public key in order to engage with both public and private (emergency) proposals. However, addresses behind a smart contract like yours cannot cryptographically sign or decrypt. You need to appoint an externally owned address that can work with cryptographic primitives, so that it can access and approve both public and private proposals.";
     object = "LABELS";
     button = {
       label: "Appoint a wallet",
       onClick: () => push("/plugins/encryption/"),
     };
   } else if (status === AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT_OR_REGISTER_PUB_KEY) {
-    title = "You need to appoint a wallet";
+    title = "Set up your encryption account";
     description =
-      "Security Council members need to register a public key in order to engage with both public and private (emergency) proposals. You need to define your public key or appoint an externally owned address, so that your account can engage with all types of proposals.";
+      "Security Council members need to register a public key in order to engage with both public and private (emergency) proposals. You need to define your public key or appoint an externally owned address, so that your account can engage with both types of proposals.";
     object = "LABELS";
     button = {
       label: "Manage encryption",
       onClick: () => push("/plugins/encryption/"),
     };
-  } else if (!derivedPublicKey?.length && isEncrypted) {
+  } else if (!derivedPublicKey?.length && needsPublicKey) {
     title = "Sign in to continue";
     description = "Please sign in with your wallet to decrypt the private proposal data.";
     object = "LABELS";

@@ -12,10 +12,8 @@ import {
 } from "@aragon/ods";
 import { useCanCreateProposal } from "@/plugins/emergency-multisig/hooks/useCanCreateProposal";
 import Link from "next/link";
-import { Else, ElseIf, If, Then } from "@/components/if";
+import { Else, If, Then } from "@/components/if";
 import { PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
-import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
-import { MissingContentView } from "@/components/MissingContentView";
 import { MainSection } from "@/components/layout/main-section";
 import {
   AccountEncryptionStatus,
@@ -78,7 +76,7 @@ export default function Proposals() {
         </div>
       </SectionView>
 
-      <EncryptionPlaceholderOrChildren isEncrypted>
+      <EncryptionPlaceholderOrChildren needsPublicKey>
         <If condition={!proposalCount}>
           <Then>
             <If condition={canCreate}>
