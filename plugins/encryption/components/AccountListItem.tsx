@@ -65,7 +65,7 @@ export const AccountListItemPending: React.FC<IAccountListItemProps> = (props) =
       comment = "Cannot load status";
       break;
     // case AccountEncryptionStatus.ERR_NOT_LISTED_OR_APPOINTED:
-    case AccountEncryptionStatus.ERR_SMART_WALLETS_CANNOT_REGISTER_PUB_KEY:
+    case AccountEncryptionStatus.ERR_APPOINTED_A_SMART_WALLET_CANNOT_GENERATE_PUBLIC_KEY:
       comment = "The owner cannot define a public key as a smart wallet";
       break;
     case AccountEncryptionStatus.WARN_APPOINTED_MUST_REGISTER_PUB_KEY:

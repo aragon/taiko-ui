@@ -92,7 +92,7 @@ function AccountStatus() {
     variant = "critical";
     title = "Not a member";
     description = "You are not listed as a signer or appointed by a signer.";
-  } else if (status === AccountEncryptionStatus.ERR_SMART_WALLETS_CANNOT_REGISTER_PUB_KEY) {
+  } else if (status === AccountEncryptionStatus.ERR_APPOINTED_A_SMART_WALLET_CANNOT_GENERATE_PUBLIC_KEY) {
     variant = "critical";
     title = "Error";
     description = "You are appointed by a listed signer but smart wallets cannot register public keys.";

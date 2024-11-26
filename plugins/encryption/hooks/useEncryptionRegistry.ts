@@ -68,7 +68,7 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
       case AccountEncryptionStatus.ERR_NOT_LISTED_OR_APPOINTED:
         addAlert("You are not currently a listed signer or an appointed wallet", { type: "error" });
         return;
-      case AccountEncryptionStatus.ERR_SMART_WALLETS_CANNOT_REGISTER_PUB_KEY:
+      case AccountEncryptionStatus.ERR_APPOINTED_A_SMART_WALLET_CANNOT_GENERATE_PUBLIC_KEY:
         addAlert("Smart wallets cannot register a public key", { type: "error" });
         return;
     }

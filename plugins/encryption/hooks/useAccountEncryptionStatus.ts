@@ -9,12 +9,19 @@ export enum AccountEncryptionStatus {
   LOADING_ENCRYPTION_STATUS,
   ERR_COULD_NOT_LOAD,
   ERR_NOT_LISTED_OR_APPOINTED,
-  ERR_SMART_WALLETS_CANNOT_REGISTER_PUB_KEY,
+  /** When appointing an address that is a smart contract */
+  ERR_APPOINTED_A_SMART_WALLET_CANNOT_GENERATE_PUBLIC_KEY,
+  /** The current user is the owner and the appointed wallet hasn't registered the public key yet */
   WARN_APPOINTED_MUST_REGISTER_PUB_KEY,
+  /** The current user is the appointed wallet and it needs to register the public key */
   CTA_APPOINTED_MUST_REGISTER_PUB_KEY,
+  /** The owner is a smart wallet and no address is appointed */
   CTA_OWNER_MUST_APPOINT,
+  /** The owner is a wallet and no public key or appointed address is defined */
   CTA_OWNER_MUST_APPOINT_OR_REGISTER_PUB_KEY,
+  /** The current account can create proposals */
   READY_CAN_CREATE,
+  /** The current account can create and decrypt proposals */
   READY_ALL,
 }
 
@@ -68,7 +75,7 @@ export function useAccountEncryptionStatus(targetAddress?: Address | undefined):
       } else {
         if (isContract) {
           // Error: smart wallets cannot register a public key
-          status = AccountEncryptionStatus.ERR_SMART_WALLETS_CANNOT_REGISTER_PUB_KEY;
+          status = AccountEncryptionStatus.ERR_APPOINTED_A_SMART_WALLET_CANNOT_GENERATE_PUBLIC_KEY;
         } else {
           // CTA: Appointed must register pubkey
           status = AccountEncryptionStatus.CTA_APPOINTED_MUST_REGISTER_PUB_KEY;
