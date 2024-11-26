@@ -17,7 +17,7 @@ export const AccountList: React.FC<IAccountListProps> = ({ listType }) => {
   const { data: signers, isLoading: isLoading1 } = useSignerList();
   const { data: encryptionAccounts, isLoading: isLoading2, error } = useEncryptionAccounts();
 
-  if (!encryptionAccounts?.length || !signers?.length || isLoading1 || isLoading2) {
+  if (!encryptionAccounts || !signers || isLoading1 || isLoading2) {
     return <PleaseWaitSpinner fullMessage="Please wait, loading accounts" />;
   } else if (!encryptionAccounts.length) {
     if (error) return <NoSignersView title="Could not fetch" message={error?.message} />;
