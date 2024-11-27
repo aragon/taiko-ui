@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, IconType, InputText, Tag, TextAreaRichText } from "@aragon/ods";
-import { Else, ElseIf, If, Then } from "@/components/if";
+import { Else, If, Then } from "@/components/if";
 import { MainSection } from "@/components/layout/main-section";
 import { useCreateProposal } from "../hooks/useCreateProposal";
 import { useApproverWalletList } from "@/plugins/members/hooks/useSignerList";
@@ -238,9 +238,11 @@ export default function Create() {
 
           {/* Submit */}
 
-          <div className="mt-6 flex w-full flex-col items-center">
+          <div className="mt-6 flex w-full flex-col items-center text-center">
             <div>
               <span className="text-md mb-2 block font-normal text-neutral-700 ">
+                The proposal will be private
+                <br />
                 {signersWithPubKey || 0} signer(s) registered their public key
               </span>
             </div>

@@ -11,7 +11,10 @@ import { useRouter } from "next/router";
 export function useProposalApprove(proposalId: string) {
   const { push } = useRouter();
   const { proposal, status: proposalFetchStatus, refetch: refetchProposal } = useProposal(proposalId, true);
-  const { data: approvals } = useProposalApprovals(proposalId, proposal?.parameters.snapshotBlock);
+  const { data: approvals, refetch: refetchApprovals } = useProposalApprovals(
+    proposalId,
+    proposal?.parameters.snapshotBlock
+  );
 
   const { addAlert } = useAlerts() as AlertContextProps;
   const {
@@ -63,6 +66,7 @@ export function useProposalApprove(proposalId: string) {
     }, 1000 * 2);
     refetchCanApprove();
     refetchProposal();
+    refetchApprovals();
   }, [approveStatus, approveTxHash, isConfirming, isConfirmed]);
 
   const approveProposal = () => {

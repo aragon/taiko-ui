@@ -12,7 +12,7 @@ export function useProposalVeto(index: number) {
   const { proposalId } = useProposalId(index);
 
   const { proposal, status: proposalFetchStatus, refetch: refetchProposal } = useProposal(proposalId, true);
-  const { data: vetoes } = useProposalVetoes(proposalId);
+  const { data: vetoes, refetch: refetchVetoes } = useProposalVetoes(proposalId);
 
   const { addAlert } = useAlerts() as AlertContextProps;
   const { writeContract: vetoWrite, data: vetoTxHash, error: vetoingError, status: vetoingStatus } = useWriteContract();
@@ -50,6 +50,7 @@ export function useProposalVeto(index: number) {
     });
     refetchCanVeto();
     refetchProposal();
+    refetchVetoes();
   }, [vetoingStatus, vetoTxHash, isConfirming, isConfirmed]);
 
   const vetoProposal = () => {

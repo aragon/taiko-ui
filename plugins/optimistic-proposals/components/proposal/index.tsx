@@ -64,9 +64,9 @@ export default function ProposalCard(props: ProposalInputs) {
 
   let vetoPercentage = 0;
   if (proposal?.vetoTally && pastSupply && proposal.parameters.minVetoRatio) {
-    vetoPercentage = Number(
-      (BigInt(1000) * proposal.vetoTally) / ((pastSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(10000000))
-    );
+    // Example: 15% of the token supply (adjusted for decimal precision, 10^6)
+    const defeatThreshold = (pastSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(1000000);
+    vetoPercentage = Number((10000n * proposal.vetoTally) / defeatThreshold) / 100;
   }
 
   return (

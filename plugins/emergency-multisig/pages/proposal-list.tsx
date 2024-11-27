@@ -15,19 +15,14 @@ import Link from "next/link";
 import { Else, If, Then } from "@/components/if";
 import { PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { MainSection } from "@/components/layout/main-section";
-import {
-  AccountEncryptionStatus,
-  useAccountEncryptionStatus,
-} from "@/plugins/encryption/hooks/useAccountEncryptionStatus";
 import { EncryptionPlaceholderOrChildren } from "../components/encryption-check-or-children";
 import { useRouter } from "next/router";
 
 const DEFAULT_PAGE_SIZE = 6;
 
 export default function Proposals() {
-  const { address: selfAddress, isConnected } = useAccount();
-  const { status } = useAccountEncryptionStatus(selfAddress);
   const { push } = useRouter();
+  const { isConnected } = useAccount();
   const { data: blockNumber } = useBlockNumber({ watch: true });
   const { canCreate } = useCanCreateProposal();
   const {
@@ -66,7 +61,7 @@ export default function Proposals() {
           Proposals
         </h1>
         <div className="justify-self-end">
-          <If condition={isConnected && canCreate && status === AccountEncryptionStatus.READY_ALL}>
+          <If condition={isConnected && canCreate}>
             <Link href="#/new">
               <Button iconLeft={IconType.PLUS} size="md" variant="primary">
                 Submit Proposal
