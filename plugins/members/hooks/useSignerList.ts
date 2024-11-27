@@ -23,8 +23,8 @@ export function useSignerList() {
       throw new Error("No public client");
     }
 
-    const addedProm = getLogsUntilNow(PUB_SIGNER_LIST_CONTRACT_ADDRESS, SignersAddedEvent, publicClient);
-    const removedProm = getLogsUntilNow(PUB_SIGNER_LIST_CONTRACT_ADDRESS, SignersRemovedEvent, publicClient);
+    const addedProm = getLogsUntilNow(PUB_SIGNER_LIST_CONTRACT_ADDRESS, SignersAddedEvent, {}, publicClient);
+    const removedProm = getLogsUntilNow(PUB_SIGNER_LIST_CONTRACT_ADDRESS, SignersRemovedEvent, {}, publicClient);
 
     return Promise.all([addedProm, removedProm]).then(([addedLogs, removedLogs]) => {
       return computeCurrentSignerList(addedLogs, removedLogs);

@@ -1,28 +1,18 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
-import { Address, Hex, getAbiItem } from "viem";
+import { getAbiItem } from "viem";
 import { ProposalMetadata, type RawAction, type DecodedAction } from "@/utils/types";
 import {
   type OptimisticProposal,
   type OptimisticProposalParameters,
   type OptimisticProposalResultType,
 } from "@/plugins/optimistic-proposals/utils/types";
-import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
+import { PUB_CHAIN, PUB_DEPLOYMENT_BLOCK, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 import { useMetadata } from "@/hooks/useMetadata";
 import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisticTokenVotingPlugin.sol";
 import { parseProposalId } from "../utils/proposal-id";
-
-type ProposalCreatedLogResponse = {
-  args: {
-    actions: RawAction[];
-    allowFailureMap: bigint;
-    creator: Address;
-    endDate: bigint;
-    startDate: bigint;
-    metadata: Hex;
-    proposalId: bigint;
-  };
-};
+import { getLogsUntilNow } from "@/utils/evm";
+import { useQuery } from "@tanstack/react-query";
 
 const ProposalCreatedEvent = getAbiItem({
   abi: TaikoOptimisticTokenVotingPluginAbi,
@@ -30,8 +20,6 @@ const ProposalCreatedEvent = getAbiItem({
 });
 
 export function useProposal(proposalId?: bigint, autoRefresh = false) {
-  const publicClient = usePublicClient();
-  const [proposalCreationEvent, setProposalCreationEvent] = useState<ProposalCreatedLogResponse["args"]>();
   const { data: blockNumber } = useBlockNumber({ watch: true });
 
   // Proposal onchain data
@@ -47,40 +35,13 @@ export function useProposal(proposalId?: bigint, autoRefresh = false) {
     args: [proposalId ?? BigInt(0)],
     chainId: PUB_CHAIN.id,
   });
+  const { data: proposalCreationEvent } = useProposalCreationEvent(proposalId);
 
   const proposalData = decodeProposalResultData(proposalResult);
 
   useEffect(() => {
     if (autoRefresh) proposalRefetch();
   }, [blockNumber]);
-
-  // Creation event
-  useEffect(() => {
-    if (!proposalData || !publicClient) return;
-
-    publicClient
-      .getLogs({
-        address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-        event: ProposalCreatedEvent,
-        args: {
-          proposalId,
-        },
-        fromBlock: BigInt(0),
-        toBlock: "latest",
-      })
-      .then((logs: any) => {
-        if (!logs || !logs.length) throw new Error("No creation logs");
-
-        const event = logs.find((item: any) => item.args.proposalId === proposalId);
-
-        if (!event) return;
-        setProposalCreationEvent((event as any).args);
-      })
-      .catch((err) => {
-        console.error("Could not fetch the proposal details", err);
-        return null;
-      });
-  }, [proposalId, !!proposalData, !!publicClient]);
 
   // JSON metadata
   const {
@@ -107,6 +68,41 @@ export function useProposal(proposalId?: bigint, autoRefresh = false) {
 
 // Helpers
 
+function useProposalCreationEvent(proposalId: bigint | undefined) {
+  const publicClient = usePublicClient();
+
+  return useQuery({
+    queryKey: [
+      "optimistic-proposal-creation-event",
+      PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
+      proposalId?.toString() || "",
+      !!publicClient,
+    ],
+    queryFn: () => {
+      if (!publicClient || typeof proposalId === "undefined") throw new Error("Not ready");
+
+      return getLogsUntilNow(
+        PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
+        ProposalCreatedEvent,
+        {
+          proposalId: BigInt(proposalId),
+        },
+        publicClient,
+        PUB_DEPLOYMENT_BLOCK
+      ).then((logs) => {
+        if (!logs || !logs.length) throw new Error("No creation logs");
+
+        return logs[0].args;
+      });
+    },
+    retry: true,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    retryOnMount: true,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
 function decodeProposalResultData(data?: OptimisticProposalResultType) {
   if (!data?.length || data.length < 6) return null;
 
@@ -124,7 +120,7 @@ function decodeProposalResultData(data?: OptimisticProposalResultType) {
 function arrangeProposalData(
   proposalId?: bigint,
   proposalData?: ReturnType<typeof decodeProposalResultData>,
-  creationEvent?: ProposalCreatedLogResponse["args"],
+  creationEvent?: ReturnType<typeof useProposalCreationEvent>["data"],
   metadata?: ProposalMetadata
 ): OptimisticProposal | null {
   if (!proposalData || !proposalId) return null;

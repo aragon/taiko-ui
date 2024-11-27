@@ -1,5 +1,5 @@
 import { PUB_DEPLOYMENT_BLOCK } from "@/constants";
-import { AbiEvent, Address, PublicClient } from "viem";
+import { AbiEvent, Address, MaybeAbiEventName, MaybeExtractEventArgsFromAbi, PublicClient } from "viem";
 
 const GET_LOGS_BLOCK_COUNT = 100_000;
 
@@ -43,6 +43,7 @@ export function isContract(address: Address, publicClient: PublicClient) {
 export async function getLogsUntilNow<T extends AbiEvent>(
   targetContract: Address,
   event: T,
+  args: MaybeExtractEventArgsFromAbi<T extends AbiEvent ? [T] : undefined, MaybeAbiEventName<T>>,
   publicClient: PublicClient,
   fromBlock = PUB_DEPLOYMENT_BLOCK
 ) {
@@ -50,10 +51,10 @@ export async function getLogsUntilNow<T extends AbiEvent>(
   const currentBlock = await publicClient.getBlockNumber();
 
   do {
-    const logs = await publicClient.getLogs({
+    const logs = await publicClient.getLogs<T>({
       address: targetContract,
       event,
-      // args: {},
+      args,
       fromBlock,
       toBlock: fromBlock + BigInt(GET_LOGS_BLOCK_COUNT),
     });

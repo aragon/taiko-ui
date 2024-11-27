@@ -38,10 +38,6 @@ export type OptimisticProposal = {
   resources: IProposalResource[];
 };
 
-export type VoteCastResponse = {
-  args: VetoCastEvent[];
-};
-
 export type VetoCastEvent = {
   voter: Address;
   proposalId: bigint;

@@ -1,42 +1,45 @@
-import { useState, useEffect } from "react";
-import { Address, getAbiItem } from "viem";
-import { PublicClient } from "viem";
-import { ApprovedEvent, ApprovedEventResponse, EmergencyProposal } from "@/plugins/emergency-multisig/utils/types";
+import { getAbiItem } from "viem";
 import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin";
+import { getLogsUntilNow } from "@/utils/evm";
+import { usePublicClient } from "wagmi";
+import { PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
+import { useQuery } from "@tanstack/react-query";
 
-const event = getAbiItem({
+const approvedEvent = getAbiItem({
   abi: EmergencyMultisigPluginAbi,
   name: "Approved",
 });
 
-export function useProposalApprovals(
-  publicClient: PublicClient,
-  address: Address,
-  proposalId: string,
-  proposal: EmergencyProposal | null
-) {
-  const [proposalLogs, setLogs] = useState<ApprovedEvent[]>([]);
+export function useProposalApprovals(proposalId: string, snapshotBlock: bigint | undefined) {
+  const publicClient = usePublicClient();
 
-  async function getLogs() {
-    if (!proposal?.parameters?.snapshotBlock) return;
+  return useQuery({
+    queryKey: [
+      "emergency-proposal-approved-event",
+      PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
+      proposalId.toString(),
+      snapshotBlock?.toString() || "",
+      !!publicClient,
+    ],
+    queryFn: () => {
+      if (!publicClient || !snapshotBlock) return [];
 
-    const logs: ApprovedEventResponse[] = (await publicClient.getLogs({
-      address,
-      event: event as any,
-      args: {
-        proposalId,
-      } as any,
-      fromBlock: proposal.parameters.snapshotBlock,
-      toBlock: "latest", // TODO: Make this variable between 'latest' and proposal last block
-    })) as any;
-
-    const newLogs = logs.flatMap((log) => log.args);
-    if (newLogs.length > proposalLogs.length) setLogs(newLogs);
-  }
-
-  useEffect(() => {
-    getLogs();
-  }, [proposal?.parameters?.snapshotBlock]);
-
-  return proposalLogs;
+      return getLogsUntilNow(
+        PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
+        approvedEvent,
+        {
+          proposalId: BigInt(proposalId),
+        },
+        publicClient,
+        snapshotBlock
+      ).then((logs) => {
+        return logs.flatMap((log) => log.args);
+      });
+    },
+    retry: true,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    retryOnMount: true,
+    staleTime: 1000 * 60 * 3,
+  });
 }

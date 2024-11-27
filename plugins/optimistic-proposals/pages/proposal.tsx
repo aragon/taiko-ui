@@ -103,7 +103,7 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
         strategy: "Optimistic voting",
         options: "Veto",
       },
-      votes: vetoes.map(({ voter }) => ({ address: voter, variant: "no" }) as IVote),
+      votes: vetoes?.map(({ voter }) => ({ address: voter, variant: "no" }) as IVote) || [],
     },
   ];
 

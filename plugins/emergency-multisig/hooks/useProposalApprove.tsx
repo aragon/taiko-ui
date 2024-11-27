@@ -1,19 +1,17 @@
 import { useEffect } from "react";
-import { usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { useProposal } from "./useProposal";
 import { useUserCanApprove } from "@/plugins/emergency-multisig/hooks/useUserCanApprove";
 import { EmergencyMultisigPluginAbi } from "@/plugins/emergency-multisig/artifacts/EmergencyMultisigPlugin";
 import { useAlerts, AlertContextProps } from "@/context/Alerts";
-import { PUB_CHAIN, PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
+import { PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useProposalApprovals } from "./useProposalApprovals";
 import { useRouter } from "next/router";
 
 export function useProposalApprove(proposalId: string) {
   const { push } = useRouter();
-  const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
-
   const { proposal, status: proposalFetchStatus, refetch: refetchProposal } = useProposal(proposalId, true);
-  const approvals = useProposalApprovals(publicClient!, PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS, proposalId, proposal);
+  const { data: approvals } = useProposalApprovals(proposalId, proposal?.parameters.snapshotBlock);
 
   const { addAlert } = useAlerts() as AlertContextProps;
   const {

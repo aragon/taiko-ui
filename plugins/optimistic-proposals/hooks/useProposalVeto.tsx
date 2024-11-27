@@ -12,7 +12,7 @@ export function useProposalVeto(index: number) {
   const { proposalId } = useProposalId(index);
 
   const { proposal, status: proposalFetchStatus, refetch: refetchProposal } = useProposal(proposalId, true);
-  const vetoes = useProposalVetoes(proposalId);
+  const { data: vetoes } = useProposalVetoes(proposalId);
 
   const { addAlert } = useAlerts() as AlertContextProps;
   const { writeContract: vetoWrite, data: vetoTxHash, error: vetoingError, status: vetoingStatus } = useWriteContract();
