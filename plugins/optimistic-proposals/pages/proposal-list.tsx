@@ -3,8 +3,8 @@ import { useEffect } from "react";
 import ProposalCard from "@/plugins/optimistic-proposals/components/proposal";
 import { AlertCard, DataList, Link, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
 import { Else, ElseIf, If, Then } from "@/components/if";
-import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN, PUB_TOKEN_SYMBOL } from "@/constants";
-import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisticTokenVotingPlugin.sol";
+import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
+import { OptimisticTokenVotingPluginAbi } from "../artifacts/OptimisticTokenVotingPlugin.sol";
 import { MainSection } from "@/components/layout/main-section";
 import { MissingContentView } from "@/components/MissingContentView";
 import { ADDRESS_ZERO } from "@/utils/evm";
@@ -27,7 +27,7 @@ export default function Proposals() {
     refetch,
   } = useReadContract({
     address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-    abi: TaikoOptimisticTokenVotingPluginAbi,
+    abi: OptimisticTokenVotingPluginAbi,
     functionName: "proposalCount",
     chainId: PUB_CHAIN.id,
   });

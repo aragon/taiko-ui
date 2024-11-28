@@ -1,6 +1,6 @@
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 import { useConfig } from "wagmi";
-import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisticTokenVotingPlugin.sol";
+import { OptimisticTokenVotingPluginAbi } from "../artifacts/OptimisticTokenVotingPlugin.sol";
 import { useQuery } from "@tanstack/react-query";
 import { readContract } from "@wagmi/core";
 
@@ -16,7 +16,7 @@ export function useGovernanceSettings() {
     queryKey: ["governance-settings", PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS],
     queryFn: () => {
       return readContract(config, {
-        abi: TaikoOptimisticTokenVotingPluginAbi,
+        abi: OptimisticTokenVotingPluginAbi,
         address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
         functionName: "governanceSettings",
         args: [],
@@ -31,10 +31,16 @@ export function useGovernanceSettings() {
 
   return {
     governanceSettings: {
+      /** 100% is represented as 1_000_000  */
       minVetoRatio: governanceSettings?.[0],
+      /** In seconds */
       minDuration: governanceSettings?.[1],
-      l2InactivityPeriod: governanceSettings?.[2],
-      l2AggregationGracePeriod: governanceSettings?.[3],
+      /** In seconds */
+      timelockPeriod: governanceSettings?.[2],
+      /** In seconds */
+      l2InactivityPeriod: governanceSettings?.[3],
+      /** In seconds */
+      l2AggregationGracePeriod: governanceSettings?.[4],
     },
     isLoading,
     error,

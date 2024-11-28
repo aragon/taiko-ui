@@ -16,7 +16,7 @@ export const useProposalVariantStatus = (proposal: OptimisticProposal) => {
   useEffect(() => {
     if (!proposal || !proposal?.parameters || !totalSupply || typeof bridgedBalance === "undefined") return;
 
-    const effectiveSupply = proposal.parameters.skipL2 ? totalSupply - bridgedBalance : totalSupply;
+    const effectiveSupply = proposal.parameters.unavailableL2 ? totalSupply - bridgedBalance : totalSupply;
     const minVetoVotingPower = (effectiveSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(1_000_000);
 
     setStatus(
@@ -51,7 +51,7 @@ export const useProposalStatus = (proposal: OptimisticProposal) => {
   useEffect(() => {
     if (!proposal || !proposal?.parameters || !totalSupply || typeof bridgedBalance === "undefined") return;
 
-    const effectiveSupply = proposal.parameters.skipL2 ? totalSupply - bridgedBalance : totalSupply;
+    const effectiveSupply = proposal.parameters.unavailableL2 ? totalSupply - bridgedBalance : totalSupply;
     const minVetoVotingPower = (effectiveSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(1_000_000);
 
     setStatus(
