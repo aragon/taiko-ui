@@ -1,7 +1,20 @@
-export const MultisigPluginAbi = [
+export const OptimisticTokenVotingPluginAbi = [
   {
     type: "function",
-    name: "UPDATE_MULTISIG_SETTINGS_PERMISSION_ID",
+    name: "PROPOSER_PERMISSION_ID",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "UPDATE_OPTIMISTIC_GOVERNANCE_SETTINGS_PERMISSION_ID",
     inputs: [],
     outputs: [
       {
@@ -27,42 +40,19 @@ export const MultisigPluginAbi = [
   },
   {
     type: "function",
-    name: "approve",
+    name: "bridgedVotingPower",
     inputs: [
       {
-        name: "_proposalId",
+        name: "_timestamp",
         type: "uint256",
         internalType: "uint256",
-      },
-      {
-        name: "_tryExecution",
-        type: "bool",
-        internalType: "bool",
-      },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "canApprove",
-    inputs: [
-      {
-        name: "_proposalId",
-        type: "uint256",
-        internalType: "uint256",
-      },
-      {
-        name: "_account",
-        type: "address",
-        internalType: "address",
       },
     ],
     outputs: [
       {
         name: "",
-        type: "bool",
-        internalType: "bool",
+        type: "uint256",
+        internalType: "uint256",
       },
     ],
     stateMutability: "view",
@@ -88,15 +78,39 @@ export const MultisigPluginAbi = [
   },
   {
     type: "function",
+    name: "canVeto",
+    inputs: [
+      {
+        name: "_proposalId",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "_voter",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "createProposal",
     inputs: [
       {
-        name: "_metadataURI",
+        name: "_metadata",
         type: "bytes",
         internalType: "bytes",
       },
       {
-        name: "_destinationActions",
+        name: "_actions",
         type: "tuple[]",
         internalType: "struct IDAO.Action[]",
         components: [
@@ -118,14 +132,14 @@ export const MultisigPluginAbi = [
         ],
       },
       {
-        name: "_destinationPlugin",
-        type: "address",
-        internalType: "contract OptimisticTokenVotingPlugin",
+        name: "_allowFailureMap",
+        type: "uint256",
+        internalType: "uint256",
       },
       {
-        name: "_approveProposal",
-        type: "bool",
-        internalType: "bool",
+        name: "_duration",
+        type: "uint64",
+        internalType: "uint64",
       },
     ],
     outputs: [
@@ -146,6 +160,30 @@ export const MultisigPluginAbi = [
         name: "",
         type: "address",
         internalType: "contract IDAO",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "effectiveVotingPower",
+    inputs: [
+      {
+        name: "_timestamp",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "_includeL2VotingPower",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
       },
     ],
     stateMutability: "view",
@@ -175,36 +213,46 @@ export const MultisigPluginAbi = [
     ],
     outputs: [
       {
+        name: "open",
+        type: "bool",
+        internalType: "bool",
+      },
+      {
         name: "executed",
         type: "bool",
         internalType: "bool",
       },
       {
-        name: "approvals",
-        type: "uint16",
-        internalType: "uint16",
-      },
-      {
         name: "parameters",
         type: "tuple",
-        internalType: "struct Multisig.ProposalParameters",
+        internalType: "struct OptimisticTokenVotingPlugin.ProposalParameters",
         components: [
           {
-            name: "minApprovals",
-            type: "uint16",
-            internalType: "uint16",
-          },
-          {
-            name: "snapshotBlock",
+            name: "vetoEndDate",
             type: "uint64",
             internalType: "uint64",
           },
           {
-            name: "expirationDate",
+            name: "snapshotTimestamp",
             type: "uint64",
             internalType: "uint64",
+          },
+          {
+            name: "minVetoRatio",
+            type: "uint32",
+            internalType: "uint32",
+          },
+          {
+            name: "unavailableL2",
+            type: "bool",
+            internalType: "bool",
           },
         ],
+      },
+      {
+        name: "vetoTally",
+        type: "uint256",
+        internalType: "uint256",
       },
       {
         name: "metadataURI",
@@ -212,7 +260,7 @@ export const MultisigPluginAbi = [
         internalType: "bytes",
       },
       {
-        name: "destinationActions",
+        name: "actions",
         type: "tuple[]",
         internalType: "struct IDAO.Action[]",
         components: [
@@ -234,16 +282,54 @@ export const MultisigPluginAbi = [
         ],
       },
       {
-        name: "destinationPlugin",
-        type: "address",
-        internalType: "contract OptimisticTokenVotingPlugin",
+        name: "allowFailureMap",
+        type: "uint256",
+        internalType: "uint256",
       },
     ],
     stateMutability: "view",
   },
   {
     type: "function",
-    name: "hasApproved",
+    name: "governanceSettings",
+    inputs: [],
+    outputs: [
+      {
+        name: "minVetoRatio",
+        type: "uint32",
+        internalType: "uint32",
+      },
+      {
+        name: "minDuration",
+        type: "uint32",
+        internalType: "uint32",
+      },
+      {
+        name: "timelockPeriod",
+        type: "uint32",
+        internalType: "uint32",
+      },
+      {
+        name: "l2InactivityPeriod",
+        type: "uint32",
+        internalType: "uint32",
+      },
+      {
+        name: "l2AggregationGracePeriod",
+        type: "uint32",
+        internalType: "uint32",
+      },
+      {
+        name: "skipL2",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "hasVetoed",
     inputs: [
       {
         name: "_proposalId",
@@ -251,7 +337,7 @@ export const MultisigPluginAbi = [
         internalType: "uint256",
       },
       {
-        name: "_account",
+        name: "_voter",
         type: "address",
         internalType: "address",
       },
@@ -288,36 +374,56 @@ export const MultisigPluginAbi = [
         internalType: "contract IDAO",
       },
       {
-        name: "_multisigSettings",
+        name: "_governanceSettings",
         type: "tuple",
-        internalType: "struct Multisig.MultisigSettings",
+        internalType: "struct OptimisticTokenVotingPlugin.OptimisticGovernanceSettings",
         components: [
           {
-            name: "onlyListed",
+            name: "minVetoRatio",
+            type: "uint32",
+            internalType: "uint32",
+          },
+          {
+            name: "minDuration",
+            type: "uint32",
+            internalType: "uint32",
+          },
+          {
+            name: "timelockPeriod",
+            type: "uint32",
+            internalType: "uint32",
+          },
+          {
+            name: "l2InactivityPeriod",
+            type: "uint32",
+            internalType: "uint32",
+          },
+          {
+            name: "l2AggregationGracePeriod",
+            type: "uint32",
+            internalType: "uint32",
+          },
+          {
+            name: "skipL2",
             type: "bool",
             internalType: "bool",
           },
-          {
-            name: "minApprovals",
-            type: "uint16",
-            internalType: "uint16",
-          },
-          {
-            name: "destinationProposalDuration",
-            type: "uint32",
-            internalType: "uint32",
-          },
-          {
-            name: "signerList",
-            type: "address",
-            internalType: "contract SignerList",
-          },
-          {
-            name: "proposalExpirationPeriod",
-            type: "uint32",
-            internalType: "uint32",
-          },
         ],
+      },
+      {
+        name: "_token",
+        type: "address",
+        internalType: "contract IVotesUpgradeable",
+      },
+      {
+        name: "_taikoL1",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "_taikoBridge",
+        type: "address",
+        internalType: "address",
       },
     ],
     outputs: [],
@@ -325,49 +431,96 @@ export const MultisigPluginAbi = [
   },
   {
     type: "function",
-    name: "lastMultisigSettingsChange",
+    name: "isL2Available",
     inputs: [],
     outputs: [
       {
         name: "",
-        type: "uint64",
-        internalType: "uint64",
+        type: "bool",
+        internalType: "bool",
       },
     ],
     stateMutability: "view",
   },
   {
     type: "function",
-    name: "multisigSettings",
-    inputs: [],
+    name: "isMember",
+    inputs: [
+      {
+        name: "_account",
+        type: "address",
+        internalType: "address",
+      },
+    ],
     outputs: [
       {
-        name: "onlyListed",
+        name: "",
         type: "bool",
         internalType: "bool",
       },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "isMinVetoRatioReached",
+    inputs: [
       {
-        name: "minApprovals",
-        type: "uint16",
-        internalType: "uint16",
+        name: "_proposalId",
+        type: "uint256",
+        internalType: "uint256",
       },
+    ],
+    outputs: [
       {
-        name: "destinationProposalDuration",
-        type: "uint32",
-        internalType: "uint32",
+        name: "",
+        type: "bool",
+        internalType: "bool",
       },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "minVetoRatio",
+    inputs: [],
+    outputs: [
       {
-        name: "signerList",
-        type: "address",
-        internalType: "contract SignerList",
-      },
-      {
-        name: "proposalExpirationPeriod",
+        name: "",
         type: "uint32",
         internalType: "uint32",
       },
     ],
     stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "parseProposalId",
+    inputs: [
+      {
+        name: "_proposalId",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "counter",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "startDate",
+        type: "uint64",
+        internalType: "uint64",
+      },
+      {
+        name: "endDate",
+        type: "uint64",
+        internalType: "uint64",
+      },
+    ],
+    stateMutability: "pure",
   },
   {
     type: "function",
@@ -386,6 +539,25 @@ export const MultisigPluginAbi = [
     type: "function",
     name: "proposalCount",
     inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "proposalIds",
+    inputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
     outputs: [
       {
         name: "",
@@ -429,37 +601,87 @@ export const MultisigPluginAbi = [
   },
   {
     type: "function",
-    name: "updateMultisigSettings",
+    name: "taikoBridge",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "taikoL1",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "contract ITaikoL1",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "totalVotingPower",
     inputs: [
       {
-        name: "_multisigSettings",
+        name: "_timestamp",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "updateOptimisticGovernanceSettings",
+    inputs: [
+      {
+        name: "_governanceSettings",
         type: "tuple",
-        internalType: "struct Multisig.MultisigSettings",
+        internalType: "struct OptimisticTokenVotingPlugin.OptimisticGovernanceSettings",
         components: [
           {
-            name: "onlyListed",
+            name: "minVetoRatio",
+            type: "uint32",
+            internalType: "uint32",
+          },
+          {
+            name: "minDuration",
+            type: "uint32",
+            internalType: "uint32",
+          },
+          {
+            name: "timelockPeriod",
+            type: "uint32",
+            internalType: "uint32",
+          },
+          {
+            name: "l2InactivityPeriod",
+            type: "uint32",
+            internalType: "uint32",
+          },
+          {
+            name: "l2AggregationGracePeriod",
+            type: "uint32",
+            internalType: "uint32",
+          },
+          {
+            name: "skipL2",
             type: "bool",
             internalType: "bool",
-          },
-          {
-            name: "minApprovals",
-            type: "uint16",
-            internalType: "uint16",
-          },
-          {
-            name: "destinationProposalDuration",
-            type: "uint32",
-            internalType: "uint32",
-          },
-          {
-            name: "signerList",
-            type: "address",
-            internalType: "contract SignerList",
-          },
-          {
-            name: "proposalExpirationPeriod",
-            type: "uint32",
-            internalType: "uint32",
           },
         ],
       },
@@ -499,6 +721,32 @@ export const MultisigPluginAbi = [
     stateMutability: "payable",
   },
   {
+    type: "function",
+    name: "veto",
+    inputs: [
+      {
+        name: "_proposalId",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "votingToken",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "contract IVotesUpgradeable",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
     type: "event",
     name: "AdminChanged",
     inputs: [
@@ -519,25 +767,6 @@ export const MultisigPluginAbi = [
   },
   {
     type: "event",
-    name: "Approved",
-    inputs: [
-      {
-        name: "proposalId",
-        type: "uint256",
-        indexed: true,
-        internalType: "uint256",
-      },
-      {
-        name: "approver",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
     name: "BeaconUpgraded",
     inputs: [
       {
@@ -545,19 +774,6 @@ export const MultisigPluginAbi = [
         type: "address",
         indexed: true,
         internalType: "address",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "Executed",
-    inputs: [
-      {
-        name: "proposalId",
-        type: "uint256",
-        indexed: true,
-        internalType: "uint256",
       },
     ],
     anonymous: false,
@@ -577,37 +793,76 @@ export const MultisigPluginAbi = [
   },
   {
     type: "event",
-    name: "MultisigSettingsUpdated",
+    name: "MembersAdded",
     inputs: [
       {
-        name: "onlyListed",
+        name: "members",
+        type: "address[]",
+        indexed: false,
+        internalType: "address[]",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "MembersRemoved",
+    inputs: [
+      {
+        name: "members",
+        type: "address[]",
+        indexed: false,
+        internalType: "address[]",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "MembershipContractAnnounced",
+    inputs: [
+      {
+        name: "definingContract",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "OptimisticGovernanceSettingsUpdated",
+    inputs: [
+      {
+        name: "minVetoRatio",
+        type: "uint32",
+        indexed: false,
+        internalType: "uint32",
+      },
+      {
+        name: "minDuration",
+        type: "uint64",
+        indexed: false,
+        internalType: "uint64",
+      },
+      {
+        name: "l2AggregationGracePeriod",
+        type: "uint64",
+        indexed: false,
+        internalType: "uint64",
+      },
+      {
+        name: "l2InactivityPeriod",
+        type: "uint64",
+        indexed: false,
+        internalType: "uint64",
+      },
+      {
+        name: "skipL2",
         type: "bool",
         indexed: false,
         internalType: "bool",
-      },
-      {
-        name: "minApprovals",
-        type: "uint16",
-        indexed: true,
-        internalType: "uint16",
-      },
-      {
-        name: "destinationProposalDuration",
-        type: "uint32",
-        indexed: false,
-        internalType: "uint32",
-      },
-      {
-        name: "signerList",
-        type: "address",
-        indexed: false,
-        internalType: "contract SignerList",
-      },
-      {
-        name: "proposalExpirationPeriod",
-        type: "uint32",
-        indexed: false,
-        internalType: "uint32",
       },
     ],
     anonymous: false,
@@ -705,20 +960,29 @@ export const MultisigPluginAbi = [
     anonymous: false,
   },
   {
-    type: "error",
-    name: "ApprovalCastForbidden",
+    type: "event",
+    name: "VetoCast",
     inputs: [
       {
         name: "proposalId",
         type: "uint256",
+        indexed: true,
         internalType: "uint256",
       },
       {
-        name: "sender",
+        name: "voter",
         type: "address",
+        indexed: true,
         internalType: "address",
       },
+      {
+        name: "votingPower",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
     ],
+    anonymous: false,
   },
   {
     type: "error",
@@ -748,41 +1012,40 @@ export const MultisigPluginAbi = [
   },
   {
     type: "error",
-    name: "InvalidAddressListSource",
-    inputs: [
-      {
-        name: "givenContract",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-  },
-  {
-    type: "error",
-    name: "InvalidSignerList",
-    inputs: [
-      {
-        name: "signerList",
-        type: "address",
-        internalType: "contract SignerList",
-      },
-    ],
-  },
-  {
-    type: "error",
-    name: "MinApprovalsOutOfBounds",
+    name: "DurationOutOfBounds",
     inputs: [
       {
         name: "limit",
-        type: "uint16",
-        internalType: "uint16",
+        type: "uint64",
+        internalType: "uint64",
       },
       {
         name: "actual",
-        type: "uint16",
-        internalType: "uint16",
+        type: "uint64",
+        internalType: "uint64",
       },
     ],
+  },
+  {
+    type: "error",
+    name: "MinDurationOutOfBounds",
+    inputs: [
+      {
+        name: "limit",
+        type: "uint64",
+        internalType: "uint64",
+      },
+      {
+        name: "actual",
+        type: "uint64",
+        internalType: "uint64",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "NoVotingPower",
+    inputs: [],
   },
   {
     type: "error",
@@ -801,6 +1064,38 @@ export const MultisigPluginAbi = [
     inputs: [
       {
         name: "proposalId",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "ProposalVetoingForbidden",
+    inputs: [
+      {
+        name: "proposalId",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "RatioOutOfBounds",
+    inputs: [
+      {
+        name: "limit",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "actual",
         type: "uint256",
         internalType: "uint256",
       },
