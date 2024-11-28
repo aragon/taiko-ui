@@ -71,7 +71,7 @@ export default function ProposalCard(props: ProposalInputs) {
       className="!p-6"
       title={proposal.title}
       summary={proposal.summary}
-      href={`#/proposals/${props.proposalIndex}`}
+      href={`${prefix}#/proposals/${props.proposalIndex}`}
       voted={hasVetoed}
       date={
         [ProposalStatus.ACTIVE, ProposalStatus.ACCEPTED].includes(proposalStatus!) && proposal.parameters.vetoEndDate

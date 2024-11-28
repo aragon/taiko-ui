@@ -12,7 +12,7 @@ export default function Home() {
         <div className="pb-4 pt-4 md:pb-6">
           <DaoResources />
         </div>
-        <div className="flex flex-col gap-y-10 px-4 pb-6 pt-10 md:flex-row md:gap-x-12 md:px-6 md:pb-12">
+        <div className="flex flex-col gap-y-10 pb-6 pt-10 md:flex-row md:gap-x-12 md:pb-12">
           <LatestProposals />
           <section className="flex flex-shrink flex-col gap-y-10 md:max-w-[464px] lg:w-full">
             <LatestTweets />

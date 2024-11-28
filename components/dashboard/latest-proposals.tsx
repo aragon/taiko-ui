@@ -1,33 +1,26 @@
-import { DataList, Heading, ProposalDataListItemSkeleton } from "@aragon/ods";
+import { DataList, DataListState, Heading, ProposalDataListItemSkeleton } from "@aragon/ods";
 import { Else, If, Then } from "../if";
 import { MissingContentView } from "../MissingContentView";
 import { useBlockNumber, useReadContract } from "wagmi";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
-import { TaikoOptimisticTokenVotingPluginAbi } from "@/plugins/optimistic-proposals/artifacts/TaikoOptimisticTokenVotingPlugin.sol";
+import { OptimisticTokenVotingPluginAbi } from "@/plugins/optimistic-proposals/artifacts/OptimisticTokenVotingPlugin.sol";
 import { useEffect } from "react";
 import ProposalCard from "@/plugins/optimistic-proposals/components/proposal";
 
 export const LatestProposals = () => {
   const { data: blockNumber } = useBlockNumber({ watch: true });
-  const {
-    data: proposalCountResponse,
-    error: isError,
-    isLoading,
-    isFetching: isFetchingNextPage,
-    refetch,
-  } = useReadContract({
+  const { data: proposalCountResponse, refetch } = useReadContract({
     address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-    abi: TaikoOptimisticTokenVotingPluginAbi,
+    abi: OptimisticTokenVotingPluginAbi,
     functionName: "proposalCount",
     chainId: PUB_CHAIN.id,
   });
   const proposalCount = Number(proposalCountResponse);
+  const entityLabel = proposalCount === 1 ? "Proposal" : "Proposals";
 
   useEffect(() => {
     refetch();
   }, [blockNumber]);
-
-  const entityLabel = proposalCount === 1 ? "Proposal" : "Proposals";
 
   return (
     <section className="flex flex-1 flex-col gap-y-4">
@@ -36,12 +29,20 @@ export const LatestProposals = () => {
       </div>
       <If condition={proposalCount}>
         <Then>
-          <DataList.Container SkeletonElement={ProposalDataListItemSkeleton}>
-            {Array.from(Array(proposalCount || 0)?.keys())
-              .reverse()
-              ?.map((proposalIndex) => <ProposalCard key={proposalIndex} proposalIndex={proposalIndex} />)}
-          </DataList.Container>
-          <DataList.Pagination />
+          <DataList.Root entityLabel={entityLabel} pageSize={3}>
+            <DataList.Container SkeletonElement={ProposalDataListItemSkeleton}>
+              {Array.from(Array(proposalCount || 0)?.keys())
+                .slice(-3)
+                .reverse()
+                ?.map((proposalIndex) => (
+                  <ProposalCard
+                    linkPrefix="/plugins/community-proposals/"
+                    key={proposalIndex}
+                    proposalIndex={proposalIndex}
+                  />
+                ))}
+            </DataList.Container>
+          </DataList.Root>
         </Then>
         <Else>
           <MissingContentView>
