@@ -37,7 +37,7 @@ The data that we need to encrypt includes:
 1. A user signs a static payload using his/her wallet. The resulting hash is used as a 256-bit private key to generate an ephemeral, in-memory key pair
 2. One of the multisig members generates a random symmetric key and uses it to encrypt the metadata and the actions
 3. The member fetches the public keys corresponding to the current Security Council members
-4. For each member's public key, he uses it to encrypt the key from step (1)
+4. For each member's public key, he uses it to encrypt the symmetric key from step (2)
 5. This generates a payload with:
   - The (symmetrically) encrypted metadata and proposals
   - The (asymmetrically) encrypted keys that only each member can recover
@@ -47,7 +47,7 @@ The data that we need to encrypt includes:
 
 ![](./readme-encryption-flow.png)
 
-### Encryption steps
+### Decryption steps
 
 1. One of the multisig members fetches the proposal, along with the pinned IPFS metadata
 2. The member signs the same predefined payload to generate the in-memory key pair
