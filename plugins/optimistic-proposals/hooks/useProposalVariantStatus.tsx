@@ -98,7 +98,7 @@ export const useProposalStatus = (proposal: OptimisticProposal | null) => {
       timelockPeriodEnd = l2GracePeriodEnd + BigInt(timelockPeriod) * 1000n;
 
       if (isPastEndDate) {
-        if (proposal.parameters.vetoEndDate <= Date.now() && Date.now() < l2GracePeriodEnd) {
+        if (proposal.parameters.vetoEndDate * 1000n <= Date.now() && Date.now() < l2GracePeriodEnd) {
           isL2GracePeriod = true;
         } else if (l2GracePeriodEnd <= Date.now() && Date.now() < timelockPeriodEnd) {
           isTimelockPeriod = true;

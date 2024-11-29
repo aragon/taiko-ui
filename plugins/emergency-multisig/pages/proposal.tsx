@@ -52,13 +52,13 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
           : canExecute
             ? {
                 isLoading: isConfirmingExecution,
-                label: "Execute",
+                label: "Execute proposal",
                 onClick: executeProposal,
               }
             : {
                 disabled: !canApprove,
                 isLoading: isConfirmingApproval,
-                label: "Approve",
+                label: "Approve proposal",
                 onClick: approveProposal,
               },
         approvalAmount: proposal?.approvals || 0,

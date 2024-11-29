@@ -62,14 +62,14 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
     cta = {
       disabled: !canExecute || !proposal?.actions.length,
       isLoading: isConfirmingExecution,
-      label: proposal?.actions.length ? "Execute" : "No actions to execute",
+      label: proposal?.actions.length ? "Execute proposal" : "No actions to execute",
       onClick: executeProposal,
     };
   } else if (proposalStatus === ProposalStatus.ACTIVE) {
     cta = {
       disabled: !canVeto,
       isLoading: isConfirmingVeto,
-      label: "Veto",
+      label: "Veto proposal",
       onClick: vetoProposal,
     };
   }

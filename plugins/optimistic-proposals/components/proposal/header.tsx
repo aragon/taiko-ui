@@ -1,5 +1,4 @@
 import { AvatarIcon, Breadcrumbs, Heading, IBreadcrumbsLink, IconType, ProposalStatus, Tag } from "@aragon/ods";
-import { Publisher } from "@/components/publisher";
 import { OptimisticProposal } from "@/plugins/optimistic-proposals/utils/types";
 import { useProposalStatus } from "@/plugins/optimistic-proposals/hooks/useProposalVariantStatus";
 import { Else, ElseIf, If, Then } from "@/components/if";
