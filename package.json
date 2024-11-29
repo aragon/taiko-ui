@@ -37,7 +37,7 @@
     "dompurify": "^3.0.11",
     "libsodium-wrappers": "^0.7.13",
     "multiformats": "^13.1.1",
-    "next": "14.1.4",
+    "next": "^14.2.0",
     "react": "^18.2.0",
     "react-blockies": "^1.4.1",
     "react-dom": "^18.2.0",
