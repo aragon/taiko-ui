@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DataList, IllustrationHuman } from "@aragon/ods";
+import { CardEmptyState, DataList } from "@aragon/ods";
 import { DelegateListItem } from "./DelegateListItem";
 import { equalAddresses } from "@/utils/evm";
 import { useDelegates } from "../hooks/useDelegates";
@@ -8,8 +8,6 @@ import { useAccount } from "wagmi";
 import VerifiedDelegates from "../../../verified-delegates.json";
 import { PleaseWaitSpinner } from "@/components/please-wait";
 // import { generateSortOptions, sortItems } from "./utils";
-
-// const DEFAULT_PAGE_SIZE = 12;
 
 interface IDelegateMemberListProps {
   verifiedOnly?: boolean;
@@ -42,19 +40,7 @@ export const DelegateMemberList: React.FC<IDelegateMemberListProps> = ({ verifie
   // const showPagination = (totalMembers ?? 0) > DEFAULT_PAGE_SIZE;
 
   if (!totalMembers) {
-    return (
-      <DataList.Root entityLabel="No members" itemsCount={0}>
-        <DataList.Filter
-          onSearchValueChange={setSearchValue}
-          searchValue={searchValue}
-          placeholder="Filter by address"
-          // onSortChange={setActiveSort}
-          // activeSort={activeSort}
-          // sortItems={sortItems}
-        />
-        <NoDelegatesView filtered={!!searchValue?.trim()} verified={verifiedOnly} />
-      </DataList.Root>
-    );
+    return <NoDelegatesView filtered={!!searchValue?.trim()} verified={verifiedOnly} />;
   }
 
   return (
@@ -100,23 +86,27 @@ function NoDelegatesView({ verified, filtered }: { verified?: boolean; filtered?
       message =
         "There are no verified delegate profiles matching the current filter. Please try entering a different search term.";
     } else {
-      message =
-        "There are no delegate profiles matching the current filter. Please try entering a different search term.";
+      message = "No delegate announcements match the current filter. Please try entering a different search term.";
     }
   } else {
     if (verified) {
       message =
-        "There are no verified delegate profiles with a public an announcement yet. Here you will see the addresses of members who have posted their candidacy. Be the first to post an announcement.";
+        "There are no verified delegate profiles with a public announcement yet. Here you will see the addresses of members who have posted their candidacy to be delegated to. Be the first to post an announcement and get noticed by the communnity.";
     } else {
       message =
-        "No delegate profiles posted an announcement yet. Here you will see the addresses of members who have posted their candidacy. Be the first to post an announcement.";
+        "No delegate announcements have been posted yet. Here you will see the addresses of members who have posted their candidacy to be delegated to. Be the first to post an announcement and get noticed by the communnity.";
     }
   }
 
   return (
-    <div className="w-full">
-      <p className="text-md text-neutral-400">{message}</p>
-      <IllustrationHuman className="mx-auto mb-10 max-w-72" body="VOTING" expression="CASUAL" hairs="CURLY" />
-    </div>
+    <CardEmptyState
+      heading="Delegate announcements"
+      description={message}
+      humanIllustration={{
+        body: "VOTING",
+        expression: "CASUAL",
+        hairs: "CURLY",
+      }}
+    />
   );
 }
