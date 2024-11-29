@@ -53,10 +53,10 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalIdx, proposal }
         </div>
         {/* Metadata */}
         <div className="flex flex-wrap gap-x-10 gap-y-2">
-          <div className="flex items-center gap-x-2">
+          {/* <div className="flex items-center gap-x-2">
             <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
             <Publisher publisher={[{ address: proposal.creator }]} />
-          </div>
+          </div> */}
           <div className="flex items-center gap-x-2">
             <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
             <div className="flex gap-x-1 text-base leading-tight ">
