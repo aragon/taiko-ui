@@ -13,7 +13,6 @@ import { Else, ElseIf, If, Then } from "@/components/if";
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { OptimisticTokenVotingPluginAbi } from "../artifacts/OptimisticTokenVotingPlugin.sol";
 import { MainSection } from "@/components/layout/main-section";
-import { MissingContentView } from "@/components/MissingContentView";
 import { ADDRESS_ZERO } from "@/utils/evm";
 import { useTokenVotes } from "@/hooks/useTokenVotes";
 import { AddressText } from "@/components/text/address";
@@ -93,7 +92,7 @@ export default function Proposals() {
         <Else>
           <CardEmptyState
             heading="No proposals yet"
-            description="The list of proposals is currently empty. Here you will see the proposals created by the Security Council submitted to the community for optimistic approval."
+            description="The list of proposals is currently empty. Here you will see the proposals created by the Security Council and submitted to the community for optimistic approval."
             objectIllustration={{
               object: "LABELS",
             }}

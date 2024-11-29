@@ -1,6 +1,5 @@
-import { DataList, DataListState, Heading, ProposalDataListItemSkeleton } from "@aragon/ods";
+import { CardEmptyState, DataList, DataListState, Heading, ProposalDataListItemSkeleton } from "@aragon/ods";
 import { Else, If, Then } from "../if";
-import { MissingContentView } from "../MissingContentView";
 import { useBlockNumber, useReadContract } from "wagmi";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
 import { OptimisticTokenVotingPluginAbi } from "@/plugins/optimistic-proposals/artifacts/OptimisticTokenVotingPlugin.sol";
@@ -45,11 +44,13 @@ export const LatestProposals = () => {
           </DataList.Root>
         </Then>
         <Else>
-          <MissingContentView>
-            No proposals have been created yet.
-            <br />
-            Here you will see the list of proposals initiated by the Security Council.
-          </MissingContentView>
+          <CardEmptyState
+            heading="No proposals yet"
+            description="The list of proposals is currently empty. Here you will see the proposals created by the Security Council and submitted to the community for optimistic approval."
+            objectIllustration={{
+              object: "LABELS",
+            }}
+          />
         </Else>
       </If>
     </section>

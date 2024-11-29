@@ -11,10 +11,10 @@ import dayjs from "dayjs";
 import { ProposalActions } from "@/components/proposalActions/proposalActions";
 import { CardResources } from "@/components/proposal/cardResources";
 import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
-import { MissingContentView } from "@/components/MissingContentView";
 import { useAccount } from "wagmi";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { CardEmptyState } from "@aragon/ods";
 
 export default function ProposalDetail({ id: proposalId }: { id: string }) {
   const { isConnected } = useAccount();
@@ -90,16 +90,32 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
       <If condition={!isConnected}>
         <Then>
           <div className="mt-12">
-            <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
-              Please connect your wallet to access the emergency proposals section.
-            </MissingContentView>
+            <CardEmptyState
+              heading="Connect wallet"
+              description="Please connect your wallet to access the emergency proposals section."
+              objectIllustration={{
+                object: "ACTION",
+              }}
+              primaryButton={{
+                label: "Connect wallet",
+                onClick: () => open(),
+              }}
+            />
           </div>
         </Then>
         <ElseIf condition={!publicKey}>
           <div className="mt-12">
-            <MissingContentView callToAction="Sign in to continue" onClick={() => requestSignature()}>
-              Please sign in with your wallet to decrypt the private proposal data.
-            </MissingContentView>
+            <CardEmptyState
+              heading="Sign in to continue"
+              description="Please sign in with your wallet to decrypt the private proposal data."
+              objectIllustration={{
+                object: "ACTION",
+              }}
+              primaryButton={{
+                label: "Sign in",
+                onClick: () => requestSignature(),
+              }}
+            />
           </div>
         </ElseIf>
         <Else>
