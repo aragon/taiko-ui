@@ -41,7 +41,7 @@ export const TwitterFeed: React.FC<ITwitterFeed> = ({ account }) => {
     >
       <a
         className="twitter-timeline"
-        data-height="498"
+        data-height="550"
         data-chrome="noheader nofooter"
         href={`https://twitter.com/${account}`}
       >
