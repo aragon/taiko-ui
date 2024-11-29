@@ -1,5 +1,5 @@
 import { http, createConfig } from "wagmi";
-import { injected } from "wagmi/connectors";
+// import { injected } from "wagmi/connectors";
 import { walletConnect, coinbaseWallet } from "wagmi/connectors";
 import {
   PUB_APP_DESCRIPTION,

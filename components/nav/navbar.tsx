@@ -19,7 +19,7 @@ export const Navbar: React.FC = () => {
   const showAllLinks = address && (listedSigners?.includes(address) || listedOrAppointedSigners?.includes(address));
 
   const navLinks: INavLink[] = [
-    // { path: "/", id: "dashboard", name: "Dashboard" /*, icon: IconType.APP_DASHBOARD*/ },
+    { path: "/", id: "dashboard", name: "Dashboard" /*, icon: IconType.APP_DASHBOARD*/ },
     ...plugins
       .filter((link) => showAllLinks || !link.hiddenIfNotSigner)
       .map((p) => ({

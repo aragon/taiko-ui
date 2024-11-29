@@ -10,6 +10,14 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        "ellipse-35":
+          "radial-gradient(50% 50% at 50% 50%, rgba(61, 136, 255, 0.14) 0%, rgba(207, 227, 255, 0.18) 100%)",
+        "ellipse-36":
+          "radial-gradient(50% 50% at 50% 50%, rgba(191, 255, 55, 0.11) 0%, rgba(189, 217, 255, 0.23) 100%)",
+        "ellipse-34":
+          "radial-gradient(50% 50% at 50% 50%, rgba(105, 164, 250, 0.65) 0%, rgba(207, 227, 255, 0.55) 100%)",
+      },
       colors: {
         primary: {
           50: "rgb(var(--ods-color-primary-50) / <alpha-value>)",
