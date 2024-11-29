@@ -1,7 +1,13 @@
 import dayjs, { type Dayjs } from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
-export function getSimpleRelativeTimeFromDate(value: Dayjs) {
+export function getShortTimeDiffFrom(timestamp: number | bigint) {
+  return getShortTimeDiffFromDate(dayjs(Number(timestamp)));
+}
+
+export function getShortTimeDiffFromDate(value?: Dayjs) {
+  if (!value) return "";
+
   dayjs.extend(relativeTime);
 
   const now = dayjs();

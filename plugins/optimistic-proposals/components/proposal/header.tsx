@@ -3,8 +3,7 @@ import { Publisher } from "@/components/publisher";
 import { OptimisticProposal } from "@/plugins/optimistic-proposals/utils/types";
 import { useProposalStatus } from "@/plugins/optimistic-proposals/hooks/useProposalVariantStatus";
 import { Else, ElseIf, If, Then } from "@/components/if";
-import { getSimpleRelativeTimeFromDate } from "@/utils/dates";
-import dayjs from "dayjs";
+import { getShortTimeDiffFrom } from "@/utils/dates";
 import { HeaderSection } from "@/components/layout/header-section";
 import { getTagVariantFromStatus } from "@/utils/ui-variants";
 import { capitalizeFirstLetter } from "@/utils/text";
@@ -73,15 +72,11 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalIdx, proposal }
                 </ElseIf>
                 <ElseIf condition={isTimelockPeriod}>
                   <span className="text-neutral-500">Accepted: in timelock for</span>
-                  <span className="text-neutral-800">
-                    {getSimpleRelativeTimeFromDate(dayjs(Number(timelockPeriodEnd)))}
-                  </span>
+                  <span className="text-neutral-800">{getShortTimeDiffFrom(timelockPeriodEnd)}</span>
                 </ElseIf>
                 <ElseIf condition={isL2GracePeriod}>
                   <span className="text-neutral-500">Accepted: waiting L2 vetoes for</span>
-                  <span className="text-neutral-800">
-                    {getSimpleRelativeTimeFromDate(dayjs(Number(timelockPeriodEnd)))}
-                  </span>
+                  <span className="text-neutral-800">{getShortTimeDiffFrom(l2GracePeriodEnd)}</span>
                 </ElseIf>
                 <ElseIf condition={isPastEndDate}>
                   <span className="text-neutral-500">The veto period is over</span>
@@ -89,7 +84,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalIdx, proposal }
                 <Else>
                   <span className="text-neutral-500">Active for </span>
                   <span className="text-neutral-800">
-                    {getSimpleRelativeTimeFromDate(dayjs(Number(proposal.parameters.vetoEndDate) * 1000))}
+                    {getShortTimeDiffFrom(proposal.parameters.vetoEndDate * 1000n)}
                   </span>
                 </Else>
               </If>

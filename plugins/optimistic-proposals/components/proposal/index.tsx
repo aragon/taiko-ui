@@ -22,7 +22,7 @@ export default function ProposalCard(props: ProposalInputs) {
   const pastSupply = usePastSupply(proposal);
   const { symbol: tokenSymbol } = useToken();
 
-  const { status: proposalStatus } = useProposalStatus(proposal!);
+  const { status: proposalStatus } = useProposalStatus(proposal);
   const showLoading = getShowProposalLoading(proposal, proposalFetchStatus);
   const hasVetoed = vetoes?.some((veto) => veto.voter === address);
   const prefix = props.linkPrefix ? props.linkPrefix + "/" : "";

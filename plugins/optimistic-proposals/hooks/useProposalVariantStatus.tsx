@@ -41,7 +41,7 @@ export const useProposalVariantStatus = (proposal: OptimisticProposal) => {
   return status;
 };
 
-export const useProposalStatus = (proposal: OptimisticProposal) => {
+export const useProposalStatus = (proposal: OptimisticProposal | null) => {
   const [status, setStatus] = useState<ProposalStatus>();
   const { tokenSupply: totalSupply } = useToken();
   const { governanceSettings } = useGovernanceSettings();
@@ -74,8 +74,8 @@ export const useProposalStatus = (proposal: OptimisticProposal) => {
     bridgedBalance,
   ]);
 
-  const isEmergency = proposal.parameters.vetoStartDate === proposal.parameters.vetoEndDate;
-  const isPastEndDate = proposal.parameters.vetoEndDate * 1000n < Date.now();
+  const isEmergency = !!proposal && proposal.parameters.vetoStartDate === proposal.parameters.vetoEndDate;
+  const isPastEndDate = !!proposal && proposal.parameters.vetoEndDate * 1000n < Date.now();
 
   let isL2GracePeriod = false;
   let isTimelockPeriod = false;
@@ -86,21 +86,23 @@ export const useProposalStatus = (proposal: OptimisticProposal) => {
     let l2AggregationGracePeriod = 0;
     let timelockPeriod = 0;
 
-    if (!proposal.parameters.unavailableL2 && governanceSettings.l2AggregationGracePeriod) {
+    if (!!proposal && !proposal.parameters.unavailableL2 && governanceSettings.l2AggregationGracePeriod) {
       l2AggregationGracePeriod = governanceSettings.l2AggregationGracePeriod;
     }
     if (governanceSettings.timelockPeriod) {
       timelockPeriod = governanceSettings.timelockPeriod;
     }
 
-    l2GracePeriodEnd = (proposal.parameters.vetoEndDate + BigInt(l2AggregationGracePeriod)) * 1000n;
-    timelockPeriodEnd = l2GracePeriodEnd + BigInt(timelockPeriod) * 1000n;
+    if (!!proposal) {
+      l2GracePeriodEnd = (proposal.parameters.vetoEndDate + BigInt(l2AggregationGracePeriod)) * 1000n;
+      timelockPeriodEnd = l2GracePeriodEnd + BigInt(timelockPeriod) * 1000n;
 
-    if (isPastEndDate) {
-      if (proposal.parameters.vetoEndDate <= Date.now() && Date.now() < l2GracePeriodEnd) {
-        isL2GracePeriod = true;
-      } else if (l2GracePeriodEnd <= Date.now() && Date.now() < timelockPeriodEnd) {
-        isTimelockPeriod = true;
+      if (isPastEndDate) {
+        if (proposal.parameters.vetoEndDate <= Date.now() && Date.now() < l2GracePeriodEnd) {
+          isL2GracePeriod = true;
+        } else if (l2GracePeriodEnd <= Date.now() && Date.now() < timelockPeriodEnd) {
+          isTimelockPeriod = true;
+        }
       }
     }
   }
