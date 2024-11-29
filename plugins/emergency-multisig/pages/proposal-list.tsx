@@ -1,24 +1,29 @@
 import { type ReactNode, useEffect } from "react";
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 import ProposalCard from "@/plugins/emergency-multisig/components/proposal";
 import { EmergencyMultisigPluginAbi } from "@/plugins/emergency-multisig/artifacts/EmergencyMultisigPlugin";
-import { Button, DataList, IconType, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
+import {
+  Button,
+  CardEmptyState,
+  DataList,
+  IconType,
+  ProposalDataListItemSkeleton,
+  type DataListState,
+} from "@aragon/ods";
 import { useCanCreateProposal } from "@/plugins/emergency-multisig/hooks/useCanCreateProposal";
 import Link from "next/link";
-import { Else, ElseIf, If, Then } from "@/components/if";
+import { Else, If, Then } from "@/components/if";
 import { PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
-import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
-import { MissingContentView } from "@/components/MissingContentView";
 import { MainSection } from "@/components/layout/main-section";
+import { EncryptionPlaceholderOrChildren } from "../components/encryption-check-or-children";
+import { useRouter } from "next/router";
 
 const DEFAULT_PAGE_SIZE = 6;
 
 export default function Proposals() {
+  const { push } = useRouter();
   const { isConnected } = useAccount();
-  const { open } = useWeb3Modal();
   const { data: blockNumber } = useBlockNumber({ watch: true });
-  const { publicKey, requestSignature } = useDerivedWallet();
   const { canCreate } = useCanCreateProposal();
   const {
     data: proposalCountResponse,
@@ -66,45 +71,56 @@ export default function Proposals() {
         </div>
       </SectionView>
 
-      <If condition={!isConnected}>
-        <Then>
-          <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
-            Please connect your wallet to access the emergency proposals section.
-          </MissingContentView>
-        </Then>
-        <ElseIf condition={!publicKey}>
-          <MissingContentView callToAction="Sign in to continue" onClick={() => requestSignature()}>
-            Please sign in with your wallet to decrypt the private proposal data.
-          </MissingContentView>
-        </ElseIf>
-        <ElseIf condition={!proposalCount}>
-          <MissingContentView>
-            No proposals have been created yet. <br />
-            Here you will see the proposals created by the Security Council before a super majority can enact an
-            emergency execution on the DAO. <If condition={canCreate}>Create your first proposal.</If>
-          </MissingContentView>
-        </ElseIf>
-        <Else>
-          <DataList.Root
-            entityLabel={entityLabel}
-            itemsCount={proposalCount}
-            pageSize={DEFAULT_PAGE_SIZE}
-            state={dataListState}
-            //onLoadMore={fetchNextPage}
-          >
-            <DataList.Container SkeletonElement={ProposalDataListItemSkeleton}>
-              {proposalCount &&
-                Array.from(Array(proposalCount || 0)?.keys())
-                  .reverse()
-                  ?.map((proposalIndex) => (
-                    // TODO: update with router agnostic ODS DataListItem
-                    <ProposalCard key={proposalIndex} proposalId={BigInt(proposalIndex)} />
-                  ))}
-            </DataList.Container>
-            <DataList.Pagination />
-          </DataList.Root>
-        </Else>
-      </If>
+      <EncryptionPlaceholderOrChildren needsPublicKey>
+        <If condition={!proposalCount}>
+          <Then>
+            <If condition={canCreate}>
+              <Then>
+                <CardEmptyState
+                  heading="No proposals yet"
+                  description="The list of proposals is currently empty. Be the first one to create a proposal."
+                  objectIllustration={{
+                    object: "ACTION",
+                  }}
+                  primaryButton={{
+                    label: "Submit a proposal",
+                    onClick: () => push("#/new"),
+                  }}
+                />
+              </Then>
+              <Else>
+                <CardEmptyState
+                  heading="No proposals yet"
+                  description="The list of proposals is currently empty. Here you will see the proposals created by the Security Council before a super majority can enact an emergency execution on the DAO."
+                  objectIllustration={{
+                    object: "ACTION",
+                  }}
+                />
+              </Else>
+            </If>
+          </Then>
+          <Else>
+            <DataList.Root
+              entityLabel={entityLabel}
+              itemsCount={proposalCount}
+              pageSize={DEFAULT_PAGE_SIZE}
+              state={dataListState}
+              //onLoadMore={fetchNextPage}
+            >
+              <DataList.Container SkeletonElement={ProposalDataListItemSkeleton}>
+                {proposalCount &&
+                  Array.from(Array(proposalCount || 0)?.keys())
+                    .reverse()
+                    ?.map((proposalIndex) => (
+                      // TODO: update with router agnostic ODS DataListItem
+                      <ProposalCard key={proposalIndex} proposalId={BigInt(proposalIndex)} />
+                    ))}
+              </DataList.Container>
+              <DataList.Pagination />
+            </DataList.Root>
+          </Else>
+        </If>
+      </EncryptionPlaceholderOrChildren>
     </MainSection>
   );
 }

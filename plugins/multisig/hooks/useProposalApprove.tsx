@@ -1,19 +1,21 @@
 import { useEffect } from "react";
-import { usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { useProposal } from "./useProposal";
 import { useUserCanApprove } from "@/plugins/multisig/hooks/useUserCanApprove";
 import { MultisigPluginAbi } from "@/plugins/multisig/artifacts/MultisigPlugin";
 import { useAlerts, AlertContextProps } from "@/context/Alerts";
-import { PUB_CHAIN, PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
+import { PUB_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useProposalApprovals } from "./useProposalApprovals";
 import { useRouter } from "next/router";
 
 export function useProposalApprove(proposalId: string) {
   const { push } = useRouter();
-  const publicClient = usePublicClient({ chainId: PUB_CHAIN.id });
 
   const { proposal, status: proposalFetchStatus, refetch: refetchProposal } = useProposal(proposalId, true);
-  const approvals = useProposalApprovals(publicClient!, PUB_MULTISIG_PLUGIN_ADDRESS, proposalId, proposal);
+  const { data: approvals, refetch: refetchApprovals } = useProposalApprovals(
+    proposalId,
+    proposal?.parameters.snapshotBlock
+  );
 
   const { addAlert } = useAlerts() as AlertContextProps;
   const {
@@ -66,6 +68,7 @@ export function useProposalApprove(proposalId: string) {
     }, 1000 * 2);
     refetchCanApprove();
     refetchProposal();
+    refetchApprovals();
   }, [approveStatus, approveTxHash, isConfirming, isConfirmed]);
 
   const approveProposal = () => {

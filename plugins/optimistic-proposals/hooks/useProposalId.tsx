@@ -1,6 +1,6 @@
 import { useReadContract } from "wagmi";
 import { PUB_CHAIN, PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS } from "@/constants";
-import { TaikoOptimisticTokenVotingPluginAbi } from "../artifacts/TaikoOptimisticTokenVotingPlugin.sol";
+import { OptimisticTokenVotingPluginAbi } from "../artifacts/OptimisticTokenVotingPlugin.sol";
 
 export function useProposalId(index: number) {
   const {
@@ -9,7 +9,7 @@ export function useProposalId(index: number) {
     fetchStatus: proposalIdFetchStatus,
   } = useReadContract({
     address: PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
-    abi: TaikoOptimisticTokenVotingPluginAbi,
+    abi: OptimisticTokenVotingPluginAbi,
     functionName: "proposalIds",
     args: [BigInt(index)],
     chainId: PUB_CHAIN.id,

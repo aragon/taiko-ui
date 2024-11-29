@@ -43,10 +43,6 @@ export type EmergencyProposal = {
   resources: IProposalResource[];
 };
 
-export type ApprovedEventResponse = {
-  args: ApprovedEvent[];
-};
-
 export type ApprovedEvent = {
   proposalId: bigint;
   approver: Address;

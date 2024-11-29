@@ -28,29 +28,25 @@ export default function ProposalCard(props: ProposalInputs) {
 
   if (!proposal && showLoading) {
     return (
-      <section className="mb-4 w-full">
-        <Card className="p-4">
-          <span className="xs:px-10 px-4 py-5 md:px-6 lg:px-7">
-            <PleaseWaitSpinner fullMessage="Loading proposal..." />
-          </span>
+      <section className="w-full">
+        <Card className="p-6">
+          <PleaseWaitSpinner fullMessage="Loading proposal..." />
         </Card>
       </section>
     );
   } else if (!proposal?.title && !proposal?.summary) {
     // We have the proposal but no metadata yet
     return (
-      <Link href={`#/proposals/${props.proposalIndex}`} className="mb-4 w-full">
-        <Card className="p-4">
-          <span className="xs:px-10 px-4 py-5 md:px-6 lg:px-7">
-            <PleaseWaitSpinner fullMessage="Loading metadata..." />
-          </span>
+      <Link href={`#/proposals/${props.proposalIndex}`} className="w-full">
+        <Card className="p-6">
+          <PleaseWaitSpinner fullMessage="Loading metadata..." />
         </Card>
       </Link>
     );
   } else if (proposalFetchStatus.metadataReady && !proposal?.title) {
     return (
-      <Link href={`#/proposals/${props.proposalIndex}`} className="mb-4 w-full">
-        <Card className="p-4">
+      <Link href={`#/proposals/${props.proposalIndex}`} className="w-full">
+        <Card className="p-6">
           <div className="xl:4/5 overflow-hidden text-ellipsis text-nowrap pr-4 md:w-7/12 lg:w-3/4">
             <h4 className="mb-1 line-clamp-1 text-lg text-neutral-300">
               {Number(props.proposalIndex) + 1} - {DEFAULT_PROPOSAL_METADATA_TITLE}
@@ -64,13 +60,14 @@ export default function ProposalCard(props: ProposalInputs) {
 
   let vetoPercentage = 0;
   if (proposal?.vetoTally && pastSupply && proposal.parameters.minVetoRatio) {
-    vetoPercentage = Number(
-      (BigInt(1000) * proposal.vetoTally) / ((pastSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(10000000))
-    );
+    // Example: 15% of the token supply (adjusted for decimal precision, 10^6)
+    const defeatThreshold = (pastSupply * BigInt(proposal.parameters.minVetoRatio)) / BigInt(1000000);
+    vetoPercentage = Number((10000n * proposal.vetoTally) / defeatThreshold) / 100;
   }
 
   return (
     <ProposalDataListItem.Structure
+      className="!p-6"
       title={proposal.title}
       summary={proposal.summary}
       href={`#/proposals/${props.proposalIndex}`}

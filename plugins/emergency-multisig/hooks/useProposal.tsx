@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useBlockNumber, usePublicClient, useReadContract } from "wagmi";
 import { getAbiItem } from "viem";
 import { EmergencyMultisigPluginAbi } from "@/plugins/emergency-multisig/artifacts/EmergencyMultisigPlugin";
@@ -11,27 +11,15 @@ import {
 import { PUB_CHAIN, PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS } from "@/constants";
 import { useDecryptedData } from "./useDecryptedData";
 import { useIpfsJsonData } from "@/hooks/useMetadata";
+import { getLogsUntilNow } from "@/utils/evm";
+import { useQuery } from "@tanstack/react-query";
 
 const ProposalCreatedEvent = getAbiItem({
   abi: EmergencyMultisigPluginAbi,
   name: "EmergencyProposalCreated",
 });
 
-type ProposalCreatedLogResponse = {
-  args: {
-    actions: RawAction[];
-    allowFailureMap: bigint;
-    creator: string;
-    endDate: bigint;
-    startDate: bigint;
-    metadata: string;
-    proposalId: bigint;
-  };
-};
-
 export function useProposal(proposalId: string, autoRefresh = false) {
-  const publicClient = usePublicClient();
-  const [proposalCreationEvent, setProposalCreationEvent] = useState<ProposalCreatedLogResponse["args"]>();
   const { data: blockNumber } = useBlockNumber({ watch: true });
 
   // Proposal onchain data
@@ -47,6 +35,10 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     args: [BigInt(proposalId)],
     chainId: PUB_CHAIN.id,
   });
+  const { data: proposalCreationEvent, isLoading: isLoadingEvent } = useProposalCreationEvent(
+    BigInt(proposalId),
+    proposalResult?.[2].snapshotBlock
+  );
 
   const proposalData = decodeProposalResultData(proposalResult);
 
@@ -71,29 +63,6 @@ export function useProposal(proposalId: string, autoRefresh = false) {
     privateMetadata || undefined
   );
 
-  useEffect(() => {
-    if (!proposalData || !publicClient || proposalCreationEvent) return;
-
-    publicClient
-      .getLogs({
-        address: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
-        event: ProposalCreatedEvent,
-        args: { proposalId: BigInt(proposalId) },
-        fromBlock: proposalData.parameters.snapshotBlock,
-        toBlock: "latest",
-      })
-      .then((logs) => {
-        if (!logs || !logs.length) throw new Error("No creation logs");
-
-        const log: ProposalCreatedLogResponse = logs[0] as any;
-        setProposalCreationEvent(log.args);
-      })
-      .catch((err) => {
-        console.error("Could not fetch the proposal details", err);
-        return null;
-      });
-  }, [proposalData, !!publicClient, !!proposalCreationEvent]);
-
   return {
     proposal,
     rawPrivateData,
@@ -110,6 +79,42 @@ export function useProposal(proposalId: string, autoRefresh = false) {
 }
 
 // Helpers
+
+function useProposalCreationEvent(proposalId: bigint, snapshotBlock: bigint | undefined) {
+  const publicClient = usePublicClient();
+
+  return useQuery({
+    queryKey: [
+      "emergency-proposal-creation-event",
+      PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
+      proposalId.toString(),
+      snapshotBlock?.toString() || "",
+      !!publicClient,
+    ],
+    queryFn: () => {
+      if (!snapshotBlock || !publicClient) throw new Error("Not ready");
+
+      return getLogsUntilNow(
+        PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
+        ProposalCreatedEvent,
+        {
+          proposalId: BigInt(proposalId),
+        },
+        publicClient,
+        snapshotBlock
+      ).then((logs) => {
+        if (!logs || !logs.length) throw new Error("No creation logs");
+
+        return logs[0].args;
+      });
+    },
+    retry: true,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    retryOnMount: true,
+    staleTime: 1000 * 60 * 10,
+  });
+}
 
 function decodeProposalResultData(data?: EmergencyProposalResultType) {
   if (!data?.length) return null;
@@ -128,7 +133,7 @@ function decodeProposalResultData(data?: EmergencyProposalResultType) {
 function arrangeProposalData(
   proposalData?: ReturnType<typeof decodeProposalResultData>,
   actions?: RawAction[],
-  creationEvent?: ProposalCreatedLogResponse["args"],
+  creationEvent?: ReturnType<typeof useProposalCreationEvent>["data"],
   metadata?: ProposalMetadata
 ): EmergencyProposal | null {
   if (!proposalData) return null;

@@ -71,7 +71,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         strategy: "Approval threshold",
         options: "Approve",
       },
-      votes: approvals.map(({ approver }) => ({ address: approver, variant: "approve" }) as IVote),
+      votes: approvals?.map(({ approver }) => ({ address: approver, variant: "approve" }) as IVote) || [],
     },
   ];
 
@@ -111,7 +111,10 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
                   stages={proposalStage}
                   description="The onchain emergency multisig flow allows its members to create proposals that, if approved by a super majority, will be executed directly by the DAO."
                 />
-                <ProposalActions actions={proposal.actions} />
+                <ProposalActions
+                  actions={proposal.actions}
+                  emptyListDescription="Either the proposal has no actions or they cannot be decrypted by your account"
+                />
               </div>
               <div className="flex flex-col gap-y-6 md:w-[33%]">
                 <CardResources resources={proposal.resources} title="Resources" />

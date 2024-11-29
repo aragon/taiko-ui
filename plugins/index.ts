@@ -3,6 +3,7 @@ import {
   PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS,
   PUB_MULTISIG_PLUGIN_ADDRESS,
   PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
+  PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS,
 } from "@/constants";
 import { IconType } from "@aragon/ods";
 
@@ -40,6 +41,14 @@ export const plugins: PluginItem[] = [
     title: "Security Council",
     // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
+    hiddenIfNotSigner: true,
+  },
+  {
+    id: "encryption",
+    folderName: "encryption",
+    title: "Proposal encryption",
+    // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
+    pluginAddress: PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS,
     hiddenIfNotSigner: true,
   },
   {

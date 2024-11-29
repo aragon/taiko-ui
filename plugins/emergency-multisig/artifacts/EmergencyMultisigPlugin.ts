@@ -337,34 +337,20 @@ export const EmergencyMultisigPluginAbi = [
             internalType: "uint16",
           },
           {
-            name: "addresslistSource",
+            name: "signerList",
             type: "address",
-            internalType: "contract Addresslist",
+            internalType: "contract SignerList",
+          },
+          {
+            name: "proposalExpirationPeriod",
+            type: "uint32",
+            internalType: "uint32",
           },
         ],
       },
     ],
     outputs: [],
     stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "isMember",
-    inputs: [
-      {
-        name: "_account",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "bool",
-        internalType: "bool",
-      },
-    ],
-    stateMutability: "view",
   },
   {
     type: "function",
@@ -395,9 +381,14 @@ export const EmergencyMultisigPluginAbi = [
         internalType: "uint16",
       },
       {
-        name: "addresslistSource",
+        name: "signerList",
         type: "address",
-        internalType: "contract Addresslist",
+        internalType: "contract SignerList",
+      },
+      {
+        name: "proposalExpirationPeriod",
+        type: "uint32",
+        internalType: "uint32",
       },
     ],
     stateMutability: "view",
@@ -480,9 +471,14 @@ export const EmergencyMultisigPluginAbi = [
             internalType: "uint16",
           },
           {
-            name: "addresslistSource",
+            name: "signerList",
             type: "address",
-            internalType: "contract Addresslist",
+            internalType: "contract SignerList",
+          },
+          {
+            name: "proposalExpirationPeriod",
+            type: "uint32",
+            internalType: "uint32",
           },
         ],
       },
@@ -625,45 +621,6 @@ export const EmergencyMultisigPluginAbi = [
   },
   {
     type: "event",
-    name: "MembersAdded",
-    inputs: [
-      {
-        name: "members",
-        type: "address[]",
-        indexed: false,
-        internalType: "address[]",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "MembersRemoved",
-    inputs: [
-      {
-        name: "members",
-        type: "address[]",
-        indexed: false,
-        internalType: "address[]",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "MembershipContractAnnounced",
-    inputs: [
-      {
-        name: "definingContract",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
     name: "MultisigSettingsUpdated",
     inputs: [
       {
@@ -679,10 +636,16 @@ export const EmergencyMultisigPluginAbi = [
         internalType: "uint16",
       },
       {
-        name: "addresslistSource",
+        name: "signerList",
         type: "address",
         indexed: false,
-        internalType: "contract Addresslist",
+        internalType: "contract SignerList",
+      },
+      {
+        name: "proposalExpirationPeriod",
+        type: "uint32",
+        indexed: false,
+        internalType: "uint32",
       },
     ],
     anonymous: false,
@@ -834,23 +797,23 @@ export const EmergencyMultisigPluginAbi = [
   },
   {
     type: "error",
-    name: "InvalidAddressListSource",
-    inputs: [
-      {
-        name: "givenContract",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-  },
-  {
-    type: "error",
     name: "InvalidMetadataUri",
     inputs: [
       {
         name: "proposalId",
         type: "uint256",
         internalType: "uint256",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "InvalidSignerList",
+    inputs: [
+      {
+        name: "signerList",
+        type: "address",
+        internalType: "contract SignerList",
       },
     ],
   },

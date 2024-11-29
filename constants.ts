@@ -2,6 +2,7 @@ import { Address } from "viem";
 import { ChainName, getChain } from "./utils/chains";
 
 // Contract Addresses
+export const PUB_DEPLOYMENT_BLOCK = BigInt(process.env.NEXT_PUBLIC_DEPLOYMENT_BLOCK ?? "0");
 export const PUB_DAO_ADDRESS = (process.env.NEXT_PUBLIC_DAO_ADDRESS ?? "") as Address;
 export const PUB_TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_TOKEN_ADDRESS ?? "") as Address;
 
@@ -10,7 +11,8 @@ export const PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_EM
   "") as Address;
 export const PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS = (process.env.NEXT_PUBLIC_DUAL_GOVERNANCE_PLUGIN_ADDRESS ??
   "") as Address;
-export const PUB_PUBLIC_KEY_REGISTRY_CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC_PUBLIC_KEY_REGISTRY_CONTRACT_ADDRESS ??
+export const PUB_SIGNER_LIST_CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC_SIGNER_LIST_CONTRACT_ADDRESS ?? "") as Address;
+export const PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS ??
   "") as Address;
 export const PUB_DELEGATION_WALL_CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC_DELEGATION_WALL_CONTRACT_ADDRESS ??
   "") as Address;

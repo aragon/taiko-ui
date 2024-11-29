@@ -1,20 +1,7 @@
-export const TaikoOptimisticTokenVotingPluginAbi = [
+export const MultisigPluginAbi = [
   {
     type: "function",
-    name: "PROPOSER_PERMISSION_ID",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "bytes32",
-        internalType: "bytes32",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "UPDATE_OPTIMISTIC_GOVERNANCE_SETTINGS_PERMISSION_ID",
+    name: "UPDATE_MULTISIG_SETTINGS_PERMISSION_ID",
     inputs: [],
     outputs: [
       {
@@ -40,19 +27,42 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
   },
   {
     type: "function",
-    name: "bridgedVotingPower",
+    name: "approve",
     inputs: [
       {
-        name: "_timestamp",
+        name: "_proposalId",
         type: "uint256",
         internalType: "uint256",
+      },
+      {
+        name: "_tryExecution",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "canApprove",
+    inputs: [
+      {
+        name: "_proposalId",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "_account",
+        type: "address",
+        internalType: "address",
       },
     ],
     outputs: [
       {
         name: "",
-        type: "uint256",
-        internalType: "uint256",
+        type: "bool",
+        internalType: "bool",
       },
     ],
     stateMutability: "view",
@@ -78,39 +88,15 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
   },
   {
     type: "function",
-    name: "canVeto",
-    inputs: [
-      {
-        name: "_proposalId",
-        type: "uint256",
-        internalType: "uint256",
-      },
-      {
-        name: "_voter",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "bool",
-        internalType: "bool",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
     name: "createProposal",
     inputs: [
       {
-        name: "_metadata",
+        name: "_metadataURI",
         type: "bytes",
         internalType: "bytes",
       },
       {
-        name: "_actions",
+        name: "_destinationActions",
         type: "tuple[]",
         internalType: "struct IDAO.Action[]",
         components: [
@@ -132,14 +118,14 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
         ],
       },
       {
-        name: "_allowFailureMap",
-        type: "uint256",
-        internalType: "uint256",
+        name: "_destinationPlugin",
+        type: "address",
+        internalType: "contract OptimisticTokenVotingPlugin",
       },
       {
-        name: "_duration",
-        type: "uint64",
-        internalType: "uint64",
+        name: "_approveProposal",
+        type: "bool",
+        internalType: "bool",
       },
     ],
     outputs: [
@@ -160,30 +146,6 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
         name: "",
         type: "address",
         internalType: "contract IDAO",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "effectiveVotingPower",
-    inputs: [
-      {
-        name: "_timestamp",
-        type: "uint256",
-        internalType: "uint256",
-      },
-      {
-        name: "_includeL2VotingPower",
-        type: "bool",
-        internalType: "bool",
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256",
       },
     ],
     stateMutability: "view",
@@ -213,46 +175,36 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
     ],
     outputs: [
       {
-        name: "open",
-        type: "bool",
-        internalType: "bool",
-      },
-      {
         name: "executed",
         type: "bool",
         internalType: "bool",
       },
       {
-        name: "parameters",
-        type: "tuple",
-        internalType: "struct OptimisticTokenVotingPlugin.ProposalParameters",
-        components: [
-          {
-            name: "vetoEndDate",
-            type: "uint64",
-            internalType: "uint64",
-          },
-          {
-            name: "snapshotTimestamp",
-            type: "uint64",
-            internalType: "uint64",
-          },
-          {
-            name: "minVetoRatio",
-            type: "uint32",
-            internalType: "uint32",
-          },
-          {
-            name: "skipL2",
-            type: "bool",
-            internalType: "bool",
-          },
-        ],
+        name: "approvals",
+        type: "uint16",
+        internalType: "uint16",
       },
       {
-        name: "vetoTally",
-        type: "uint256",
-        internalType: "uint256",
+        name: "parameters",
+        type: "tuple",
+        internalType: "struct Multisig.ProposalParameters",
+        components: [
+          {
+            name: "minApprovals",
+            type: "uint16",
+            internalType: "uint16",
+          },
+          {
+            name: "snapshotBlock",
+            type: "uint64",
+            internalType: "uint64",
+          },
+          {
+            name: "expirationDate",
+            type: "uint64",
+            internalType: "uint64",
+          },
+        ],
       },
       {
         name: "metadataURI",
@@ -260,7 +212,7 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
         internalType: "bytes",
       },
       {
-        name: "actions",
+        name: "destinationActions",
         type: "tuple[]",
         internalType: "struct IDAO.Action[]",
         components: [
@@ -282,44 +234,16 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
         ],
       },
       {
-        name: "allowFailureMap",
-        type: "uint256",
-        internalType: "uint256",
+        name: "destinationPlugin",
+        type: "address",
+        internalType: "contract OptimisticTokenVotingPlugin",
       },
     ],
     stateMutability: "view",
   },
   {
     type: "function",
-    name: "governanceSettings",
-    inputs: [],
-    outputs: [
-      {
-        name: "minVetoRatio",
-        type: "uint32",
-        internalType: "uint32",
-      },
-      {
-        name: "minDuration",
-        type: "uint64",
-        internalType: "uint64",
-      },
-      {
-        name: "l2InactivityPeriod",
-        type: "uint64",
-        internalType: "uint64",
-      },
-      {
-        name: "l2AggregationGracePeriod",
-        type: "uint64",
-        internalType: "uint64",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "hasVetoed",
+    name: "hasApproved",
     inputs: [
       {
         name: "_proposalId",
@@ -327,7 +251,7 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
         internalType: "uint256",
       },
       {
-        name: "_voter",
+        name: "_account",
         type: "address",
         internalType: "address",
       },
@@ -364,46 +288,36 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
         internalType: "contract IDAO",
       },
       {
-        name: "_governanceSettings",
+        name: "_multisigSettings",
         type: "tuple",
-        internalType: "struct OptimisticTokenVotingPlugin.OptimisticGovernanceSettings",
+        internalType: "struct Multisig.MultisigSettings",
         components: [
           {
-            name: "minVetoRatio",
+            name: "onlyListed",
+            type: "bool",
+            internalType: "bool",
+          },
+          {
+            name: "minApprovals",
+            type: "uint16",
+            internalType: "uint16",
+          },
+          {
+            name: "destinationProposalDuration",
             type: "uint32",
             internalType: "uint32",
           },
           {
-            name: "minDuration",
-            type: "uint64",
-            internalType: "uint64",
+            name: "signerList",
+            type: "address",
+            internalType: "contract SignerList",
           },
           {
-            name: "l2InactivityPeriod",
-            type: "uint64",
-            internalType: "uint64",
-          },
-          {
-            name: "l2AggregationGracePeriod",
-            type: "uint64",
-            internalType: "uint64",
+            name: "proposalExpirationPeriod",
+            type: "uint32",
+            internalType: "uint32",
           },
         ],
-      },
-      {
-        name: "_token",
-        type: "address",
-        internalType: "contract IVotesUpgradeable",
-      },
-      {
-        name: "_taikoL1",
-        type: "address",
-        internalType: "address",
-      },
-      {
-        name: "_taikoBridge",
-        type: "address",
-        internalType: "address",
       },
     ],
     outputs: [],
@@ -411,96 +325,49 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
   },
   {
     type: "function",
-    name: "isL2Available",
+    name: "lastMultisigSettingsChange",
     inputs: [],
     outputs: [
       {
         name: "",
-        type: "bool",
-        internalType: "bool",
+        type: "uint64",
+        internalType: "uint64",
       },
     ],
     stateMutability: "view",
   },
   {
     type: "function",
-    name: "isMember",
-    inputs: [
+    name: "multisigSettings",
+    inputs: [],
+    outputs: [
       {
-        name: "_account",
+        name: "onlyListed",
+        type: "bool",
+        internalType: "bool",
+      },
+      {
+        name: "minApprovals",
+        type: "uint16",
+        internalType: "uint16",
+      },
+      {
+        name: "destinationProposalDuration",
+        type: "uint32",
+        internalType: "uint32",
+      },
+      {
+        name: "signerList",
         type: "address",
-        internalType: "address",
+        internalType: "contract SignerList",
       },
-    ],
-    outputs: [
       {
-        name: "",
-        type: "bool",
-        internalType: "bool",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "isMinVetoRatioReached",
-    inputs: [
-      {
-        name: "_proposalId",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "bool",
-        internalType: "bool",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "minVetoRatio",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
+        name: "proposalExpirationPeriod",
         type: "uint32",
         internalType: "uint32",
       },
     ],
     stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "parseProposalId",
-    inputs: [
-      {
-        name: "_proposalId",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    outputs: [
-      {
-        name: "counter",
-        type: "uint256",
-        internalType: "uint256",
-      },
-      {
-        name: "startDate",
-        type: "uint64",
-        internalType: "uint64",
-      },
-      {
-        name: "endDate",
-        type: "uint64",
-        internalType: "uint64",
-      },
-    ],
-    stateMutability: "pure",
   },
   {
     type: "function",
@@ -519,25 +386,6 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
     type: "function",
     name: "proposalCount",
     inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "proposalIds",
-    inputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
     outputs: [
       {
         name: "",
@@ -581,77 +429,37 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
   },
   {
     type: "function",
-    name: "taikoBridge",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "taikoL1",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "address",
-        internalType: "contract TaikoL1",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "totalVotingPower",
+    name: "updateMultisigSettings",
     inputs: [
       {
-        name: "_timestamp",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "updateOptimisticGovernanceSettings",
-    inputs: [
-      {
-        name: "_governanceSettings",
+        name: "_multisigSettings",
         type: "tuple",
-        internalType: "struct OptimisticTokenVotingPlugin.OptimisticGovernanceSettings",
+        internalType: "struct Multisig.MultisigSettings",
         components: [
           {
-            name: "minVetoRatio",
+            name: "onlyListed",
+            type: "bool",
+            internalType: "bool",
+          },
+          {
+            name: "minApprovals",
+            type: "uint16",
+            internalType: "uint16",
+          },
+          {
+            name: "destinationProposalDuration",
             type: "uint32",
             internalType: "uint32",
           },
           {
-            name: "minDuration",
-            type: "uint64",
-            internalType: "uint64",
+            name: "signerList",
+            type: "address",
+            internalType: "contract SignerList",
           },
           {
-            name: "l2InactivityPeriod",
-            type: "uint64",
-            internalType: "uint64",
-          },
-          {
-            name: "l2AggregationGracePeriod",
-            type: "uint64",
-            internalType: "uint64",
+            name: "proposalExpirationPeriod",
+            type: "uint32",
+            internalType: "uint32",
           },
         ],
       },
@@ -691,32 +499,6 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
     stateMutability: "payable",
   },
   {
-    type: "function",
-    name: "veto",
-    inputs: [
-      {
-        name: "_proposalId",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "votingToken",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "address",
-        internalType: "contract IVotesUpgradeable",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
     type: "event",
     name: "AdminChanged",
     inputs: [
@@ -737,6 +519,25 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
   },
   {
     type: "event",
+    name: "Approved",
+    inputs: [
+      {
+        name: "proposalId",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
+      },
+      {
+        name: "approver",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
     name: "BeaconUpgraded",
     inputs: [
       {
@@ -744,6 +545,19 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
         type: "address",
         indexed: true,
         internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "Executed",
+    inputs: [
+      {
+        name: "proposalId",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
       },
     ],
     anonymous: false,
@@ -763,70 +577,37 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
   },
   {
     type: "event",
-    name: "MembersAdded",
+    name: "MultisigSettingsUpdated",
     inputs: [
       {
-        name: "members",
-        type: "address[]",
+        name: "onlyListed",
+        type: "bool",
         indexed: false,
-        internalType: "address[]",
+        internalType: "bool",
       },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "MembersRemoved",
-    inputs: [
       {
-        name: "members",
-        type: "address[]",
-        indexed: false,
-        internalType: "address[]",
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "MembershipContractAnnounced",
-    inputs: [
-      {
-        name: "definingContract",
-        type: "address",
+        name: "minApprovals",
+        type: "uint16",
         indexed: true,
-        internalType: "address",
+        internalType: "uint16",
       },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "OptimisticGovernanceSettingsUpdated",
-    inputs: [
       {
-        name: "minVetoRatio",
+        name: "destinationProposalDuration",
         type: "uint32",
         indexed: false,
         internalType: "uint32",
       },
       {
-        name: "minDuration",
-        type: "uint64",
+        name: "signerList",
+        type: "address",
         indexed: false,
-        internalType: "uint64",
+        internalType: "contract SignerList",
       },
       {
-        name: "l2AggregationGracePeriod",
-        type: "uint64",
+        name: "proposalExpirationPeriod",
+        type: "uint32",
         indexed: false,
-        internalType: "uint64",
-      },
-      {
-        name: "l2InactivityPeriod",
-        type: "uint64",
-        indexed: false,
-        internalType: "uint64",
+        internalType: "uint32",
       },
     ],
     anonymous: false,
@@ -924,29 +705,20 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
     anonymous: false,
   },
   {
-    type: "event",
-    name: "VetoCast",
+    type: "error",
+    name: "ApprovalCastForbidden",
     inputs: [
       {
         name: "proposalId",
         type: "uint256",
-        indexed: true,
         internalType: "uint256",
       },
       {
-        name: "voter",
+        name: "sender",
         type: "address",
-        indexed: true,
         internalType: "address",
       },
-      {
-        name: "votingPower",
-        type: "uint256",
-        indexed: false,
-        internalType: "uint256",
-      },
     ],
-    anonymous: false,
   },
   {
     type: "error",
@@ -976,40 +748,41 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
   },
   {
     type: "error",
-    name: "DurationOutOfBounds",
+    name: "InvalidAddressListSource",
     inputs: [
       {
-        name: "limit",
-        type: "uint64",
-        internalType: "uint64",
-      },
-      {
-        name: "actual",
-        type: "uint64",
-        internalType: "uint64",
+        name: "givenContract",
+        type: "address",
+        internalType: "address",
       },
     ],
   },
   {
     type: "error",
-    name: "MinDurationOutOfBounds",
+    name: "InvalidSignerList",
     inputs: [
       {
-        name: "limit",
-        type: "uint64",
-        internalType: "uint64",
-      },
-      {
-        name: "actual",
-        type: "uint64",
-        internalType: "uint64",
+        name: "signerList",
+        type: "address",
+        internalType: "contract SignerList",
       },
     ],
   },
   {
     type: "error",
-    name: "NoVotingPower",
-    inputs: [],
+    name: "MinApprovalsOutOfBounds",
+    inputs: [
+      {
+        name: "limit",
+        type: "uint16",
+        internalType: "uint16",
+      },
+      {
+        name: "actual",
+        type: "uint16",
+        internalType: "uint16",
+      },
+    ],
   },
   {
     type: "error",
@@ -1028,38 +801,6 @@ export const TaikoOptimisticTokenVotingPluginAbi = [
     inputs: [
       {
         name: "proposalId",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-  },
-  {
-    type: "error",
-    name: "ProposalVetoingForbidden",
-    inputs: [
-      {
-        name: "proposalId",
-        type: "uint256",
-        internalType: "uint256",
-      },
-      {
-        name: "account",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-  },
-  {
-    type: "error",
-    name: "RatioOutOfBounds",
-    inputs: [
-      {
-        name: "limit",
-        type: "uint256",
-        internalType: "uint256",
-      },
-      {
-        name: "actual",
         type: "uint256",
         internalType: "uint256",
       },

@@ -1,29 +1,20 @@
-import React, { ReactNode, useState } from "react";
+import React, { useState } from "react";
 import { Button, IconType, InputText, Tag, TextAreaRichText } from "@aragon/ods";
-import { useAccount } from "wagmi";
-import { Else, ElseIf, If, Then } from "@/components/if";
-import { PleaseWaitSpinner } from "@/components/please-wait";
-import { MissingContentView } from "@/components/MissingContentView";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { useDerivedWallet } from "../../../hooks/useDerivedWallet";
+import { Else, If, Then } from "@/components/if";
 import { MainSection } from "@/components/layout/main-section";
 import { useCreateProposal } from "../hooks/useCreateProposal";
-import { useCanCreateProposal } from "../hooks/useCanCreateProposal";
-import { usePublicKeyRegistry } from "../hooks/usePublicKeyRegistry";
-import { useMultisigMembers } from "@/plugins/members/hooks/useMultisigMembers";
+import { useApproverWalletList } from "@/plugins/members/hooks/useSignerList";
 import { RawAction } from "@/utils/types";
 import { NewActionDialog, NewActionType } from "@/components/dialogs/NewActionDialog";
-import { Address } from "viem";
 import { AddActionCard } from "@/components/cards/AddActionCard";
 import { ProposalActions } from "@/components/proposalActions/proposalActions";
 import { downloadAsFile } from "@/utils/download-as-file";
 import { encodeActionsAsJson } from "@/utils/json-actions";
+import { EncryptionPlaceholderOrChildren } from "../components/encryption-check-or-children";
+import { useEncryptionAccounts } from "@/plugins/encryption/hooks/useEncryptionAccounts";
 
 export default function Create() {
-  const { address: selfAddress, isConnected } = useAccount();
-  const { canCreate } = useCanCreateProposal();
   const [addActionType, setAddActionType] = useState<NewActionType>("");
-  const { data: registeredSigners } = usePublicKeyRegistry();
   const {
     title,
     summary,
@@ -38,7 +29,10 @@ export default function Create() {
     isCreating,
     submitProposal,
   } = useCreateProposal();
-  const { members: multisigMembers } = useMultisigMembers();
+  const {
+    data: encryptionRecipients, // Filtering out former members
+  } = useApproverWalletList();
+  const { data: encryptionAccounts } = useEncryptionAccounts();
 
   const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event?.target?.value);
@@ -72,10 +66,13 @@ export default function Create() {
     setResources([].concat(resources as any));
   };
 
-  const filteredSignerItems = registeredSigners.filter((signer) => {
-    return multisigMembers.includes(signer.address);
-  });
-  const signersWithPubKey = filteredSignerItems.length;
+  let signersWithPubKey = 0;
+  for (const recipient of encryptionRecipients || []) {
+    const account = encryptionAccounts?.find((a) => a.owner === recipient || a.appointedWallet === recipient);
+    if (!account) continue;
+
+    signersWithPubKey++;
+  }
 
   const exportAsJson = () => {
     if (!actions.length) return;
@@ -90,7 +87,7 @@ export default function Create() {
         <h1 className="mb-8 line-clamp-1 flex flex-1 shrink-0 text-2xl font-normal leading-tight text-neutral-800 md:text-3xl">
           Create Proposal
         </h1>
-        <PlaceHolderOr selfAddress={selfAddress} canCreate={canCreate} isConnected={isConnected}>
+        <EncryptionPlaceholderOrChildren needsPublicKey>
           <div className="mb-6">
             <InputText
               className=""
@@ -241,9 +238,11 @@ export default function Create() {
 
           {/* Submit */}
 
-          <div className="mt-6 flex w-full flex-col items-center">
+          <div className="mt-6 flex w-full flex-col items-center text-center">
             <div>
-              <span className="text-md mb-2 block font-normal text-neutral-700 ">
+              <span className="text-md mb-2 block font-normal text-neutral-600 ">
+                The proposal details will remain private until executed
+                <br />
                 {signersWithPubKey || 0} signer(s) registered their public key
               </span>
             </div>
@@ -260,74 +259,8 @@ export default function Create() {
               </If>
             </Button>
           </div>
-        </PlaceHolderOr>
+        </EncryptionPlaceholderOrChildren>
       </div>
     </MainSection>
   );
 }
-
-// HELPERS
-
-const PlaceHolderOr = ({
-  selfAddress,
-  isConnected,
-  canCreate,
-  children,
-}: {
-  selfAddress: Address | undefined;
-  isConnected: boolean;
-  canCreate: boolean | undefined;
-  children: ReactNode;
-}) => {
-  const { open } = useWeb3Modal();
-  const { publicKey, requestSignature } = useDerivedWallet();
-  const {
-    data: registeredSigners,
-    registerPublicKey,
-    isLoading: isLoadingPubKeys,
-    isConfirming: isRegisteringPublicKey,
-  } = usePublicKeyRegistry();
-  const hasPubKeyRegistered = registeredSigners.some((item) => item.address === selfAddress);
-
-  return (
-    <If condition={isLoadingPubKeys}>
-      <Then>
-        {/* No public keys yet */}
-        <div>
-          <PleaseWaitSpinner fullMessage="Loading the signer public keys..." />
-        </div>
-      </Then>
-      <ElseIf condition={!selfAddress || !isConnected}>
-        {/* Not connected */}
-        <MissingContentView callToAction="Connect wallet" onClick={() => open()}>
-          Please connect your wallet to continue.
-        </MissingContentView>
-      </ElseIf>
-      <ElseIf condition={selfAddress && !hasPubKeyRegistered}>
-        {/* Public key not registered yet */}
-        <MissingContentView
-          callToAction="Register your public key"
-          onClick={() => registerPublicKey()}
-          isLoading={isRegisteringPublicKey}
-        >
-          You haven&apos;t registered a public key yet. A public key is necessary in order for proposals to have private
-          data that only members can decrypt. You will sign a deterministic text, which will be used to generate an
-          encryption key only for this DAO.
-        </MissingContentView>
-      </ElseIf>
-      <ElseIf condition={!publicKey}>
-        {/* Not signed in */}
-        <MissingContentView callToAction="Sign in to continue" onClick={() => requestSignature()}>
-          Please sign in with your wallet to decrypt the private proposal data.
-        </MissingContentView>
-      </ElseIf>
-      <ElseIf condition={!canCreate}>
-        {/* Not a member */}
-        <MissingContentView>
-          You cannot create proposals on the multisig because you are not currently defined as a member.
-        </MissingContentView>
-      </ElseIf>
-      <Else>{children}</Else>
-    </If>
-  );
-};

@@ -1,20 +1,20 @@
 import { useState } from "react";
-import { DataList, IconType, IllustrationHuman } from "@aragon/ods";
+import { DataList, IllustrationHuman } from "@aragon/ods";
 import { MultisigMemberListItem } from "./MultisigMemberListItem";
 import { PleaseWaitSpinner } from "@/components/please-wait";
-import { useMultisigMembers } from "../hooks/useMultisigMembers";
+import { useSignerList } from "../hooks/useSignerList";
 import { PUB_CHAIN } from "@/constants";
 
 interface IMultisigMemberListProps {}
 
 export const MultisigMemberList: React.FC<IMultisigMemberListProps> = () => {
   const [searchValue, setSearchValue] = useState<string>();
-  const { members, isLoading } = useMultisigMembers();
+  const { data: members, isLoading, error } = useSignerList();
 
-  if (isLoading && !members?.length) {
+  if (isLoading && !members) {
     return <PleaseWaitSpinner fullMessage="Please wait, loading members" />;
   } else if (!members?.length) {
-    return <NoMembersView />;
+    return <NoMembersView error={error?.message} />;
   }
 
   const filteredMembers = (members || []).filter((item) => {
@@ -56,9 +56,11 @@ export const MultisigMemberList: React.FC<IMultisigMemberListProps> = () => {
   );
 };
 
-function NoMembersView({ filtered }: { filtered?: boolean }) {
+function NoMembersView({ filtered, error }: { filtered?: boolean; error?: string }) {
   let message: string;
-  if (filtered) {
+  if (error?.length) {
+    message = error;
+  } else if (filtered) {
     message = "There are no members matching the current filter. Please try entering a different search term.";
   } else {
     message = "There are no multisig members yet. Here you will see the addresses of members who can create proposals.";

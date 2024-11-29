@@ -12,7 +12,7 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useDelegates } from "../hooks/useDelegates";
 import { useDelegateAnnounce } from "../hooks/useDelegateAnnounce";
 import { MultisigMemberList } from "../components/MultisigMemberList";
-import { useMultisigMembers } from "../hooks/useMultisigMembers";
+import { useSignerList } from "../hooks/useSignerList";
 
 const DELEGATION_DESCRIPTION =
   "Proposals submitted to the community can be vetoed by token holders. Additionally, token holders can opt to delegate their voting power to delegates.";
@@ -25,7 +25,7 @@ export default function MembersList() {
   const { address, isConnected } = useAccount();
   const { delegates } = useDelegates();
   const delegateCount = delegates?.length || 0;
-  const { members: multisigMembers, isLoading: isLoadingMultisigMembers } = useMultisigMembers();
+  const { data: multisigMembers, isLoading: isLoadingMultisigMembers } = useSignerList();
 
   const [toggleValue, setToggleValue] = useState<"all" | "verified" | "multisig">("all");
   const onToggleChange = (value: string | undefined) => {

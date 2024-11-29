@@ -65,7 +65,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
         strategy: "Approval threshold",
         options: "Approve",
       },
-      votes: approvals.map(({ approver }) => ({ address: approver, variant: "approve" }) as IVote),
+      votes: approvals?.map(({ approver }) => ({ address: approver, variant: "approve" }) as IVote) || [],
     },
   ];
 

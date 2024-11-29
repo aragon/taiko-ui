@@ -16,11 +16,11 @@ export type OptimisticProposalResultType = readonly [
 ];
 
 export type OptimisticProposalParameters = {
+  vetoStartDate?: bigint; // Not present when receiving the contract params. Available otherwise.
+  vetoEndDate: bigint;
   snapshotTimestamp: bigint;
-  vetoStartDate?: number | bigint;
-  vetoEndDate: number | bigint;
   minVetoRatio: number;
-  skipL2: boolean;
+  unavailableL2: boolean;
 };
 
 export type OptimisticProposal = {
@@ -36,10 +36,6 @@ export type OptimisticProposal = {
   summary: string;
   description: string;
   resources: IProposalResource[];
-};
-
-export type VoteCastResponse = {
-  args: VetoCastEvent[];
 };
 
 export type VetoCastEvent = {

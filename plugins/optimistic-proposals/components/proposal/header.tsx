@@ -28,7 +28,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalIdx, proposal }
   const endDateIsInThePast = Number(proposal.parameters.vetoEndDate) * 1000 < Date.now();
 
   let isL2GracePeriod = false;
-  if (!proposal.parameters.skipL2 && governanceSettings.l2AggregationGracePeriod) {
+  if (!proposal.parameters.unavailableL2 && governanceSettings.l2AggregationGracePeriod) {
     const gracePeriodEnd =
       (Number(proposal.parameters.vetoEndDate) + Number(governanceSettings.l2AggregationGracePeriod)) * 1000;
 
