@@ -1,7 +1,14 @@
 import { useAccount, useBlockNumber, useReadContract } from "wagmi";
 import { useEffect } from "react";
 import ProposalCard from "@/plugins/optimistic-proposals/components/proposal";
-import { AlertCard, DataList, Link, ProposalDataListItemSkeleton, type DataListState } from "@aragon/ods";
+import {
+  AlertCard,
+  CardEmptyState,
+  DataList,
+  Link,
+  ProposalDataListItemSkeleton,
+  type DataListState,
+} from "@aragon/ods";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { PUB_DUAL_GOVERNANCE_PLUGIN_ADDRESS, PUB_CHAIN } from "@/constants";
 import { OptimisticTokenVotingPluginAbi } from "../artifacts/OptimisticTokenVotingPlugin.sol";
@@ -84,11 +91,13 @@ export default function Proposals() {
           </DataList.Root>
         </Then>
         <Else>
-          <MissingContentView>
-            No proposals have been created yet.
-            <br />
-            Here you will see the list of proposals initiated by the Security Council.
-          </MissingContentView>
+          <CardEmptyState
+            heading="No proposals yet"
+            description="The list of proposals is currently empty. Here you will see the proposals created by the Security Council submitted to the community for optimistic approval."
+            objectIllustration={{
+              object: "LABELS",
+            }}
+          />
         </Else>
       </If>
     </MainSection>

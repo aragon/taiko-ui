@@ -58,7 +58,7 @@ export default function Proposals() {
     <MainSection narrow>
       <SectionView>
         <h1 className="line-clamp-1 flex flex-1 shrink-0 text-2xl font-normal leading-tight text-neutral-800 md:text-3xl">
-          Proposals
+          Multisig proposals
         </h1>
         <div className="justify-self-end">
           <If condition={isConnected && canCreate}>
