@@ -1,6 +1,6 @@
 export const FeedSkeleton = () => {
   return (
-    <div className="h-[522px] divide-y divide-neutral-100 overflow-hidden rounded-xl border border-neutral-100">
+    <div className="h-[600px] divide-y divide-neutral-100 overflow-hidden rounded-xl border border-neutral-100">
       <TweetSkeleton />
       <TweetSkeleton />
     </div>

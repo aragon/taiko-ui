@@ -73,7 +73,7 @@ export function useProposalExecute(proposalId: string) {
       return;
     } else if (!isConfirmed) return;
 
-    addAlert("Proposal executed", {
+    addAlert("Proposal passed to the community stage", {
       description: "The transaction has been validated",
       type: "success",
       txHash: executeTxHash,

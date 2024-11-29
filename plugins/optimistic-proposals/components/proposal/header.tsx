@@ -3,10 +3,8 @@ import { Publisher } from "@/components/publisher";
 import { OptimisticProposal } from "@/plugins/optimistic-proposals/utils/types";
 import { useProposalStatus } from "@/plugins/optimistic-proposals/hooks/useProposalVariantStatus";
 import { Else, ElseIf, If, Then } from "@/components/if";
-import { getSimpleRelativeTimeFromDate } from "@/utils/dates";
-import dayjs from "dayjs";
+import { getShortTimeDiffFrom } from "@/utils/dates";
 import { HeaderSection } from "@/components/layout/header-section";
-import { useGovernanceSettings } from "../../hooks/useGovernanceSettings";
 import { getTagVariantFromStatus } from "@/utils/ui-variants";
 import { capitalizeFirstLetter } from "@/utils/text";
 
@@ -19,21 +17,18 @@ interface ProposalHeaderProps {
 }
 
 const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalIdx, proposal }) => {
-  const proposalStatus = useProposalStatus(proposal);
+  const {
+    status: proposalStatus,
+    isEmergency,
+    isPastEndDate,
+    isL2GracePeriod,
+    isTimelockPeriod,
+    l2GracePeriodEnd,
+    timelockPeriodEnd,
+  } = useProposalStatus(proposal);
   const tagVariant = getTagVariantFromStatus(proposalStatus);
-  const { governanceSettings } = useGovernanceSettings();
 
   const breadcrumbs: IBreadcrumbsLink[] = [{ label: "Proposals", href: "#/" }, { label: proposalIdx.toString() }];
-  const isEmergency = proposal.parameters.vetoStartDate === 0n;
-  const endDateIsInThePast = Number(proposal.parameters.vetoEndDate) * 1000 < Date.now();
-
-  let isL2GracePeriod = false;
-  if (!proposal.parameters.unavailableL2 && governanceSettings.l2AggregationGracePeriod) {
-    const gracePeriodEnd =
-      (Number(proposal.parameters.vetoEndDate) + Number(governanceSettings.l2AggregationGracePeriod)) * 1000;
-
-    isL2GracePeriod = endDateIsInThePast && Date.now() < gracePeriodEnd;
-  }
 
   return (
     <div className="flex w-full justify-center bg-neutral-0">
@@ -52,16 +47,16 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalIdx, proposal }
         <div className="flex w-full flex-col gap-y-2">
           <div className="flex w-full items-center gap-x-4">
             <Heading size="h1">{proposal.title || DEFAULT_PROPOSAL_TITLE}</Heading>
-            {isEmergency && <Tag label="Emergency" variant="critical" />}
+            {isEmergency && <Tag label="Emergency update" variant="critical" />}
           </div>
           <p className="text-lg leading-normal text-neutral-500">{proposal.summary || DEFAULT_PROPOSAL_SUMMARY}</p>
         </div>
         {/* Metadata */}
         <div className="flex flex-wrap gap-x-10 gap-y-2">
-          <div className="flex items-center gap-x-2">
+          {/* <div className="flex items-center gap-x-2">
             <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
             <Publisher publisher={[{ address: proposal.creator }]} />
-          </div>
+          </div> */}
           <div className="flex items-center gap-x-2">
             <AvatarIcon icon={IconType.APP_MEMBERS} size="sm" variant="primary" />
             <div className="flex gap-x-1 text-base leading-tight ">
@@ -69,16 +64,27 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalIdx, proposal }
                 <Then>
                   <span className="text-neutral-500">The proposal has been defeated</span>
                 </Then>
-                <ElseIf condition={isL2GracePeriod}>
-                  <span className="text-neutral-500">The veto period is over, waiting for L2 vetoes</span>
+                <ElseIf condition={isEmergency}>
+                  <span className="text-neutral-500">The emergency proposal has been executed</span>
                 </ElseIf>
-                <ElseIf condition={endDateIsInThePast}>
+                <ElseIf condition={proposalStatus == ProposalStatus.EXECUTED}>
+                  <span className="text-neutral-500">The proposal has been executed</span>
+                </ElseIf>
+                <ElseIf condition={isTimelockPeriod}>
+                  <span className="text-neutral-500">Accepted: in timelock for</span>
+                  <span className="text-neutral-800">{getShortTimeDiffFrom(timelockPeriodEnd)}</span>
+                </ElseIf>
+                <ElseIf condition={isL2GracePeriod}>
+                  <span className="text-neutral-500">Accepted: waiting L2 vetoes for</span>
+                  <span className="text-neutral-800">{getShortTimeDiffFrom(l2GracePeriodEnd)}</span>
+                </ElseIf>
+                <ElseIf condition={isPastEndDate}>
                   <span className="text-neutral-500">The veto period is over</span>
                 </ElseIf>
                 <Else>
                   <span className="text-neutral-500">Active for </span>
                   <span className="text-neutral-800">
-                    {getSimpleRelativeTimeFromDate(dayjs(Number(proposal.parameters.vetoEndDate) * 1000))}
+                    {getShortTimeDiffFrom(proposal.parameters.vetoEndDate * 1000n)}
                   </span>
                 </Else>
               </If>

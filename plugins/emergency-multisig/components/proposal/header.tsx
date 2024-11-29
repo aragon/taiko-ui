@@ -1,8 +1,7 @@
 import { AvatarIcon, Breadcrumbs, Heading, IBreadcrumbsLink, IconType, ProposalStatus, TagVariant } from "@aragon/ods";
 import { useProposalStatus } from "@/plugins/emergency-multisig/hooks/useProposalVariantStatus";
-import dayjs from "dayjs";
 import { Publisher } from "@/components/publisher";
-import { getSimpleRelativeTimeFromDate } from "@/utils/dates";
+import { getShortTimeDiffFrom } from "@/utils/dates";
 import { EmergencyProposal } from "../../utils/types";
 import { Else, ElseIf, If, Then } from "@/components/if";
 import { HeaderSection } from "@/components/layout/header-section";
@@ -59,7 +58,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = ({ proposalId, proposal })
                 </ElseIf>
                 <Else>
                   <span className="text-neutral-800">
-                    {getSimpleRelativeTimeFromDate(dayjs(Number(proposal.parameters.expirationDate) * 1000))}
+                    {getShortTimeDiffFrom(proposal.parameters.expirationDate * 1000n)}
                   </span>
                   <span className="text-neutral-500">left until expiration</span>
                 </Else>

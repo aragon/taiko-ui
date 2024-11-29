@@ -1,5 +1,5 @@
 import { PUB_CHAIN } from "@/constants";
-import { getSimpleRelativeTimeFromDate } from "@/utils/dates";
+import { getShortTimeDiffFromDate } from "@/utils/dates";
 import { AccordionItem, AccordionItemContent, AccordionItemHeader, Heading, Tabs } from "@aragon/ods";
 import { Tabs as RadixTabsRoot } from "@radix-ui/react-tabs";
 import dayjs from "dayjs";
@@ -73,6 +73,7 @@ export const VotingStage: React.FC<IVotingStageProps> = (props) => {
   const snapshotBlockURL = details?.censusBlock
     ? `${PUB_CHAIN.blockExplorers?.default.url}/block/${details?.censusBlock}`
     : "";
+  const endDate = details?.endDate ? dayjs(details?.endDate) : undefined;
 
   return (
     <AccordionItem
@@ -87,7 +88,7 @@ export const VotingStage: React.FC<IVotingStageProps> = (props) => {
             <Heading size="h3" className="line-clamp-1 text-left">
               {title}
             </Heading>
-            <VotingStageStatus status={status} endDate={getSimpleRelativeTimeFromDate(dayjs(details?.endDate))} />
+            <VotingStageStatus status={status} endDate={getShortTimeDiffFromDate(endDate)} />
           </div>
           <span className="hidden leading-tight text-neutral-500 sm:block">{stageKey}</span>
         </div>

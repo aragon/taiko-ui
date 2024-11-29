@@ -44,7 +44,7 @@ export default function ProposalDetail({ index: proposalIdx }: { index: number }
   const endDate = dayjs(Number(proposal?.parameters.vetoEndDate) * 1000).toString();
 
   const showProposalLoading = getShowProposalLoading(proposal, proposalFetchStatus);
-  const proposalStatus = useProposalStatus(proposal!);
+  const { status: proposalStatus } = useProposalStatus(proposal!);
   let vetoPercentage = 0;
   if (proposal?.vetoTally && pastSupply && proposal.parameters.minVetoRatio) {
     // Example: 15% of the token supply (adjusted for decimal precision, 10^6)
