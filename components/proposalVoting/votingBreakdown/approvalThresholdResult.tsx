@@ -34,7 +34,7 @@ export const BreakdownApprovalThresholdResult: React.FC<IBreakdownApprovalThresh
           </span>
           <span>of</span>
           <span>{formatterUtils.formatNumber(approvalThreshold, { format: NumberFormat.GENERIC_SHORT })}</span>
-          <span>Members</span>
+          <span>approvals required</span>
         </div>
       </div>
       {/* Button */}

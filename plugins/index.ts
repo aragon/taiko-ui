@@ -30,7 +30,7 @@ export const plugins: PluginItem[] = [
   {
     id: "taiko-council",
     folderName: "multisig",
-    title: "Taiko Council",
+    title: "Draft Proposals",
     // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_MULTISIG_PLUGIN_ADDRESS,
     hiddenIfNotSigner: true,
@@ -38,7 +38,7 @@ export const plugins: PluginItem[] = [
   {
     id: "security-council",
     folderName: "emergency-multisig",
-    title: "Security Council",
+    title: "Emergency Proposals",
     // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
     hiddenIfNotSigner: true,
@@ -46,7 +46,7 @@ export const plugins: PluginItem[] = [
   {
     id: "encryption",
     folderName: "encryption",
-    title: "Proposal encryption",
+    title: "Proposal Encryption",
     // icon: IconType.BLOCKCHAIN_BLOCKCHAIN,
     pluginAddress: PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS,
     hiddenIfNotSigner: true,
