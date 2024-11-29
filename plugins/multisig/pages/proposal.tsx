@@ -52,7 +52,7 @@ export default function ProposalDetail({ id: proposalId }: { id: string }) {
             : {
                 disabled: !canApprove,
                 isLoading: isConfirmingApproval,
-                label: "Approve",
+                label: "Approve proposal",
                 onClick: approveProposal,
               },
         approvalAmount: proposal?.approvals || 0,
