@@ -68,7 +68,7 @@ export default function Create() {
 
   let signersWithPubKey = 0;
   for (const recipient of encryptionRecipients || []) {
-    const account = encryptionAccounts?.find((a) => a.owner === recipient || a.appointedWallet === recipient);
+    const account = encryptionAccounts?.find((a) => a.owner === recipient || a.appointedAgent === recipient);
     if (!account) continue;
 
     signersWithPubKey++;

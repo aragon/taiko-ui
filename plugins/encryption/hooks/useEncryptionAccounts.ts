@@ -27,8 +27,8 @@ export function useEncryptionAccounts() {
               args: [accountAddress],
             }).then((result) => {
               // zip values
-              const [appointedWallet, publicKey] = result;
-              return { owner: accountAddress, appointedWallet, publicKey };
+              const [appointedAgent, publicKey] = result;
+              return { owner: accountAddress, appointedAgent, publicKey };
             })
           )
         );

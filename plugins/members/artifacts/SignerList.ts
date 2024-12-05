@@ -64,7 +64,7 @@ export const SignerListAbi = [
   },
   {
     type: "function",
-    name: "getEncryptionRecipients",
+    name: "getEncryptionAgents",
     inputs: [],
     outputs: [
       {
@@ -214,7 +214,7 @@ export const SignerListAbi = [
         internalType: "address",
       },
       {
-        name: "_voter",
+        name: "_agent",
         type: "address",
         internalType: "address",
       },

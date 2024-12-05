@@ -24,7 +24,7 @@ export const AccountList: React.FC<IAccountListProps> = ({ listType }) => {
     return (
       <NoSignersView
         title="No signers registered"
-        message="There are no signers registered on the Encryption Registry. Be the first one to register a public key or appoint an Externally Owned Wallet."
+        message="There are no signers registered on the Encryption Registry. Be the first one to register a public key or appoint an agent that uses an EOA."
       />
     );
   }
@@ -53,7 +53,7 @@ export const AccountList: React.FC<IAccountListProps> = ({ listType }) => {
       return (
         <NoSignersView
           title="No active encryption accounts"
-          message="There are no active accounts fully set up on the Encryption Registry. Be the first one to register a public key or appoint an Externally Owned Account."
+          message="There are no active accounts fully set up on the Encryption Registry. Be the first one to register a public key or appoint an agent who uses an EOA."
         />
       );
     } else {
@@ -85,7 +85,7 @@ export const AccountList: React.FC<IAccountListProps> = ({ listType }) => {
                   href={`${PUB_CHAIN.blockExplorers?.default.url}/address/${account}`}
                   target="_blank"
                   owner={account}
-                  appointedWallet={eAcc?.appointedWallet}
+                  appointedAgent={eAcc?.appointedAgent}
                   publicKey={eAcc?.publicKey}
                 />
               );
@@ -98,7 +98,7 @@ export const AccountList: React.FC<IAccountListProps> = ({ listType }) => {
                 href={`${PUB_CHAIN.blockExplorers?.default.url}/address/${account}`}
                 target="_blank"
                 owner={account}
-                appointedWallet={eAcc?.appointedWallet}
+                appointedAgent={eAcc?.appointedAgent}
                 publicKey={eAcc?.publicKey}
               />
             );

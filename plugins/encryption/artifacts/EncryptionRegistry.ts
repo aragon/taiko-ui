@@ -12,6 +12,25 @@ export const EncryptionRegistryAbi = [
   },
   {
     type: "function",
+    name: "accountList",
+    inputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "accounts",
     inputs: [
       {
@@ -22,7 +41,7 @@ export const EncryptionRegistryAbi = [
     ],
     outputs: [
       {
-        name: "appointedWallet",
+        name: "appointedAgent",
         type: "address",
         internalType: "address",
       },
@@ -36,10 +55,10 @@ export const EncryptionRegistryAbi = [
   },
   {
     type: "function",
-    name: "appointWallet",
+    name: "appointAgent",
     inputs: [
       {
-        name: "_newWallet",
+        name: "_newAgent",
         type: "address",
         internalType: "address",
       },
@@ -49,7 +68,7 @@ export const EncryptionRegistryAbi = [
   },
   {
     type: "function",
-    name: "appointedBy",
+    name: "appointerOf",
     inputs: [
       {
         name: "",
@@ -68,10 +87,10 @@ export const EncryptionRegistryAbi = [
   },
   {
     type: "function",
-    name: "getAppointedWallet",
+    name: "getAppointedAgent",
     inputs: [
       {
-        name: "_member",
+        name: "_account",
         type: "address",
         internalType: "address",
       },
@@ -94,25 +113,6 @@ export const EncryptionRegistryAbi = [
         name: "",
         type: "address[]",
         internalType: "address[]",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "registeredAccounts",
-    inputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "address",
-        internalType: "address",
       },
     ],
     stateMutability: "view",
@@ -169,6 +169,25 @@ export const EncryptionRegistryAbi = [
   },
   {
     type: "event",
+    name: "AgentAppointed",
+    inputs: [
+      {
+        name: "account",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
+      {
+        name: "agent",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
     name: "PublicKeySet",
     inputs: [
       {
@@ -187,27 +206,13 @@ export const EncryptionRegistryAbi = [
     anonymous: false,
   },
   {
-    type: "event",
-    name: "WalletAppointed",
-    inputs: [
-      {
-        name: "account",
-        type: "address",
-        indexed: false,
-        internalType: "address",
-      },
-      {
-        name: "appointedWallet",
-        type: "address",
-        indexed: false,
-        internalType: "address",
-      },
-    ],
-    anonymous: false,
+    type: "error",
+    name: "AlreadyAppointed",
+    inputs: [],
   },
   {
     type: "error",
-    name: "AlreadyAppointed",
+    name: "AlreadyListed",
     inputs: [],
   },
   {
@@ -232,7 +237,7 @@ export const EncryptionRegistryAbi = [
   },
   {
     type: "error",
-    name: "MustResetAppointment",
+    name: "MustResetAppointedAgent",
     inputs: [],
   },
 ] as const;

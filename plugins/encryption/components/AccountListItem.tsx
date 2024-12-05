@@ -10,18 +10,18 @@ export interface IAccountListItemProps extends IDataListItemProps {
   /** 0x address of the account owner */
   owner: Address;
   /** Address of the EOA appointed (if any) */
-  appointedWallet?: Address;
-  /** The public key of the appointed wallet */
+  appointedAgent?: Address;
+  /** The public key of the appointed agent */
   publicKey?: Hex;
   /** Direct URL src of the user avatar image to be rendered */
   avatarSrc?: string;
 }
 
 export const AccountListItemReady: React.FC<IAccountListItemProps> = (props) => {
-  const { avatarSrc, owner, appointedWallet, publicKey, ...otherProps } = props;
+  const { avatarSrc, owner, appointedAgent, publicKey, ...otherProps } = props;
   const { address: currentUserAddress, isConnected } = useAccount();
   const isCurrentUser = isConnected && owner && equalAddresses(currentUserAddress, owner);
-  const selfAppointed = !appointedWallet || appointedWallet === ADDRESS_ZERO;
+  const selfAppointed = !appointedAgent || appointedAgent === ADDRESS_ZERO;
 
   return (
     <DataList.Item className="min-w-fit !py-0 px-4 md:px-6" {...otherProps}>
@@ -42,7 +42,7 @@ export const AccountListItemReady: React.FC<IAccountListItemProps> = (props) => 
         <p className="inline-block w-full text-sm text-success-500">
           <If condition={selfAppointed}>
             <Then>The owner can decrypt emergency proposals</Then>
-            <Else>Appointed: {appointedWallet === currentUserAddress ? "You" : formatHexString(appointedWallet)}</Else>
+            <Else>Appointed: {appointedAgent === currentUserAddress ? "You" : formatHexString(appointedAgent)}</Else>
           </If>
         </p>
       </div>
@@ -51,7 +51,7 @@ export const AccountListItemReady: React.FC<IAccountListItemProps> = (props) => 
 };
 
 export const AccountListItemPending: React.FC<IAccountListItemProps> = (props) => {
-  const { avatarSrc, owner, appointedWallet, publicKey, ...otherProps } = props;
+  const { avatarSrc, owner, appointedAgent, publicKey, ...otherProps } = props;
   const { address: currentUserAddress, isConnected } = useAccount();
   const isCurrentUser = isConnected && owner && equalAddresses(currentUserAddress, owner);
   const { status } = useAccountEncryptionStatus(owner);
@@ -73,10 +73,10 @@ export const AccountListItemPending: React.FC<IAccountListItemProps> = (props) =
       comment = "No public key defined";
       break;
     case AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT:
-      comment = "The owner needs to appoint a wallet";
+      comment = "The owner needs to appoint an agent";
       break;
     case AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT_OR_REGISTER_PUB_KEY:
-      comment = "The owner needs to define a public key or appoint a wallet";
+      comment = "The owner needs to define a public key or appoint an agent";
       break;
     // case AccountEncryptionStatus.READY_CAN_CREATE:
     // case AccountEncryptionStatus.READY_ALL:
@@ -98,9 +98,9 @@ export const AccountListItemPending: React.FC<IAccountListItemProps> = (props) =
         </div>
 
         <p className="inline-block w-full text-lg text-neutral-800 md:text-xl">{formatHexString(owner)}</p>
-        <If condition={!!appointedWallet && appointedWallet !== ADDRESS_ZERO}>
+        <If condition={!!appointedAgent && appointedAgent !== ADDRESS_ZERO}>
           <p className="inline-block w-full text-sm text-neutral-400">
-            Appointed: {appointedWallet === currentUserAddress ? "You" : <AddressText>{appointedWallet}</AddressText>}
+            Appointed: {appointedAgent === currentUserAddress ? "You" : <AddressText>{appointedAgent}</AddressText>}
           </p>
         </If>
         <If condition={!!comment}>

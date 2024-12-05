@@ -48,9 +48,9 @@ export const EncryptionPlaceholderOrChildren = ({
     description = "You are not currently listed as a Security Council signer or appointed by one.";
     object = "ERROR";
   } else if (status === AccountEncryptionStatus.ERR_APPOINTED_A_SMART_WALLET_CANNOT_GENERATE_PUBLIC_KEY) {
-    title = "Smart wallets cannot be the appointed address";
+    title = "Smart wallets cannot be appointed as an agent";
     description =
-      "You have appointed an address that is a smart wallet. Emergency proposal decryption will not be possible until you appoint a wallet that registers his public key.";
+      "You have appointed an agent that is a smart wallet. Emergency proposal decryption will not be possible until you appoint an agent that registers his public key.";
     object = "ERROR";
     button = {
       label: "Manage encryption",
@@ -59,7 +59,7 @@ export const EncryptionPlaceholderOrChildren = ({
   } else if (status === AccountEncryptionStatus.WARN_APPOINTED_MUST_REGISTER_PUB_KEY) {
     title = "Public key not registered";
     description =
-      "The address you appointed has not registered its public key yet. Emergency proposals cannot be decrypted by the appointed wallet until this step is completed.";
+      "The agent you appointed has not registered its public key yet. Emergency proposals cannot be decrypted by the appointed agent until this step is completed.";
     object = "ERROR";
   } else if (status === AccountEncryptionStatus.CTA_APPOINTED_MUST_REGISTER_PUB_KEY) {
     title = "Public key not registered";
@@ -71,12 +71,12 @@ export const EncryptionPlaceholderOrChildren = ({
       onClick: () => push("/plugins/encryption/"),
     };
   } else if (status === AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT) {
-    title = "You need to appoint a wallet";
+    title = "You need to appoint an agent";
     description =
       "Security Council members need to register a public key in order to engage with both public and private (emergency) proposals. However, addresses behind a smart contract like yours cannot cryptographically sign or decrypt. You need to appoint an externally owned address that can work with cryptographic primitives, so that it can access and approve both public and private proposals.";
     object = "LABELS";
     button = {
-      label: "Appoint a wallet",
+      label: "Appoint an agent",
       onClick: () => push("/plugins/encryption/"),
     };
   } else if (status === AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT_OR_REGISTER_PUB_KEY) {

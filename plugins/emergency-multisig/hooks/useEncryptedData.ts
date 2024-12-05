@@ -30,7 +30,7 @@ export function useEncryptedData() {
     const encryptionPubKeys: Uint8Array[] = [];
     if (encryptionAccounts) {
       for (const recipient of encryptionRecipients) {
-        const account = encryptionAccounts.find((a) => a.owner === recipient || a.appointedWallet === recipient);
+        const account = encryptionAccounts.find((a) => a.owner === recipient || a.appointedAgent === recipient);
         if (!account) continue;
 
         encryptionPubKeys.push(hexToUint8Array(account.publicKey));

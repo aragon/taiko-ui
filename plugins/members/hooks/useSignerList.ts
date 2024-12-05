@@ -51,7 +51,7 @@ export function useApproverWalletList() {
       readContract(config, {
         abi: SignerListAbi,
         address: PUB_SIGNER_LIST_CONTRACT_ADDRESS,
-        functionName: "getEncryptionRecipients",
+        functionName: "getEncryptionAgents",
       }),
     retry: true,
     refetchOnMount: false,

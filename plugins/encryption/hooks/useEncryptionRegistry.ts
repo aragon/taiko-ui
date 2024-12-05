@@ -26,7 +26,7 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
   const { data: signers, isLoading } = useSignerList();
   const {
     owner: accountOwner,
-    appointedWallet,
+    appointedAgent,
     publicKey: definedPublicKey,
     status: accountStatus,
   } = useAccountEncryptionStatus(address);
@@ -52,11 +52,11 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
     },
   });
 
-  // Appoint wallet
-  const { writeContract: appointWalletWrite, isConfirming: isConfirmingAppoint } = useTransactionManager({
+  // Appoint agent
+  const { writeContract: appointAgentWrite, isConfirming: isConfirmingAppoint } = useTransactionManager({
     // OK
-    onSuccessMessage: "The wallet has been appointed",
-    onSuccessDescription: "The appointed wallet will be able to decrypt future emergency proposals",
+    onSuccessMessage: "The agent has been appointed",
+    onSuccessDescription: "The appointed agent will be able to decrypt future emergency proposals",
     onSuccess() {
       setTimeout(() => {
         refetchAccounts();
@@ -66,7 +66,7 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
       onAppointSuccess?.();
     },
     // Err
-    onErrorMessage: "Could not appoint the wallet",
+    onErrorMessage: "Could not appoint the agent",
     onError() {
       debounce(() => {
         refetchAccounts();
@@ -85,7 +85,7 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
         addAlert("Could not load the account status", { type: "error" });
         return;
       case AccountEncryptionStatus.ERR_NOT_LISTED_OR_APPOINTED:
-        addAlert("You are not currently a listed signer or an appointed wallet", { type: "error" });
+        addAlert("You are not currently a listed signer or an appointed agent", { type: "error" });
         return;
       case AccountEncryptionStatus.ERR_APPOINTED_A_SMART_WALLET_CANNOT_GENERATE_PUBLIC_KEY:
         addAlert("Smart wallets cannot register a public key", { type: "error" });
@@ -114,7 +114,7 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
           args: [uint8ArrayToHex(pubK)],
         });
       } else {
-        // Define public key as the appointed wallet
+        // Define public key as the appointed agent
         if (!accountOwner) throw new Error("Could not load the owner account status");
 
         setPubKeyWrite({
@@ -135,30 +135,30 @@ export function useEncryptionRegistry({ onAppointSuccess }: { onAppointSuccess?:
     }
   };
 
-  const appointWallet = (walletToAppoint: Address) => {
+  const appointAgent = (agentToAppoint: Address) => {
     if (!address || isLoading) {
       addAlert("Please connect your wallet");
       return;
     } else if (!signers?.includes(address)) {
-      addAlert("You are not currently listed as a Security Member signer", { type: "error" });
+      addAlert("You are not currently listed as a Security Council member", { type: "error" });
       return;
-    } else if (walletToAppoint != ADDRESS_ZERO && walletToAppoint.toLowerCase() === appointedWallet?.toLowerCase()) {
-      addAlert("The wallet is already appointed");
+    } else if (agentToAppoint != ADDRESS_ZERO && agentToAppoint.toLowerCase() === appointedAgent?.toLowerCase()) {
+      addAlert("The agent is already appointed");
       return;
     }
 
     setIsWaiting(true);
 
-    appointWalletWrite({
+    appointAgentWrite({
       abi: EncryptionRegistryAbi,
       address: PUB_ENCRYPTION_REGISTRY_CONTRACT_ADDRESS,
-      functionName: "appointWallet",
-      args: [walletToAppoint],
+      functionName: "appointAgent",
+      args: [agentToAppoint],
     });
   };
 
   return {
-    appointWallet,
+    appointAgent,
     registerPublicKey,
     isConfirming: isWaiting || isConfirmingPubK || isConfirmingAppoint,
   };

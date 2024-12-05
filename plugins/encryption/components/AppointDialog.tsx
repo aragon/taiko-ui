@@ -26,7 +26,7 @@ export const AppointDialog: React.FC<IAppointDialogProps> = (props) => {
   const { onClose, open } = props;
   const [address, setAddress] = useState<Address>();
   const { isContract, isLoading: isLoadingIsContract } = useIsContract(address);
-  const { appointWallet, isConfirming } = useEncryptionRegistry({
+  const { appointAgent, isConfirming } = useEncryptionRegistry({
     onAppointSuccess: () => onClose(),
   });
   const { publicKey } = useAccountEncryptionStatus();
@@ -44,13 +44,13 @@ export const AppointDialog: React.FC<IAppointDialogProps> = (props) => {
 
   return (
     <DialogRoot open={open} containerClassName="!max-w-[420px]">
-      <DialogHeader title="Appoint a wallet" onCloseClick={() => onClose()} onBackClick={() => onClose()} />
+      <DialogHeader title="Appoint an agent" onCloseClick={() => onClose()} onBackClick={() => onClose()} />
       <DialogContent className="flex flex-col gap-y-4 md:gap-y-6">
         <div className="my-6">
           <div className="pb-4">
             <AddressInput
               value={address}
-              label="Address of the wallet to appoint"
+              label="Address of the agent to appoint"
               alert={addressAlert}
               placeholder="0x..."
               onChange={(addr: any) => setAddress(addr)}
@@ -63,19 +63,19 @@ export const AppointDialog: React.FC<IAppointDialogProps> = (props) => {
           </If>
           <If condition={!!publicKey && publicKey !== BYTES32_ZERO}>
             <p className="pb-2 text-sm text-neutral-400">
-              You currently have a public key defined. By appointing an address, the public key will be reset and the
-              appointed wallet will need to register the new one.
+              You currently have a public key defined. By appointing an agent, the public key will be reset and the
+              agent will need to register the new one.
             </p>
           </If>
           <p className="pb-2 text-sm text-neutral-400">
             <If condition={address !== "0x0000000000000000000000000000000000000000"}>
               <Then>
-                If you wish to undo an appointment,{" "}
+                If you wish to undo your appointment,{" "}
                 <a
                   className="cursor-pointer underline"
                   onClick={() => setAddress("0x0000000000000000000000000000000000000000")}
                 >
-                  click here to undo the appointment to the current address
+                  click here to reset it
                 </a>
                 .
               </Then>
@@ -96,11 +96,11 @@ export const AppointDialog: React.FC<IAppointDialogProps> = (props) => {
             size="lg"
             isLoading={isConfirming}
             disabled={!validAddress || isContract}
-            onClick={() => appointWallet(address!)}
+            onClick={() => appointAgent(address!)}
           >
             <If condition={address === ADDRESS_ZERO}>
               <Then>Clear appointment</Then>
-              <Else>Appoint address</Else>
+              <Else>Appoint agent</Else>
             </If>
           </Button>
         </div>

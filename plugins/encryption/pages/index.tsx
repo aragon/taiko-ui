@@ -63,7 +63,8 @@ function AsideSection() {
         </p>
         <p className="text-neutral-500">
           This section allows Security Council members holding an EOA to register their public key. For smart contract
-          based accounts, it allows to appoint an EOA which can generate a public key to receive encrypted payloads.
+          based accounts, it allows to appoint an agent using an EOA that can generate a public key to receive encrypted
+          payloads.
         </p>
       </div>
     </aside>
@@ -77,7 +78,7 @@ function AccountStatus() {
   let actions: JSX.Element[] = [];
   const { address, isConnected } = useAccount();
   const { publicKey: derivedPublicKey } = useDerivedWallet();
-  const { status, owner, appointedWallet, publicKey } = useAccountEncryptionStatus();
+  const { status, owner, appointedAgent, publicKey } = useAccountEncryptionStatus();
   const { registerPublicKey, isConfirming } = useEncryptionRegistry();
   const [showAppointModal, setShowAppointModal] = useState(false);
 
@@ -99,10 +100,10 @@ function AccountStatus() {
     description = "You are appointed by a listed signer but smart wallets cannot register public keys.";
   } else if (status === AccountEncryptionStatus.WARN_APPOINTED_MUST_REGISTER_PUB_KEY) {
     title = "Warning";
-    description = "The wallet you appointed needs to define a public key.";
+    description = "The agent you appointed needs to define a public key.";
     actions = [
       <Button size="md" isLoading={isConfirming} variant="secondary" onClick={() => setShowAppointModal(true)}>
-        Appoint a different wallet
+        Appoint a different agent
       </Button>,
     ];
   } else if (status === AccountEncryptionStatus.CTA_APPOINTED_MUST_REGISTER_PUB_KEY) {
@@ -119,18 +120,18 @@ function AccountStatus() {
       "You are listed as a signer but you have not appointed an Externally Owned Account for decryption yet.";
     actions = [
       <Button size="md" isLoading={isConfirming} onClick={() => setShowAppointModal(true)}>
-        Appoint a wallet
+        Appoint an agent
       </Button>,
     ];
   } else if (status === AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT_OR_REGISTER_PUB_KEY) {
     title = "Warning";
-    description = "You are listed as a signer but you have not defined your public key or appointed a wallet yet.";
+    description = "You are listed as a signer but you have not defined your public key or appointed an agent yet.";
     actions = [
       <Button size="md" isLoading={isConfirming} onClick={() => registerPublicKey("own")}>
         Define my public key
       </Button>,
       <Button size="md" isLoading={isConfirming} variant="secondary" onClick={() => setShowAppointModal(true)}>
-        Appoint a wallet
+        Appoint an agent
       </Button>,
     ];
   }
@@ -160,7 +161,7 @@ function AccountStatus() {
     if (owner === address) {
       actions.push(
         <Button size="md" isLoading={isConfirming} variant="secondary" onClick={() => setShowAppointModal(true)}>
-          Appoint a wallet
+          Appoint an agent
         </Button>
       );
     }
@@ -180,13 +181,13 @@ function AccountStatus() {
         </div>
         <div className="flex flex-col items-baseline gap-y-2 py-3 lg:gap-x-6 lg:py-4">
           <dt className="line-clamp-1 shrink-0 text-lg leading-tight text-neutral-800 lg:line-clamp-6 lg:w-40">
-            Appointed wallet
+            Appointed agent
           </dt>
           <dd className="size-full text-base leading-tight text-neutral-500">
-            <If condition={!appointedWallet || appointedWallet === ADDRESS_ZERO}>
-              <Then>Acting by itself (no appointed wallet)</Then>
+            <If condition={!appointedAgent || appointedAgent === ADDRESS_ZERO}>
+              <Then>Acting by itself (no appointed agent)</Then>
               <Else>
-                <AddressText>{appointedWallet}</AddressText>
+                <AddressText>{appointedAgent}</AddressText>
               </Else>
             </If>
           </dd>

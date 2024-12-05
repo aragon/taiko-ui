@@ -11,9 +11,9 @@ export enum AccountEncryptionStatus {
   ERR_NOT_LISTED_OR_APPOINTED,
   /** When appointing an address that is a smart contract */
   ERR_APPOINTED_A_SMART_WALLET_CANNOT_GENERATE_PUBLIC_KEY,
-  /** The current user is the owner and the appointed wallet hasn't registered the public key yet */
+  /** The current user is the owner and the appointed agent hasn't registered the public key yet */
   WARN_APPOINTED_MUST_REGISTER_PUB_KEY,
-  /** The current user is the appointed wallet and it needs to register the public key */
+  /** The current user is the appointed agent and it needs to register the public key */
   CTA_APPOINTED_MUST_REGISTER_PUB_KEY,
   /** The owner is a smart wallet and no address is appointed */
   CTA_OWNER_MUST_APPOINT,
@@ -28,7 +28,7 @@ export enum AccountEncryptionStatus {
 type HookResult = {
   status: AccountEncryptionStatus;
   owner: Address | undefined;
-  appointedWallet: Address | undefined;
+  appointedAgent: Address | undefined;
   publicKey: Hex | undefined;
 };
 
@@ -41,16 +41,16 @@ export function useAccountEncryptionStatus(targetAddress?: Address | undefined):
   const { isContract } = useIsContract(targetAddress);
 
   const encryptionAccount = (encryptionAccounts || []).find(
-    (item) => item.owner === targetAddress || item.appointedWallet === targetAddress
+    (item) => item.owner === targetAddress || item.appointedAgent === targetAddress
   );
   const owner = encryptionAccount?.owner;
   const registeredPublicKey = encryptionAccount?.publicKey;
   const isListed = signers?.includes(targetAddress!);
-  const isAppointed = (encryptionAccounts || []).findIndex((acc) => acc.appointedWallet === targetAddress) >= 0;
+  const isAppointed = (encryptionAccounts || []).findIndex((acc) => acc.appointedAgent === targetAddress) >= 0;
 
-  let appointedWallet: Address | undefined;
-  if (encryptionAccount?.appointedWallet && encryptionAccount.appointedWallet !== ADDRESS_ZERO) {
-    appointedWallet = encryptionAccount.appointedWallet;
+  let appointedAgent: Address | undefined;
+  if (encryptionAccount?.appointedAgent && encryptionAccount.appointedAgent !== ADDRESS_ZERO) {
+    appointedAgent = encryptionAccount.appointedAgent;
   }
   let status: AccountEncryptionStatus;
 
@@ -87,12 +87,12 @@ export function useAccountEncryptionStatus(targetAddress?: Address | undefined):
     if (isContract) {
       // Address is a smart wallet
 
-      // Is there an appointed wallet?
-      if (!appointedWallet || appointedWallet === ADDRESS_ZERO) {
+      // Is there an appointed agent?
+      if (!appointedAgent || appointedAgent === ADDRESS_ZERO) {
         // CTA: Owner must appoint
         status = AccountEncryptionStatus.CTA_OWNER_MUST_APPOINT;
       } else {
-        // There's an appointed wallet
+        // There's an appointed agent
 
         // Defined public key?
         if (!registeredPublicKey || registeredPublicKey === BYTES32_ZERO) {
@@ -106,9 +106,9 @@ export function useAccountEncryptionStatus(targetAddress?: Address | undefined):
     } else {
       // Address is an EOA
 
-      // Is there an appointed wallet?
-      if (!appointedWallet || appointedWallet === ADDRESS_ZERO) {
-        // No appointed wallet
+      // Is there an appointed agent?
+      if (!appointedAgent || appointedAgent === ADDRESS_ZERO) {
+        // No appointed agent
 
         if (!registeredPublicKey || registeredPublicKey === BYTES32_ZERO) {
           // CTA: Owner must appoint
@@ -136,7 +136,7 @@ export function useAccountEncryptionStatus(targetAddress?: Address | undefined):
   return {
     status,
     owner,
-    appointedWallet,
+    appointedAgent,
     publicKey: registeredPublicKey,
   };
 }
