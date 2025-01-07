@@ -7,6 +7,7 @@ import { EmergencyMultisigPluginAbi } from "../artifacts/EmergencyMultisigPlugin
 import { toHex } from "viem";
 import { useProposal } from "./useProposal";
 import { getContentCid, uploadToPinata } from "@/utils/ipfs";
+import { DaoAbi } from "@/artifacts/DAO.sol";
 
 export function useProposalExecute(proposalId: string) {
   const { push } = useRouter();
@@ -57,7 +58,7 @@ export function useProposalExecute(proposalId: string) {
 
         executeWrite({
           chainId: PUB_CHAIN.id,
-          abi: EmergencyMultisigPluginAbi,
+          abi: EmergencyMultisigPluginAbi.concat(DaoAbi as any),
           address: PUB_EMERGENCY_MULTISIG_PLUGIN_ADDRESS,
           functionName: "execute",
           args: [BigInt(proposalId), toHex(expectedMetadataUri), proposal.actions],
@@ -80,9 +81,17 @@ export function useProposalExecute(proposalId: string) {
         });
       } else {
         console.error(executingError);
+        let description = "The proposal may contain actions with invalid operations";
+
+        if (executingError?.toString()) {
+          const found = executingError.toString().match(/ror: ActionFailed\(uint256 index\)\n\s+\(([0-9]+)\)/);
+          if (found && found[1] && typeof parseInt(found[1]) === "number") {
+            description = `Action ${parseInt(found[1]) + 1} failed to complete successfully`;
+          }
+        }
         addAlert("Could not execute the proposal", {
           type: "error",
-          description: "The proposal may contain actions with invalid operations",
+          description,
         });
       }
       setIsExecuting(false);
