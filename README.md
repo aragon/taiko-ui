@@ -1,5 +1,8 @@
 # Taiko DAO UI
 
+> [!NOTE]
+> This repo is now read-only. The up to date version can be found on https://github.com/taikoxyz/dao-ui-mono
+
 ## Overview
 
 This project is the combination of a host UI including common tools and services, which features 4 UI modules:
