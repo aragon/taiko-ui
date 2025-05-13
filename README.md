@@ -1,7 +1,7 @@
 # Taiko DAO UI
 
 > [!NOTE]
-> This repo is now read-only. The up to date version can be found on https://github.com/taikoxyz/dao-ui-mono
+> This repository is now read-only. You can find the most up to date version on https://github.com/taikoxyz/dao-ui-mono
 
 ## Overview
 
